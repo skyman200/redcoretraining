@@ -12,20 +12,25 @@ function BoardPage() {
     const { t } = useLanguage();
     const [allPosts, setAllPosts] = useState(defaultPosts);
     const [showAnimation, setShowAnimation] = useState(true);
+    const [animationComplete, setAnimationComplete] = useState(false);
 
     useEffect(() => {
         // Load admin posts from localStorage
         const savedPosts = localStorage.getItem('admin_posts');
         if (savedPosts) {
             const adminPosts = JSON.parse(savedPosts);
-            // Combine admin posts with default posts
             setAllPosts([...adminPosts, ...defaultPosts]);
         }
 
-        // End animation after 2 seconds
+        // Start animation
+        setShowAnimation(true);
+        setAnimationComplete(false);
+
+        // End animation after duration
         const timer = setTimeout(() => {
             setShowAnimation(false);
-        }, 2000);
+            setAnimationComplete(true);
+        }, 1800);
 
         return () => clearTimeout(timer);
     }, []);

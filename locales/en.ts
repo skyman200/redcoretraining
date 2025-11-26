@@ -55,6 +55,8 @@ export const en = {
         digitalHealth: {
             title: "Digital Healthcare Revolution",
             subtitle: "Beyond Traditional Training",
+            appTitle: "App Development in Progress",
+            dataTitle: "Data Validation",
             description: "Redcore accumulates and analyzes pain, posture changes, and exercise data to provide personalized recommendations and quantifiable improvements through our digital healthcare system.",
             appDevelopment: "We are developing our own mobile application based on accumulated customer data. Clients can easily track and manage their health records and transformation journey on mobile devices.",
             dataValidation: "All data and feedback are continuously upgraded based on expert group meetings, latest medical research, and international training experience."

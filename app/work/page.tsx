@@ -65,7 +65,7 @@ function WorkPage() {
                         >
                             <div className="p-8 bg-white border border-gray-200 rounded-lg">
                                 <Smartphone className="w-12 h-12 mb-4 text-red-600" />
-                                <h3 className="text-2xl font-bold mb-4">앱 개발 진행 중</h3>
+                                <h3 className="text-2xl font-bold mb-4">{t.work.digitalHealth.appTitle}</h3>
                                 <p className="text-gray-600 leading-relaxed">
                                     {t.work.digitalHealth.appDevelopment}
                                 </p>
@@ -80,7 +80,7 @@ function WorkPage() {
                         >
                             <div className="p-8 bg-white border border-gray-200 rounded-lg">
                                 <Database className="w-12 h-12 mb-4 text-red-600" />
-                                <h3 className="text-2xl font-bold mb-4">데이터 검증</h3>
+                                <h3 className="text-2xl font-bold mb-4">{t.work.digitalHealth.dataTitle}</h3>
                                 <p className="text-gray-600 leading-relaxed">
                                     {t.work.digitalHealth.dataValidation}
                                 </p>

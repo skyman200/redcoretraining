@@ -34,25 +34,17 @@ function WorkPage() {
                     <motion.h1
                         initial={{
                             scale: 5,
-                            position: "fixed",
-                            top: "50%",
-                            left: "50%",
-                            x: "-50%",
-                            y: "-50%",
-                            zIndex: 50
+                            opacity: 0,
+                            y: "30vh"
                         }}
                         animate={{
                             scale: 1,
-                            position: "relative",
-                            top: "auto",
-                            left: "auto",
-                            x: 0,
-                            y: 0,
-                            zIndex: 1
+                            opacity: 1,
+                            y: 0
                         }}
                         transition={{
                             duration: 1.5,
-                            ease: "easeInOut",
+                            ease: "easeOut",
                             delay: 0.2
                         }}
                         className="text-5xl md:text-7xl font-bold tracking-tighter mb-8 leading-tight"

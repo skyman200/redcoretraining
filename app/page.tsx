@@ -303,43 +303,45 @@ export default function Home() {
                 </a>
               </div>
             </div>
-            {/* Right: Dynamic Dual Images */}
-            <div className="flex-1 relative w-full max-w-xl">
+            {/* Right: Dynamic Dual Images with Container Animation */}
+            <div className="flex-1 relative w-full max-w-xl" style={{ animation: 'containerFloat 6s ease-in-out infinite' }}>
               <div className="absolute inset-0 bg-gradient-to-tr from-red-500/20 to-orange-500/20 blur-2xl rounded-3xl transform rotate-3 scale-105 opacity-70" />
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-white/10">
-                <div className="relative w-full aspect-[4/3]">
+              <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-white/10 p-2">
+                <div className="relative w-full aspect-[4/3] flex gap-2">
                   {/* Hero Image - 역동적인 애니메이션 */}
                   <div
-                    className={`absolute inset-0 transition-all duration-1000 ease-in-out ${
-                      showAppImage ? 'opacity-0 scale-95 translate-y-4' : 'opacity-100 scale-100 translate-y-0'
+                    className={`flex-1 relative transition-all duration-1000 ${
+                      showAppImage ? 'opacity-50 scale-95' : 'opacity-100 scale-100'
                     }`}
                     style={{
-                      animation: showAppImage ? 'none' : 'floatUpDown 4s ease-in-out infinite',
+                      animation: 'floatUpDown 4s ease-in-out infinite',
+                      animationDelay: '0s',
                     }}
                   >
                     <Image
                       src="/hero.jpg"
                       alt="Redcore Center Main"
                       fill
-                      className="object-cover"
+                      className="object-cover rounded-lg"
                       priority
                     />
                   </div>
                   
                   {/* App Image - 역동적인 애니메이션 */}
                   <div
-                    className={`absolute inset-0 transition-all duration-1000 ease-in-out ${
-                      showAppImage ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 -translate-y-4'
+                    className={`flex-1 relative transition-all duration-1000 ${
+                      showAppImage ? 'opacity-100 scale-100' : 'opacity-50 scale-95'
                     }`}
                     style={{
-                      animation: showAppImage ? 'floatLeftRight 4s ease-in-out infinite' : 'none',
+                      animation: 'floatLeftRight 5s ease-in-out infinite',
+                      animationDelay: '1s',
                     }}
                   >
                     <Image
                       src="/app.jpg"
                       alt="Redcore App"
                       fill
-                      className="object-cover"
+                      className="object-cover rounded-lg"
                       priority
                     />
                   </div>

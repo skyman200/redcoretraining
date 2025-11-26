@@ -184,7 +184,7 @@ function BoardDetailPage({ params }: { params: Promise<{ slug: string }> }) {
                     </h1>
 
                     <div className="prose prose-lg max-w-none mb-12">
-                        {detail.content.split('\n').map((line, i) => (
+                        {detail.content.split('\n').map((line: string, i: number) => (
                             <p key={i} className="whitespace-pre-wrap">{line}</p>
                         ))}
                     </div>
@@ -196,7 +196,7 @@ function BoardDetailPage({ params }: { params: Promise<{ slug: string }> }) {
                                 다운로드 자료
                             </h2>
                             <div className="space-y-4">
-                                {detail.files.map((file, index) => (
+                                {detail.files.map((file: { name: string; url: string }, index: number) => (
                                     <a
                                         key={index}
                                         href={file.url}

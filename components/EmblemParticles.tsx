@@ -1,144 +1,156 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 
 interface Particle {
     x: number;
     y: number;
     originX: number;
     originY: number;
-    color: string;
-    size: number;
     vx: number;
     vy: number;
-    ease: number;
+    size: number;
 }
 
-interface EmblemParticlesProps {
-    className?: string;
-}
-
-export default function EmblemParticles({ className = '' }: EmblemParticlesProps) {
+export default function EmblemParticles({ className = '' }: { className?: string }) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const [isLoaded, setIsLoaded] = useState(false);
 
     useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
 
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext('2d', { alpha: true });
         if (!ctx) return;
 
-        let animationFrameId: number;
         let particles: Particle[] = [];
-        let mouseX = 0;
-        let mouseY = 0;
-        let isMouseOver = false;
+        let animationFrameId: number;
+        let mouseX = -9999;
+        let mouseY = -9999;
 
-        // Load image
-        const image = new Image();
-        image.src = '/logo-mark.jpg';
-        image.onload = () => {
-            initParticles();
-            setIsLoaded(true);
-            animate();
+        // Set canvas size
+        const setCanvasSize = () => {
+            const parent = canvas.parentElement;
+            if (!parent) return;
+
+            const dpr = window.devicePixelRatio || 1;
+            const rect = parent.getBoundingClientRect();
+
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            canvas.style.width = `${rect.width}px`;
+            canvas.style.height = `${rect.height}px`;
+
+            ctx.scale(dpr, dpr);
+
+            return { width: rect.width, height: rect.height };
         };
 
         const initParticles = () => {
-            particles = [];
-            const width = canvas.width;
-            const height = canvas.height;
+            const size = setCanvasSize();
+            if (!size) return;
 
-            // Draw image to offscreen canvas to read pixel data
-            const offscreen = document.createElement('canvas');
-            offscreen.width = width;
-            offscreen.height = height;
-            const offCtx = offscreen.getContext('2d');
-            if (!offCtx) return;
+            const { width, height } = size;
 
-            // Calculate aspect ratio to fit image in canvas
-            const scale = Math.min(width / image.width, height / image.height) * 0.6; // 60% of canvas size
-            const w = image.width * scale;
-            const h = image.height * scale;
-            const x = (width - w) / 2;
-            const y = (height - h) / 2;
+            // Load image
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
 
-            offCtx.drawImage(image, x, y, w, h);
+            img.onload = () => {
+                // Create offscreen canvas for image analysis
+                const offCanvas = document.createElement('canvas');
+                const offCtx = offCanvas.getContext('2d');
+                if (!offCtx) return;
 
-            const imageData = offCtx.getImageData(0, 0, width, height).data;
+                // Size for the R logo - make it centered and appropriately sized
+                const logoSize = Math.min(width, height) * 0.4;
+                offCanvas.width = logoSize;
+                offCanvas.height = logoSize;
 
-            // Create particles from pixel data
-            // Skip pixels for performance (density)
-            const density = 4;
+                // Draw image
+                offCtx.drawImage(img, 0, 0, logoSize, logoSize);
 
-            for (let py = 0; py < height; py += density) {
-                for (let px = 0; px < width; px += density) {
-                    const index = (py * width + px) * 4;
-                    const r = imageData[index];
-                    const g = imageData[index + 1];
-                    const b = imageData[index + 2];
-                    const a = imageData[index + 3];
+                // Get image data
+                const imageData = offCtx.getImageData(0, 0, logoSize, logoSize);
+                const data = imageData.data;
 
-                    // If pixel is not white (it's part of the logo)
-                    // Adjust threshold as needed based on the actual image
-                    if (a > 128 && (r < 240 || g < 240 || b < 240)) {
-                        particles.push({
-                            x: Math.random() * width, // Start at random position
-                            y: Math.random() * height,
-                            originX: px,
-                            originY: py,
-                            color: `rgb(${r}, ${g}, ${b})`,
-                            size: Math.random() * 1.5 + 0.5,
-                            vx: 0,
-                            vy: 0,
-                            ease: Math.random() * 0.05 + 0.02 // Random easing for organic movement
-                        });
+                // Create particles - very dense grid (1 pixel = 1 potential particle)
+                particles = [];
+                const density = 2; // Lower = more particles
+
+                for (let y = 0; y < logoSize; y += density) {
+                    for (let x = 0; x < logoSize; x += density) {
+                        const index = (y * logoSize + x) * 4;
+                        const r = data[index];
+                        const g = data[index + 1];
+                        const b = data[index + 2];
+                        const alpha = data[index + 3];
+
+                        // Detect dark pixels (the logo itself)
+                        const brightness = (r + g + b) / 3;
+
+                        if (alpha > 50 && brightness < 200) {
+                            // Position in center of screen
+                            const originX = (width - logoSize) / 2 + x;
+                            const originY = (height - logoSize) / 2 + y;
+
+                            particles.push({
+                                x: Math.random() * width,
+                                y: Math.random() * height,
+                                originX,
+                                originY,
+                                vx: 0,
+                                vy: 0,
+                                size: 1.5
+                            });
+                        }
                     }
                 }
-            }
+
+                console.log(`Created ${particles.length} particles`);
+                animate();
+            };
+
+            img.onerror = () => {
+                console.error('Failed to load logo image');
+            };
+
+            img.src = '/logo-mark.jpg';
         };
 
         const animate = () => {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const size = canvas.getBoundingClientRect();
+            ctx.clearRect(0, 0, size.width, size.height);
 
             particles.forEach(p => {
-                // Calculate distance to origin
+                // Spring physics towards origin
                 const dx = p.originX - p.x;
                 const dy = p.originY - p.y;
-                const distance = Math.sqrt(dx * dx + dy * dy);
 
-                // Mouse interaction
-                let forceX = 0;
-                let forceY = 0;
+                // Mouse repulsion
+                const mdx = mouseX - p.x;
+                const mdy = mouseY - p.y;
+                const mouseDist = Math.sqrt(mdx * mdx + mdy * mdy);
 
-                if (isMouseOver) {
-                    const mdx = mouseX - p.x;
-                    const mdy = mouseY - p.y;
-                    const mouseDistance = Math.sqrt(mdx * mdx + mdy * mdy);
-                    const repulsionRadius = 80;
-
-                    if (mouseDistance < repulsionRadius) {
-                        const force = (repulsionRadius - mouseDistance) / repulsionRadius;
-                        const angle = Math.atan2(mdy, mdx);
-                        forceX = -Math.cos(angle) * force * 5; // Repulsion strength
-                        forceY = -Math.sin(angle) * force * 5;
-                    }
+                if (mouseDist < 100) {
+                    const force = (100 - mouseDist) / 100;
+                    p.vx -= (mdx / mouseDist) * force * 3;
+                    p.vy -= (mdy / mouseDist) * force * 3;
                 }
 
-                // Physics update
-                p.vx += forceX;
-                p.vy += forceY;
-
-                // Move towards origin
-                p.x += (p.originX - p.x) * p.ease + p.vx * 0.1;
-                p.y += (p.originY - p.y) * p.ease + p.vy * 0.1;
+                // Spring force
+                p.vx += dx * 0.02;
+                p.vy += dy * 0.02;
 
                 // Damping
-                p.vx *= 0.9;
-                p.vy *= 0.9;
+                p.vx *= 0.85;
+                p.vy *= 0.85;
 
-                // Draw particle
-                ctx.fillStyle = p.color;
+                // Update position
+                p.x += p.vx;
+                p.y += p.vy;
+
+                // Draw
+                ctx.fillStyle = '#000';
                 ctx.beginPath();
                 ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
                 ctx.fill();
@@ -147,45 +159,36 @@ export default function EmblemParticles({ className = '' }: EmblemParticlesProps
             animationFrameId = requestAnimationFrame(animate);
         };
 
-        const handleResize = () => {
-            const parent = canvas.parentElement;
-            if (parent) {
-                canvas.width = parent.clientWidth;
-                canvas.height = parent.clientHeight;
-                if (isLoaded) initParticles();
-            }
-        };
-
+        // Event listeners
         const handleMouseMove = (e: MouseEvent) => {
             const rect = canvas.getBoundingClientRect();
             mouseX = e.clientX - rect.left;
             mouseY = e.clientY - rect.top;
-            isMouseOver = true;
         };
 
         const handleMouseLeave = () => {
-            isMouseOver = false;
+            mouseX = -9999;
+            mouseY = -9999;
         };
 
-        window.addEventListener('resize', handleResize);
+        const handleResize = () => {
+            initParticles();
+        };
+
         canvas.addEventListener('mousemove', handleMouseMove);
         canvas.addEventListener('mouseleave', handleMouseLeave);
+        window.addEventListener('resize', handleResize);
 
-        // Initial resize
-        handleResize();
+        // Initialize
+        initParticles();
 
         return () => {
-            window.removeEventListener('resize', handleResize);
             canvas.removeEventListener('mousemove', handleMouseMove);
             canvas.removeEventListener('mouseleave', handleMouseLeave);
+            window.removeEventListener('resize', handleResize);
             cancelAnimationFrame(animationFrameId);
         };
-    }, [isLoaded]);
+    }, []);
 
-    return (
-        <canvas
-            ref={canvasRef}
-            className={`w-full h-full ${className}`}
-        />
-    );
+    return <canvas ref={canvasRef} className={className} />;
 }

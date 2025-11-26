@@ -48,46 +48,54 @@ function BoardPage() {
             <main className="pt-32 pb-20 px-6 relative">
                 {/* Main Content */}
                 <div className="container mx-auto">
-                    <div className="text-center mb-16">
-                        <motion.h1
-                            initial={{
-                                scale: 3,
-                                position: "fixed",
-                                top: "50%",
-                                left: "50%",
-                                x: "-50%",
-                                y: "-50%",
-                                zIndex: 50
-                            }}
-                            animate={{
-                                scale: 1,
-                                position: "relative",
-                                top: "auto",
-                                left: "auto",
-                                x: 0,
-                                y: 0,
-                                zIndex: 1
-                            }}
-                            transition={{
-                                duration: 1.5,
-                                ease: "easeInOut",
-                                delay: 0.2
-                            }}
-                            className="text-5xl md:text-7xl font-bold tracking-tighter mb-6"
-                        >
-                            <span className="bg-gradient-to-r from-black via-red-600 to-black dark:from-white dark:via-red-400 dark:to-white bg-clip-text text-transparent">
-                                {t.board.title}
-                            </span>
-                        </motion.h1>
-                        <motion.p
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 1.5, duration: 0.5 }}
-                            className="text-xl text-gray-500 max-w-2xl mx-auto"
-                        >
-                            {t.board.subtitle}
-                        </motion.p>
+                    <div className="text-center mb-16 relative h-24 md:h-32">
+                        {/* Placeholder to reserve space */}
+
+                        <AnimatePresence>
+                            {showAnimation ? (
+                                <motion.div
+                                    key="overlay-title"
+                                    className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"
+                                    initial={{ opacity: 1 }}
+                                    exit={{ opacity: 0, transition: { duration: 0.5, delay: 1 } }}
+                                >
+                                    <motion.h1
+                                        layoutId="board-title"
+                                        className="text-5xl md:text-7xl font-bold tracking-tighter"
+                                        initial={{ scale: 3 }}
+                                        animate={{ scale: 3 }}
+                                        exit={{ scale: 1 }}
+                                        transition={{ duration: 1.2, ease: "easeInOut" }}
+                                    >
+                                        <span className="bg-gradient-to-r from-black via-red-600 to-black dark:from-white dark:via-red-400 dark:to-white bg-clip-text text-transparent">
+                                            {t.board.title}
+                                        </span>
+                                    </motion.h1>
+                                </motion.div>
+                            ) : (
+                                <motion.h1
+                                    layoutId="board-title"
+                                    className="text-5xl md:text-7xl font-bold tracking-tighter absolute inset-0 flex items-center justify-center"
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ duration: 0.5 }}
+                                >
+                                    <span className="bg-gradient-to-r from-black via-red-600 to-black dark:from-white dark:via-red-400 dark:to-white bg-clip-text text-transparent">
+                                        {t.board.title}
+                                    </span>
+                                </motion.h1>
+                            )}
+                        </AnimatePresence>
                     </div>
+
+                    <motion.p
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 1.5, duration: 0.5 }}
+                        className="text-xl text-gray-500 max-w-2xl mx-auto text-center mb-16"
+                    >
+                        {t.board.subtitle}
+                    </motion.p>
 
                     <motion.div
                         initial={{ opacity: 0, filter: "blur(10px)" }}
@@ -95,7 +103,7 @@ function BoardPage() {
                             opacity: animationComplete ? 1 : 0,
                             filter: animationComplete ? "blur(0px)" : "blur(10px)"
                         }}
-                        transition={{ duration: 0.8, delay: 1.6 }}
+                        transition={{ duration: 0.8 }}
                         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
                     >
                         {allPosts.map((post, index) => (
@@ -103,7 +111,7 @@ function BoardPage() {
                                 key={post.id}
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 1.8 + (index * 0.1) }}
+                                transition={{ delay: 0.2 + (index * 0.1) }}
                             >
                                 <BoardCard post={post} />
                             </motion.div>

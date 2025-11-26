@@ -96,6 +96,46 @@ function AboutPage() {
                 </div>
             </section>
 
+            {/* DNS & Rehab Section */}
+            <section className="py-20">
+                <div className="container mx-auto px-6 max-w-5xl">
+                    <div className="grid md:grid-cols-2 gap-16">
+                        <motion.div
+                            initial={{ opacity: 0, x: -30 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true }}
+                        >
+                            <h2 className="text-3xl font-bold mb-6">{t.about.dns.title}</h2>
+                            <p className="text-lg text-gray-700 leading-relaxed mb-6">
+                                {t.about.dns.description}
+                            </p>
+                            <p className="text-gray-600 leading-relaxed">
+                                {t.about.dns.detail}
+                            </p>
+                        </motion.div>
+
+                        <motion.div
+                            initial={{ opacity: 0, x: 30 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true }}
+                        >
+                            <h2 className="text-3xl font-bold mb-6">{t.about.rehab.title}</h2>
+                            <p className="text-lg text-gray-700 leading-relaxed mb-6">
+                                {t.about.rehab.description}
+                            </p>
+                            <ul className="space-y-4">
+                                {t.about.rehab.features.map((feature, index) => (
+                                    <li key={index} className="flex items-center gap-3">
+                                        <div className="w-2 h-2 bg-red-600 rounded-full" />
+                                        <span className="text-gray-700">{feature}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </motion.div>
+                    </div>
+                </div>
+            </section>
+
             {/* Breathing & Movement Research */}
             <section className="py-20">
                 <div className="container mx-auto px-6 max-w-5xl">

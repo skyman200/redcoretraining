@@ -1,3 +1,5 @@
+'use client';
+
 import { useLanguage } from '@/contexts/LanguageContext';
 import EmblemParticles from './EmblemParticles';
 

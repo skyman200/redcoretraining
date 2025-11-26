@@ -1,14 +1,22 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { LanguageProvider } from '@/contexts/LanguageContext';
 import { motion } from 'framer-motion';
 import { Database, Smartphone, TrendingUp, Users } from 'lucide-react';
 
 function WorkPage() {
     const { t } = useLanguage();
+    const [animationComplete, setAnimationComplete] = useState(false);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setAnimationComplete(true);
+        }, 1800);
+        return () => clearTimeout(timer);
+    }, []);
 
     return (
         <motion.div
@@ -22,20 +30,46 @@ function WorkPage() {
             {/* Hero Section */}
             <section className="pt-32 pb-20 px-6">
                 <div className="container mx-auto max-w-5xl text-center">
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.2 }}
+                    <motion.h1
+                        initial={{
+                            scale: 5,
+                            position: "fixed",
+                            top: "50%",
+                            left: "50%",
+                            x: "-50%",
+                            y: "-50%",
+                            zIndex: 50
+                        }}
+                        animate={{
+                            scale: 1,
+                            position: "relative",
+                            top: "auto",
+                            left: "auto",
+                            x: 0,
+                            y: 0,
+                            zIndex: 1
+                        }}
+                        transition={{
+                            duration: 1.5,
+                            ease: "easeInOut",
+                            delay: 0.2
+                        }}
+                        className="text-5xl md:text-7xl font-bold tracking-tighter mb-8 leading-tight"
                     >
-                        <h1 className="text-5xl md:text-7xl font-bold tracking-tighter mb-8 leading-tight">
-                            <span className="bg-gradient-to-r from-black via-red-600 to-black bg-clip-text text-transparent">
-                                {t.work.hero.title}
-                            </span>
-                        </h1>
-                        <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                        <span className="bg-gradient-to-r from-black via-red-600 to-black bg-clip-text text-transparent">
+                            {t.work.hero.title}
+                        </span>
+                    </motion.h1>
+                    {animationComplete && (
+                        <motion.p
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.2, duration: 0.5 }}
+                            className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed"
+                        >
                             {t.work.hero.subtitle}
-                        </p>
-                    </motion.div>
+                        </motion.p>
+                    )}
                 </div>
             </section>
 
@@ -183,10 +217,4 @@ function WorkPage() {
     );
 }
 
-export default function WorkPageWrapper() {
-    return (
-        <LanguageProvider>
-            <WorkPage />
-        </LanguageProvider>
-    );
-}
+export default WorkPage;

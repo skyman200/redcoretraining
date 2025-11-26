@@ -6,234 +6,231 @@ import { motion, AnimatePresence } from 'framer-motion';
 interface Particle {
     x: number;
     y: number;
-    originX: number;
-    originY: number;
+    targetX: number;
+    targetY: number;
     vx: number;
     vy: number;
     color: string;
-    angle: number;
-    distance: number;
-    speed: number;
-    settled: boolean;
 }
 
 export default function FacadeAnimation() {
     const [stage, setStage] = useState<'text' | 'particles' | 'done'>('text');
-    const canvasRef = useRef<HTMLCanvasElement>(null);
-    const particlesRef = useRef<Particle[]>([]);
-    const [isExploding, setIsExploding] = useState(false);
+    const canvasRef = useRef<HTMLHTMLCanvasElement>(null);
 
     useEffect(() => {
-        const textTimer = setTimeout(() => {
-            setStage('particles');
-        }, 2500);
-
-        return () => clearTimeout(textTimer);
+        const timer = setTimeout(() => setStage('particles'), 2500);
+        return () => clearTimeout(timer);
     }, []);
 
     useEffect(() => {
         if (stage !== 'particles') return;
 
         const canvas = canvasRef.current;
-        if (!canvas) return;
+        if (!canvas) {
+            console.error('Canvas not found');
+            return;
+        }
 
-        const ctx = canvas.getContext('2d', { alpha: true });
-        if (!ctx) return;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+            console.error('Context not found');
+            return;
+        }
 
-        let animationFrameId: number;
-        let frameCount = 0;
+        // Setup canvas
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = window.innerWidth * dpr;
+        canvas.height = window.innerHeight * dpr;
+        canvas.style.width = `${window.innerWidth}px`;
+        canvas.style.height = `${window.innerHeight}px`;
+        ctx.scale(dpr, dpr);
 
-        const colors = [
-            '#FF0000', '#FF1744', '#F44336', '#E91E63', '#FF3366',
-            '#FF6B35', '#FF8C42', '#FF5722', '#FFB649'
-        ];
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        const centerX = width / 2;
+        const centerY = height / 2;
 
-        const setCanvasSize = () => {
-            const dpr = window.devicePixelRatio || 1;
-            canvas.width = window.innerWidth * dpr;
-            canvas.height = window.innerHeight * dpr;
-            canvas.style.width = `${window.innerWidth}px`;
-            canvas.style.height = `${window.innerHeight}px`;
-            ctx.scale(dpr, dpr);
-            return { width: window.innerWidth, height: window.innerHeight };
-        };
+        let particles: Particle[] = [];
+        let animationId: number;
+        let exploding = false;
+        let explosionFrame = 0;
 
-        const initParticles = () => {
-            const size = setCanvasSize();
-            const { width, height } = size;
-            const centerX = width / 2;
-            const centerY = height / 2;
+        const colors = ['#FF0000', '#FF1744', '#F44336', '#E91E63', '#FF3366', '#FF6B35', '#FF8C42', '#FF5722', '#FFB649'];
 
-            const img = new Image();
-            img.crossOrigin = 'anonymous';
+        // Load image and create particles
+        const img = new Image();
+        img.onload = () => {
+            console.log('Image loaded successfully');
 
-            img.onload = () => {
-                const offCanvas = document.createElement('canvas');
-                const offCtx = offCanvas.getContext('2d');
-                if (!offCtx) return;
+            // Create temporary canvas for pixel analysis
+            const tempCanvas = document.createElement('canvas');
+            const logoSize = Math.min(width, height) * 1.2; // Big logo
+            tempCanvas.width = logoSize;
+            tempCanvas.height = logoSize;
 
-                const logoSize = Math.min(width, height) * 1.6;
-                offCanvas.width = logoSize;
-                offCanvas.height = logoSize;
+            const tempCtx = tempCanvas.getContext('2d');
+            if (!tempCtx) return;
 
-                offCtx.drawImage(img, 0, 0, logoSize, logoSize);
-                const imageData = offCtx.getImageData(0, 0, logoSize, logoSize);
-                const data = imageData.data;
+            // Draw logo to temp canvas
+            tempCtx.drawImage(img, 0, 0, logoSize, logoSize);
 
-                const particles: Particle[] = [];
-                const targetParticles = 50000;
-                const totalPixels = logoSize * logoSize;
-                const estimatedDarkPixels = totalPixels * 0.3;
-                const density = Math.sqrt(estimatedDarkPixels / targetParticles);
+            // Get pixel data
+            const imageData = tempCtx.getImageData(0, 0, logoSize, logoSize);
+            const pixels = imageData.data;
 
-                for (let y = 0; y < logoSize; y += density) {
-                    for (let x = 0; x < logoSize; x += density) {
-                        const index = (Math.floor(y) * logoSize + Math.floor(x)) * 4;
-                        const alpha = data[index + 3];
-                        const brightness = (data[index] + data[index + 1] + data[index + 2]) / 3;
+            // Create particles from dark pixels
+            const step = 1; // Check every pixel for maximum density
+            let count = 0;
 
-                        if (alpha > 50 && brightness < 200) {
-                            const originX = (width - logoSize) / 2 + x;
-                            const originY = (height - logoSize) / 2 + y;
+            for (let y = 0; y < logoSize && count < 50000; y += step) {
+                for (let x = 0; x < logoSize && count < 50000; x += step) {
+                    const i = (y * logoSize + x) * 4;
+                    const r = pixels[i];
+                    const g = pixels[i + 1];
+                    const b = pixels[i + 2];
+                    const a = pixels[i + 3];
 
-                            const dx = originX - centerX;
-                            const dy = originY - centerY;
-                            const angle = Math.atan2(dy, dx);
-                            const distance = Math.sqrt(dx * dx + dy * dy);
+                    const brightness = (r + g + b) / 3;
 
-                            const colorIndex = Math.floor(((angle + Math.PI) / (Math.PI * 2)) * colors.length);
-                            const color = colors[colorIndex % colors.length];
+                    // If pixel is dark (part of logo)
+                    if (a > 100 && brightness < 150) {
+                        const targetX = (width - logoSize) / 2 + x;
+                        const targetY = (height - logoSize) / 2 + y;
 
-                            // Start far away in spiral pattern
-                            const startAngle = angle + Math.PI * 4;
-                            const startDist = distance + 800;
-                            const startX = centerX + Math.cos(startAngle) * startDist;
-                            const startY = centerY + Math.sin(startAngle) * startDist;
+                        // Calculate angle for color
+                        const dx = targetX - centerX;
+                        const dy = targetY - centerY;
+                        const angle = Math.atan2(dy, dx);
+                        const dist = Math.sqrt(dx * dx + dy * dy);
 
-                            particles.push({
-                                x: startX,
-                                y: startY,
-                                originX,
-                                originY,
-                                vx: 0,
-                                vy: 0,
-                                color,
-                                angle: startAngle,
-                                distance: startDist,
-                                speed: Math.random() * 1.5 + 0.5,
-                                settled: false
-                            });
-                        }
+                        // Assign color by angle
+                        const colorIdx = Math.floor(((angle + Math.PI) / (Math.PI * 2)) * colors.length) % colors.length;
+
+                        // Start position - spiral outward
+                        const startAngle = angle + Math.PI * 3;
+                        const startDist = dist + 600;
+
+                        particles.push({
+                            x: centerX + Math.cos(startAngle) * startDist,
+                            y: centerY + Math.sin(startAngle) * startDist,
+                            targetX,
+                            targetY,
+                            vx: 0,
+                            vy: 0,
+                            color: colors[colorIdx]
+                        });
+
+                        count++;
                     }
                 }
+            }
 
-                particlesRef.current = particles;
-                console.log(`Created ${particles.length} particles`);
+            console.log(`Created ${particles.length} particles from logo`);
 
-                // Start explosion after 2.5 seconds
-                setTimeout(() => {
-                    setIsExploding(true);
-                    setTimeout(() => {
-                        setStage('done');
-                    }, 800);
-                }, 2500);
+            // Start explosion after 2.5 seconds
+            setTimeout(() => {
+                exploding = true;
+                setTimeout(() => setStage('done'), 1000);
+            }, 2500);
 
-                animate();
-            };
-
-            img.onerror = () => {
-                console.error('Failed to load logo');
-                setStage('done');
-            };
-
-            img.src = '/logo-mark.jpg';
+            // Start animation
+            animate();
         };
 
-        const animate = () => {
-            const size = { width: window.innerWidth, height: window.innerHeight };
-            ctx.clearRect(0, 0, size.width, size.height);
+        img.onerror = (e) => {
+            console.error('Failed to load image:', e);
+            setStage('done');
+        };
 
-            frameCount++;
-            const particles = particlesRef.current;
-            const centerX = size.width / 2;
-            const centerY = size.height / 2;
+        img.src = '/logo-mark.jpg';
+        console.log('Loading image from /logo-mark.jpg');
 
-            particles.forEach(p => {
-                if (isExploding) {
-                    // EXPLOSION EFFECT
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+
+            if (exploding) {
+                explosionFrame++;
+                const opacity = Math.max(0, 1 - explosionFrame / 60);
+
+                particles.forEach(p => {
+                    // Explode outward from center
                     const dx = p.x - centerX;
                     const dy = p.y - centerY;
                     const angle = Math.atan2(dy, dx);
-                    const force = 15;
 
-                    p.vx = Math.cos(angle) * force;
-                    p.vy = Math.sin(angle) * force;
+                    p.vx = Math.cos(angle) * 20;
+                    p.vy = Math.sin(angle) * 20;
 
                     p.x += p.vx;
                     p.y += p.vy;
 
-                    // Fade out
-                    ctx.globalAlpha = Math.max(0, 1 - frameCount / 50);
-                } else {
-                    // SPIRAL CONVERGENCE
-                    const dx = p.originX - p.x;
-                    const dy = p.originY - p.y;
+                    ctx.globalAlpha = opacity;
+                    ctx.fillStyle = p.color;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, 1.5, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+
+                if (opacity > 0) {
+                    animationId = requestAnimationFrame(animate);
+                }
+            } else {
+                // Spiral convergence
+                particles.forEach(p => {
+                    const dx = p.targetX - p.x;
+                    const dy = p.targetY - p.y;
                     const dist = Math.sqrt(dx * dx + dy * dy);
 
-                    if (dist > 2) {
-                        // Still converging - spiral motion
-                        const centerDx = p.originX - centerX;
-                        const centerDy = p.originY - centerY;
-
-                        // Reduce angle (spiral inward)
-                        p.angle -= 0.08 * p.speed;
-                        p.distance = Math.max(p.distance - p.speed * 3, dist);
-
+                    if (dist > 1) {
                         // Calculate spiral position
-                        const spiralX = centerX + Math.cos(p.angle) * p.distance;
-                        const spiralY = centerY + Math.sin(p.angle) * p.distance;
+                        const angle = Math.atan2(p.y - centerY, p.x - centerX);
+                        const currentDist = Math.sqrt(
+                            Math.pow(p.x - centerX, 2) +
+                            Math.pow(p.y - centerY, 2)
+                        );
 
-                        // Move towards spiral position AND origin
-                        p.vx += (spiralX - p.x) * 0.03;
-                        p.vy += (spiralY - p.y) * 0.03;
-                        p.vx += dx * 0.02;
-                        p.vy += dy * 0.02;
-                    } else {
-                        // Settled at origin
-                        p.settled = true;
-                        p.vx += dx * 0.05;
-                        p.vy += dy * 0.05;
+                        const targetDist = Math.sqrt(
+                            Math.pow(p.targetX - centerX, 2) +
+                            Math.pow(p.targetY - centerY, 2)
+                        );
+
+                        // Spiral inward
+                        const newAngle = angle - 0.1;
+                        const newDist = Math.max(currentDist - 4, targetDist);
+
+                        const spiralX = centerX + Math.cos(newAngle) * newDist;
+                        const spiralY = centerY + Math.sin(newAngle) * newDist;
+
+                        // Combine spiral and direct movement
+                        p.vx += (spiralX - p.x) * 0.05;
+                        p.vy += (spiralY - p.y) * 0.05;
+                        p.vx += dx * 0.03;
+                        p.vy += dy * 0.03;
+
+                        p.vx *= 0.9;
+                        p.vy *= 0.9;
+
+                        p.x += p.vx;
+                        p.y += p.vy;
                     }
 
-                    p.vx *= 0.88;
-                    p.vy *= 0.88;
-
-                    p.x += p.vx;
-                    p.y += p.vy;
-
                     ctx.globalAlpha = 1;
-                }
+                    ctx.fillStyle = p.color;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, 1.5, 0, Math.PI * 2);
+                    ctx.fill();
+                });
 
-                // Draw particle
-                ctx.fillStyle = p.color;
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, 1.2, 0, Math.PI * 2);
-                ctx.fill();
-            });
-
-            animationFrameId = requestAnimationFrame(animate);
-        };
-
-        initParticles();
+                animationId = requestAnimationFrame(animate);
+            }
+        }
 
         return () => {
-            cancelAnimationFrame(animationFrameId);
+            cancelAnimationFrame(animationId);
         };
-    }, [stage, isExploding]);
+    }, [stage]);
 
-    if (stage === 'done') {
-        return null;
-    }
+    if (stage === 'done') return null;
 
     return (
         <div className="fixed inset-0 z-50 bg-white">
@@ -263,10 +260,7 @@ export default function FacadeAnimation() {
             </AnimatePresence>
 
             {stage === 'particles' && (
-                <canvas
-                    ref={canvasRef}
-                    className="absolute inset-0 w-full h-full"
-                />
+                <canvas ref={canvasRef} className="w-full h-full" />
             )}
         </div>
     );

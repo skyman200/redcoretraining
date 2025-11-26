@@ -45,7 +45,10 @@ export default function Footer() {
 
                 <div className="border-t border-white/20 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
                     <p>{t.footer.copyright}</p>
-                    <p className="mt-2 md:mt-0">{t.footer.designed}</p>
+                    <div className="flex gap-4 items-center mt-2 md:mt-0">
+                        <Link href="/admin" className="hover:text-gray-300 transition-colors">Admin</Link>
+                        <p>{t.footer.designed}</p>
+                    </div>
                 </div>
             </div>
         </footer>

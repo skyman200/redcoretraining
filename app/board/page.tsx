@@ -5,6 +5,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import BoardCard, { posts as defaultPosts } from '@/components/BoardCard';
+import DataChart from '@/components/DataChart';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -96,6 +97,33 @@ function BoardPage() {
                     >
                         {t.board.subtitle}
                     </motion.p>
+
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 1.8, duration: 0.8 }}
+                        className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16 max-w-5xl mx-auto"
+                    >
+                        <DataChart
+                            title="Pain Reduction Rate"
+                            variant="gemini"
+                            data={[
+                                { label: 'Neck', value: 85 },
+                                { label: 'Back', value: 75 },
+                                { label: 'Shoulder', value: 60 },
+                                { label: 'Knee', value: 40 },
+                            ]}
+                        />
+                        <DataChart
+                            title="Posture Improvement"
+                            variant="gemini"
+                            data={[
+                                { label: 'Spine', value: 80 },
+                                { label: 'Pelvis', value: 70 },
+                                { label: 'Shoulder', value: 65 },
+                            ]}
+                        />
+                    </motion.div>
 
                     <motion.div
                         initial={{ opacity: 0, filter: "blur(10px)" }}

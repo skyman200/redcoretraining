@@ -303,45 +303,50 @@ export default function Home() {
                 </a>
               </div>
             </div>
-            {/* Right: Dynamic Dual Images with Container Animation */}
-            <div className="flex-1 relative w-full max-w-xl" style={{ animation: 'containerFloat 6s ease-in-out infinite' }}>
-              <div className="absolute inset-0 bg-gradient-to-tr from-red-500/20 to-orange-500/20 blur-2xl rounded-3xl transform rotate-3 scale-105 opacity-70" />
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-white/10 p-2">
-                <div className="relative w-full aspect-[4/3] flex gap-2">
-                  {/* Hero Image - 역동적인 애니메이션 */}
-                  <div
-                    className={`flex-1 relative transition-all duration-1000 ${
-                      showAppImage ? 'opacity-50 scale-95' : 'opacity-100 scale-100'
-                    }`}
-                    style={{
-                      animation: 'floatUpDown 4s ease-in-out infinite',
-                      animationDelay: '0s',
-                    }}
-                  >
+            {/* Right: Dynamic Dual Images - Separate Containers */}
+            <div className="flex-1 relative w-full max-w-xl flex gap-4 items-center justify-center">
+              {/* Hero Image Container - 독립적인 컨테이너 */}
+              <div
+                className={`relative w-full max-w-[280px] transition-all duration-1000 ${
+                  showAppImage ? 'opacity-50 scale-90 z-0' : 'opacity-100 scale-100 z-10'
+                }`}
+                style={{
+                  animation: 'heroContainerFloat 5s ease-in-out infinite',
+                  animationDelay: '0s',
+                }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-tr from-red-500/20 to-orange-500/20 blur-2xl rounded-3xl transform rotate-3 scale-105 opacity-70" />
+                <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-white/10">
+                  <div className="relative w-full aspect-[4/3]">
                     <Image
                       src="/hero.jpg"
                       alt="Redcore Center Main"
                       fill
-                      className="object-cover rounded-lg"
+                      className="object-cover"
                       priority
                     />
                   </div>
-                  
-                  {/* App Image - 역동적인 애니메이션 */}
-                  <div
-                    className={`flex-1 relative transition-all duration-1000 ${
-                      showAppImage ? 'opacity-100 scale-100' : 'opacity-50 scale-95'
-                    }`}
-                    style={{
-                      animation: 'floatLeftRight 5s ease-in-out infinite',
-                      animationDelay: '1s',
-                    }}
-                  >
+                </div>
+              </div>
+              
+              {/* App Image Container - 독립적인 컨테이너 */}
+              <div
+                className={`relative w-full max-w-[280px] transition-all duration-1000 ${
+                  showAppImage ? 'opacity-100 scale-100 z-10' : 'opacity-50 scale-90 z-0'
+                }`}
+                style={{
+                  animation: 'appContainerFloat 6s ease-in-out infinite',
+                  animationDelay: '1.5s',
+                }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-tr from-red-500/20 to-orange-500/20 blur-2xl rounded-3xl transform -rotate-3 scale-105 opacity-70" />
+                <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-white/10">
+                  <div className="relative w-full aspect-[4/3]">
                     <Image
                       src="/app.jpg"
                       alt="Redcore App"
                       fill
-                      className="object-cover rounded-lg"
+                      className="object-cover"
                       priority
                     />
                   </div>

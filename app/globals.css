@@ -26,47 +26,37 @@ body {
 }
 
 /* 역동적인 이미지 애니메이션 */
-@keyframes floatUpDown {
+/* Hero Container - 역동적인 3D 움직임 */
+@keyframes heroContainerFloat {
   0%, 100% {
-    transform: translateY(0) scale(1) rotate(0deg);
+    transform: translateY(0) translateX(0) rotate(0deg) scale(1);
   }
-  25% {
-    transform: translateY(-8px) scale(1.02) rotate(1deg);
+  20% {
+    transform: translateY(-15px) translateX(10px) rotate(3deg) scale(1.05);
   }
-  50% {
-    transform: translateY(0) scale(1) rotate(0deg);
+  40% {
+    transform: translateY(10px) translateX(-8px) rotate(-2deg) scale(0.98);
   }
-  75% {
-    transform: translateY(8px) scale(0.98) rotate(-1deg);
+  60% {
+    transform: translateY(-8px) translateX(-12px) rotate(-3deg) scale(1.02);
+  }
+  80% {
+    transform: translateY(12px) translateX(8px) rotate(2deg) scale(0.95);
   }
 }
 
-@keyframes floatLeftRight {
+/* App Container - 역동적인 3D 움직임 (다른 패턴) */
+@keyframes appContainerFloat {
   0%, 100% {
-    transform: translateX(0) scale(1) rotate(0deg);
+    transform: translateY(0) translateX(0) rotate(0deg) scale(1);
   }
   25% {
-    transform: translateX(-10px) scale(1.03) rotate(-2deg);
+    transform: translateY(15px) translateX(-10px) rotate(-3deg) scale(1.05);
   }
   50% {
-    transform: translateX(0) scale(1) rotate(0deg);
+    transform: translateY(-10px) translateX(12px) rotate(2deg) scale(0.98);
   }
   75% {
-    transform: translateX(10px) scale(0.97) rotate(2deg);
-  }
-}
-
-@keyframes containerFloat {
-  0%, 100% {
-    transform: translateY(0) rotate(0deg);
-  }
-  25% {
-    transform: translateY(-5px) rotate(1deg);
-  }
-  50% {
-    transform: translateY(0) rotate(0deg);
-  }
-  75% {
-    transform: translateY(5px) rotate(-1deg);
+    transform: translateY(8px) translateX(8px) rotate(3deg) scale(1.02);
   }
 }

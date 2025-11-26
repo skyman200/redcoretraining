@@ -109,7 +109,7 @@ export default function BoardCard({ post }: { post: BoardPost }) {
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
-                                        title={file.name}
+                                        title={`${file.name} 다운로드`}
                                         onClick={(e) => e.stopPropagation()}
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

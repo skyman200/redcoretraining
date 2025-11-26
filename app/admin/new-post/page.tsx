@@ -18,6 +18,8 @@ export default function NewPostPage() {
     const [files, setFiles] = useState<Array<{ name: string; url: string }>>([]);
     const [newFileName, setNewFileName] = useState('');
     const [newFileUrl, setNewFileUrl] = useState('');
+    const [uploading, setUploading] = useState(false);
+    const [uploadProgress, setUploadProgress] = useState<string>('');
 
     useEffect(() => {
         // Check authentication
@@ -168,11 +170,19 @@ export default function NewPostPage() {
                                 <div className="space-y-2 mb-4">
                                     {files.map((file, index) => (
                                         <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded border border-gray-200">
-                                            <span className="font-medium">{file.name}</span>
+                                            <div className="flex items-center gap-3 overflow-hidden">
+                                                <div className="bg-gray-200 p-2 rounded">
+                                                    <Save size={16} className="text-gray-600" />
+                                                </div>
+                                                <div className="min-w-0">
+                                                    <p className="font-medium truncate">{file.name}</p>
+                                                    <p className="text-xs text-gray-500 truncate">{file.url.startsWith('data:') ? '로컬 파일 (Base64)' : file.url}</p>
+                                                </div>
+                                            </div>
                                             <button
                                                 type="button"
                                                 onClick={() => handleRemoveFile(index)}
-                                                className="text-red-600 hover:text-red-700"
+                                                className="text-red-600 hover:text-red-700 p-1"
                                             >
                                                 <X size={20} />
                                             </button>
@@ -182,34 +192,117 @@ export default function NewPostPage() {
                             )}
 
                             {/* Add new file */}
-                            <div className="p-4 border-2 border-dashed border-gray-300 rounded space-y-3">
-                                <input
-                                    type="text"
-                                    value={newFileName}
-                                    onChange={(e) => setNewFileName(e.target.value)}
-                                    className="w-full px-4 py-2 border border-gray-300 focus:outline-none focus:border-black transition-colors"
-                                    placeholder="파일 이름 (예: pilates-guide.pdf)"
-                                />
-                                <input
-                                    type="text"
-                                    value={newFileUrl}
-                                    onChange={(e) => setNewFileUrl(e.target.value)}
-                                    className="w-full px-4 py-2 border border-gray-300 focus:outline-none focus:border-black transition-colors"
-                                    placeholder="파일 URL (Google Drive 링크 등)"
-                                />
-                                <button
-                                    type="button"
-                                    onClick={handleAddFile}
-                                    disabled={!newFileName || !newFileUrl}
-                                    className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-gray-200 hover:bg-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed rounded"
-                                >
-                                    <Upload size={20} />
-                                    파일 추가
-                                </button>
+                            <div className="space-y-4">
+                                {/* Upload Progress */}
+                                {uploading && (
+                                    <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                                        <div className="flex items-center gap-3">
+                                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
+                                            <p className="text-sm font-medium text-blue-900">{uploadProgress}</p>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Local File Upload */}
+                                <div className="p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-black transition-colors text-center group cursor-pointer relative">
+                                    <input
+                                        type="file"
+                                        disabled={uploading}
+                                        onChange={async (e) => {
+                                            const file = e.target.files?.[0];
+                                            if (file) {
+                                                // Check file size (limit to 300MB)
+                                                const maxSize = 300 * 1024 * 1024; // 300MB
+                                                if (file.size > maxSize) {
+                                                    alert('파일 크기가 너무 큽니다. 300MB 이하의 파일만 업로드 가능합니다.');
+                                                    return;
+                                                }
+
+                                                setUploading(true);
+                                                setUploadProgress('Google Drive에 업로드 중...');
+
+                                                try {
+                                                    const formData = new FormData();
+                                                    formData.append('file', file);
+
+                                                    const response = await fetch('/api/upload', {
+                                                        method: 'POST',
+                                                        body: formData,
+                                                    });
+
+                                                    const data = await response.json();
+
+                                                    if (response.ok && data.success) {
+                                                        setFiles(prev => [...prev, {
+                                                            name: data.file.name,
+                                                            url: data.file.downloadLink || data.file.url
+                                                        }]);
+                                                        setUploadProgress('업로드 완료!');
+                                                        setTimeout(() => setUploadProgress(''), 2000);
+                                                    } else {
+                                                        alert(`업로드 실패: ${data.error || '알 수 없는 오류'}`);
+                                                        setUploadProgress('');
+                                                    }
+                                                } catch (error) {
+                                                    console.error('Upload error:', error);
+                                                    alert('파일 업로드 중 오류가 발생했습니다.');
+                                                    setUploadProgress('');
+                                                } finally {
+                                                    setUploading(false);
+                                                    // Reset input
+                                                    e.target.value = '';
+                                                }
+                                            }
+                                        }}
+                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                                    />
+                                    <div className={`flex flex-col items-center gap-2 transition-colors ${uploading ? 'text-gray-400' : 'text-gray-500 group-hover:text-black'}`}>
+                                        <div className={`p-3 bg-gray-100 rounded-full transition-colors ${!uploading && 'group-hover:bg-gray-200'}`}>
+                                            <Upload size={24} />
+                                        </div>
+                                        <p className="font-medium">내 컴퓨터에서 파일 선택</p>
+                                        <p className="text-xs text-gray-400">클릭하거나 파일을 여기로 드래그하세요 (최대 300MB)</p>
+                                        <p className="text-xs text-gray-400 mt-1">파일은 Google Drive에 자동으로 저장됩니다</p>
+                                    </div>
+                                </div>
+
+                                <div className="relative">
+                                    <div className="absolute inset-0 flex items-center">
+                                        <div className="w-full border-t border-gray-200"></div>
+                                    </div>
+                                    <div className="relative flex justify-center text-sm">
+                                        <span className="px-2 bg-white text-gray-500">또는 링크 직접 입력</span>
+                                    </div>
+                                </div>
+
+                                {/* Manual URL Input */}
+                                <div className="p-4 bg-gray-50 rounded border border-gray-200 space-y-3">
+                                    <input
+                                        type="text"
+                                        value={newFileName}
+                                        onChange={(e) => setNewFileName(e.target.value)}
+                                        className="w-full px-4 py-2 border border-gray-300 focus:outline-none focus:border-black transition-colors bg-white"
+                                        placeholder="파일 이름 (예: pilates-guide.pdf)"
+                                    />
+                                    <div className="flex gap-2">
+                                        <input
+                                            type="text"
+                                            value={newFileUrl}
+                                            onChange={(e) => setNewFileUrl(e.target.value)}
+                                            className="w-full px-4 py-2 border border-gray-300 focus:outline-none focus:border-black transition-colors bg-white"
+                                            placeholder="파일 URL (Google Drive 링크 등)"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={handleAddFile}
+                                            disabled={!newFileName || !newFileUrl}
+                                            className="px-4 py-2 bg-black text-white hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed rounded whitespace-nowrap"
+                                        >
+                                            추가
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
-                            <p className="text-sm text-gray-500 mt-2">
-                                Google Drive에 파일을 업로드한 후 공유 링크를 붙여넣으세요.
-                            </p>
                         </div>
 
                         {/* Submit */}

@@ -40,12 +40,16 @@ export default function DataChart({ title, data, type = 'bar', maxValue = 100, v
                         <div key={index} className="flex flex-col items-center gap-2 flex-1 group h-full justify-end">
                             <div className="w-full h-full flex items-end justify-center relative">
                                 <motion.div
-                                    initial={{ height: 0 }}
-                                    whileInView={{ height: `${(point.value / maxValue) * 100}%` }}
+                                    initial={{ scaleY: 0 }}
+                                    whileInView={{ scaleY: 1 }}
                                     viewport={{ once: true }}
                                     transition={{ duration: 1.5, delay: index * 0.2, ease: "easeOut" }}
                                     className={`w-full max-w-[40px] rounded-t-lg relative ${barStyle.className || ''}`}
-                                    style={barStyle.style}
+                                    style={{
+                                        ...barStyle.style,
+                                        height: `${(point.value / maxValue) * 100}%`,
+                                        transformOrigin: 'bottom'
+                                    }}
                                 >
                                     <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-black text-white text-xs py-1 px-2 rounded pointer-events-none whitespace-nowrap z-10">
                                         {point.value}%

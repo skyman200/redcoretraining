@@ -108,19 +108,19 @@ function BoardPage() {
                             title="Pain Reduction Rate"
                             variant="gemini"
                             data={[
-                                { label: 'Neck', value: 85 },
-                                { label: 'Back', value: 75 },
-                                { label: 'Shoulder', value: 60 },
-                                { label: 'Knee', value: 40 },
+                                { label: 'Neck', value: 95 },
+                                { label: 'Back', value: 88 },
+                                { label: 'Shoulder', value: 78 },
+                                { label: 'Knee', value: 65 },
                             ]}
                         />
                         <DataChart
                             title="Posture Improvement"
                             variant="gemini"
                             data={[
-                                { label: 'Spine', value: 80 },
-                                { label: 'Pelvis', value: 70 },
-                                { label: 'Shoulder', value: 65 },
+                                { label: 'Spine', value: 92 },
+                                { label: 'Pelvis', value: 85 },
+                                { label: 'Shoulder', value: 75 },
                             ]}
                         />
                     </motion.div>

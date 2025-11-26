@@ -7,11 +7,8 @@ export default function Hero() {
     const { t } = useLanguage();
 
     return (
-        <section className="min-h-screen flex flex-col justify-center px-6 pt-20 pb-10 relative overflow-hidden">
-            <div className="absolute inset-0 z-0 opacity-20 pointer-events-none">
-                <EmblemParticles />
-            </div>
-            <div className="container mx-auto z-10 relative">
+        <section className="min-h-screen flex flex-col justify-center px-6 pt-20 pb-10">
+            <div className="container mx-auto">
                 <h1 className="text-[12vw] leading-[0.9] font-bold tracking-tighter text-balance uppercase">
                     <span className="bg-gradient-to-r from-black via-gray-700 to-black dark:from-white dark:via-gray-300 dark:to-white bg-clip-text text-transparent">
                         {t.hero.title1}

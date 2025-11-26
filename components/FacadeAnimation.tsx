@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// --- Gemini Gradient Utils ---
+// Gemini Gradient Colors
 const GRADIENT_COLORS = [
     { r: 76, g: 29, b: 149 },   // Deep Purple
     { r: 220, g: 20, b: 60 },   // Crimson
@@ -73,34 +73,35 @@ export default function FacadeAnimation() {
         let exploding = false;
         let explosionFrame = 0;
 
-        const generateParticlesFromCanvas = (sourceCanvas: HTMLCanvasElement, size: number) => {
-            const tempCtx = sourceCanvas.getContext('2d');
-            if (!tempCtx) return [];
+        // Generate R text emblem particles
+        const generateRParticles = () => {
+            const tempCanvas = document.createElement('canvas');
+            const logoSize = Math.min(width, height) * 0.6;
+            tempCanvas.width = logoSize;
+            tempCanvas.height = logoSize;
+            const tCtx = tempCanvas.getContext('2d');
 
-            let pixels: Uint8ClampedArray;
-            try {
-                const imageData = tempCtx.getImageData(0, 0, size, size);
-                pixels = imageData.data;
-            } catch (e) {
-                console.error("Failed to get image data, using fallback.", e);
-                tempCtx.clearRect(0, 0, size, size);
-                tempCtx.fillStyle = '#000000';
-                tempCtx.font = `900 ${size * 0.6}px serif`;
-                tempCtx.textAlign = 'center';
-                tempCtx.textBaseline = 'middle';
-                tempCtx.fillText('R', size / 2, size / 2);
+            if (!tCtx) return [];
 
-                const imageData = tempCtx.getImageData(0, 0, size, size);
-                pixels = imageData.data;
-            }
+            // Draw R text
+            tCtx.fillStyle = '#FFFFFF';
+            tCtx.fillRect(0, 0, logoSize, logoSize);
+            tCtx.fillStyle = '#000000';
+            tCtx.font = `italic 900 ${logoSize * 0.8}px serif`;
+            tCtx.textAlign = 'center';
+            tCtx.textBaseline = 'middle';
+            tCtx.fillText('R', logoSize / 2, logoSize / 2);
 
+            const imageData = tCtx.getImageData(0, 0, logoSize, logoSize);
+            const pixels = imageData.data;
+
+            const particleList: Particle[] = [];
             const step = 1;
             let count = 0;
-            const particleList: Particle[] = [];
 
-            for (let y = 0; y < size && count < 80000; y += step) {
-                for (let x = 0; x < size && count < 80000; x += step) {
-                    const i = (y * size + x) * 4;
+            for (let y = 0; y < logoSize && count < 80000; y += step) {
+                for (let x = 0; x < logoSize && count < 80000; x += step) {
+                    const i = (y * logoSize + x) * 4;
                     const r = pixels[i];
                     const g = pixels[i + 1];
                     const b = pixels[i + 2];
@@ -108,15 +109,15 @@ export default function FacadeAnimation() {
                     const brightness = (r + g + b) / 3;
 
                     if (a > 128 && brightness < 200) {
-                        const targetX = (width - size) / 2 + x;
-                        const targetY = (height - size) / 2 + y;
+                        const targetX = (width - logoSize) / 2 + x;
+                        const targetY = (height - logoSize) / 2 + y;
 
                         const dx = targetX - centerX;
                         const dy = targetY - centerY;
                         const angle = Math.atan2(dy, dx);
                         const dist = Math.sqrt(dx * dx + dy * dy);
 
-                        const gradientPos = x / size;
+                        const gradientPos = x / logoSize;
                         const color = getGradientColor(gradientPos);
 
                         const startAngle = angle + Math.PI * 5;
@@ -136,61 +137,18 @@ export default function FacadeAnimation() {
                     }
                 }
             }
+
             return particleList;
         };
 
-        const loadSource = () => {
-            const tempCanvas = document.createElement('canvas');
-            const logoSize = Math.min(width, height) * 0.6;
-            tempCanvas.width = logoSize;
-            tempCanvas.height = logoSize;
-            const tCtx = tempCanvas.getContext('2d');
+        particles = generateRParticles();
+        console.log(`Animation starting with ${particles.length} particles.`);
 
-            if (!tCtx) return;
-
-            const img = new Image();
-
-            const start = (generatedParticles: Particle[]) => {
-                particles = generatedParticles;
-                console.log(`Animation starting with ${particles.length} particles.`);
-
-                setTimeout(() => {
-                    exploding = true;
-                    setTimeout(() => setStage('done'), 1500);
-                }, 5000);
-
-                animate();
-            };
-
-            img.onload = () => {
-                tCtx.fillStyle = '#FFFFFF';
-                tCtx.fillRect(0, 0, logoSize, logoSize);
-
-                const scale = Math.min(logoSize / img.width, logoSize / img.height);
-                const w = img.width * scale;
-                const h = img.height * scale;
-                tCtx.drawImage(img, (logoSize - w) / 2, (logoSize - h) / 2, w, h);
-
-                const generated = generateParticlesFromCanvas(tempCanvas, logoSize);
-                start(generated);
-            };
-
-            img.onerror = () => {
-                console.warn("Image load failed, using fallback text.");
-                tCtx.fillStyle = '#FFFFFF';
-                tCtx.fillRect(0, 0, logoSize, logoSize);
-                tCtx.fillStyle = '#000000';
-                tCtx.font = `italic 900 ${logoSize * 0.8}px serif`;
-                tCtx.textAlign = 'center';
-                tCtx.textBaseline = 'middle';
-                tCtx.fillText('R', logoSize / 2, logoSize / 2);
-
-                const generated = generateParticlesFromCanvas(tempCanvas, logoSize);
-                start(generated);
-            };
-
-            img.src = '/logo-mark.jpg';
-        };
+        // Explosion after 5 seconds
+        setTimeout(() => {
+            exploding = true;
+            setTimeout(() => setStage('done'), 1500);
+        }, 5000);
 
         function animate() {
             ctx.clearRect(0, 0, width, height);
@@ -254,7 +212,7 @@ export default function FacadeAnimation() {
             }
         }
 
-        loadSource();
+        animate();
 
         return () => {
             cancelAnimationFrame(animationId);

@@ -30,9 +30,14 @@ function AboutPage() {
                         <span className="inline-block px-4 py-2 bg-red-600 text-white text-xs uppercase font-bold tracking-wider mb-6">
                             {t.about.hero.since}
                         </span>
-                        <h1 className="text-5xl md:text-7xl font-bold tracking-tighter mb-8 leading-tight">
+                        <motion.h1
+                            className="text-5xl md:text-7xl font-bold tracking-tighter mb-8 leading-tight"
+                            initial={{ scale: 2.5, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            transition={{ duration: 1, ease: 'easeOut', delay: 0.3 }}
+                        >
                             {t.about.hero.title}
-                        </h1>
+                        </motion.h1>
                         <p className="text-xl md:text-2xl text-gray-400 max-w-3xl leading-relaxed">
                             {t.about.hero.subtitle}
                         </p>

@@ -12,14 +12,16 @@ interface Particle {
     vy: number;
     color: string;
     angle: number;
-    radius: number;
+    distance: number;
     speed: number;
+    settled: boolean;
 }
 
 export default function FacadeAnimation() {
     const [stage, setStage] = useState<'text' | 'particles' | 'done'>('text');
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const particlesRef = useRef<Particle[]>([]);
+    const [isExploding, setIsExploding] = useState(false);
 
     useEffect(() => {
         const textTimer = setTimeout(() => {
@@ -39,20 +41,11 @@ export default function FacadeAnimation() {
         if (!ctx) return;
 
         let animationFrameId: number;
-        let time = 0;
-        let fadingOut = false;
-        let opacity = 1;
+        let frameCount = 0;
 
         const colors = [
-            '#FF0000', // Red
-            '#FF3366', // Pink Red
-            '#FF6B35', // Orange Red
-            '#FF8C42', // Orange
-            '#FFB649', // Yellow Orange
-            '#FF1744', // Vivid Red
-            '#E91E63', // Pink
-            '#F44336', // Light Red
-            '#FF5722', // Deep Orange
+            '#FF0000', '#FF1744', '#F44336', '#E91E63', '#FF3366',
+            '#FF6B35', '#FF8C42', '#FF5722', '#FFB649'
         ];
 
         const setCanvasSize = () => {
@@ -79,7 +72,6 @@ export default function FacadeAnimation() {
                 const offCtx = offCanvas.getContext('2d');
                 if (!offCtx) return;
 
-                // HUGE logo - almost fill entire screen (2x bigger)
                 const logoSize = Math.min(width, height) * 1.6;
                 offCanvas.width = logoSize;
                 offCanvas.height = logoSize;
@@ -89,42 +81,34 @@ export default function FacadeAnimation() {
                 const data = imageData.data;
 
                 const particles: Particle[] = [];
-
-                // Calculate density to get ~50,000 particles
                 const targetParticles = 50000;
                 const totalPixels = logoSize * logoSize;
-                const estimatedDarkPixels = totalPixels * 0.3; // Rough estimate
+                const estimatedDarkPixels = totalPixels * 0.3;
                 const density = Math.sqrt(estimatedDarkPixels / targetParticles);
 
                 for (let y = 0; y < logoSize; y += density) {
                     for (let x = 0; x < logoSize; x += density) {
                         const index = (Math.floor(y) * logoSize + Math.floor(x)) * 4;
-                        const r = data[index];
-                        const g = data[index + 1];
-                        const b = data[index + 2];
                         const alpha = data[index + 3];
-
-                        const brightness = (r + g + b) / 3;
+                        const brightness = (data[index] + data[index + 1] + data[index + 2]) / 3;
 
                         if (alpha > 50 && brightness < 200) {
                             const originX = (width - logoSize) / 2 + x;
                             const originY = (height - logoSize) / 2 + y;
 
-                            // Calculate angle and distance from center for vortex effect
                             const dx = originX - centerX;
                             const dy = originY - centerY;
                             const angle = Math.atan2(dy, dx);
-                            const radius = Math.sqrt(dx * dx + dy * dy);
+                            const distance = Math.sqrt(dx * dx + dy * dy);
 
-                            // Assign color based on angle (creates rainbow vortex)
                             const colorIndex = Math.floor(((angle + Math.PI) / (Math.PI * 2)) * colors.length);
                             const color = colors[colorIndex % colors.length];
 
-                            // Start particles in a vortex pattern far from origin
-                            const startAngle = angle + Math.PI * 2;
-                            const startRadius = radius + 500;
-                            const startX = centerX + Math.cos(startAngle) * startRadius;
-                            const startY = centerY + Math.sin(startAngle) * startRadius;
+                            // Start far away in spiral pattern
+                            const startAngle = angle + Math.PI * 4;
+                            const startDist = distance + 800;
+                            const startX = centerX + Math.cos(startAngle) * startDist;
+                            const startY = centerY + Math.sin(startAngle) * startDist;
 
                             particles.push({
                                 x: startX,
@@ -135,8 +119,9 @@ export default function FacadeAnimation() {
                                 vy: 0,
                                 color,
                                 angle: startAngle,
-                                radius: startRadius,
-                                speed: Math.random() * 2 + 1
+                                distance: startDist,
+                                speed: Math.random() * 1.5 + 0.5,
+                                settled: false
                             });
                         }
                     }
@@ -145,10 +130,13 @@ export default function FacadeAnimation() {
                 particlesRef.current = particles;
                 console.log(`Created ${particles.length} particles`);
 
-                // Start fading out after 3 seconds
+                // Start explosion after 2.5 seconds
                 setTimeout(() => {
-                    fadingOut = true;
-                }, 3000);
+                    setIsExploding(true);
+                    setTimeout(() => {
+                        setStage('done');
+                    }, 800);
+                }, 2500);
 
                 animate();
             };
@@ -165,59 +153,68 @@ export default function FacadeAnimation() {
             const size = { width: window.innerWidth, height: window.innerHeight };
             ctx.clearRect(0, 0, size.width, size.height);
 
-            time += 0.016; // ~60fps
+            frameCount++;
             const particles = particlesRef.current;
-
-            // Handle fade out
-            if (fadingOut) {
-                opacity -= 0.015;
-                if (opacity <= 0) {
-                    setStage('done');
-                    return;
-                }
-            }
-
             const centerX = size.width / 2;
             const centerY = size.height / 2;
 
             particles.forEach(p => {
-                // Spiral motion towards origin
-                const dx = p.originX - p.x;
-                const dy = p.originY - p.y;
-                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (isExploding) {
+                    // EXPLOSION EFFECT
+                    const dx = p.x - centerX;
+                    const dy = p.y - centerY;
+                    const angle = Math.atan2(dy, dx);
+                    const force = 15;
 
-                if (dist > 5) {
-                    // Vortex effect - spiral inward
-                    const targetAngle = Math.atan2(p.originY - centerY, p.originX - centerX);
-                    const currentAngle = Math.atan2(p.y - centerY, p.x - centerX);
+                    p.vx = Math.cos(angle) * force;
+                    p.vy = Math.sin(angle) * force;
 
-                    // Spiral motion
-                    p.angle -= 0.05 * p.speed;
-                    p.radius = Math.max(p.radius - p.speed * 2, dist);
+                    p.x += p.vx;
+                    p.y += p.vy;
 
-                    // Move in spiral
-                    const spiralX = centerX + Math.cos(p.angle) * p.radius;
-                    const spiralY = centerY + Math.sin(p.angle) * p.radius;
-
-                    // Blend spiral with direct movement
-                    p.vx += (spiralX - p.x) * 0.02;
-                    p.vy += (spiralY - p.y) * 0.02;
-                    p.vx += dx * 0.008;
-                    p.vy += dy * 0.008;
+                    // Fade out
+                    ctx.globalAlpha = Math.max(0, 1 - frameCount / 50);
                 } else {
-                    // Settled - small spring motion
-                    p.vx += dx * 0.01;
-                    p.vy += dy * 0.01;
+                    // SPIRAL CONVERGENCE
+                    const dx = p.originX - p.x;
+                    const dy = p.originY - p.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist > 2) {
+                        // Still converging - spiral motion
+                        const centerDx = p.originX - centerX;
+                        const centerDy = p.originY - centerY;
+
+                        // Reduce angle (spiral inward)
+                        p.angle -= 0.08 * p.speed;
+                        p.distance = Math.max(p.distance - p.speed * 3, dist);
+
+                        // Calculate spiral position
+                        const spiralX = centerX + Math.cos(p.angle) * p.distance;
+                        const spiralY = centerY + Math.sin(p.angle) * p.distance;
+
+                        // Move towards spiral position AND origin
+                        p.vx += (spiralX - p.x) * 0.03;
+                        p.vy += (spiralY - p.y) * 0.03;
+                        p.vx += dx * 0.02;
+                        p.vy += dy * 0.02;
+                    } else {
+                        // Settled at origin
+                        p.settled = true;
+                        p.vx += dx * 0.05;
+                        p.vy += dy * 0.05;
+                    }
+
+                    p.vx *= 0.88;
+                    p.vy *= 0.88;
+
+                    p.x += p.vx;
+                    p.y += p.vy;
+
+                    ctx.globalAlpha = 1;
                 }
 
-                p.vx *= 0.92;
-                p.vy *= 0.92;
-
-                p.x += p.vx;
-                p.y += p.vy;
-
                 // Draw particle
-                ctx.globalAlpha = opacity;
                 ctx.fillStyle = p.color;
                 ctx.beginPath();
                 ctx.arc(p.x, p.y, 1.2, 0, Math.PI * 2);
@@ -232,7 +229,7 @@ export default function FacadeAnimation() {
         return () => {
             cancelAnimationFrame(animationFrameId);
         };
-    }, [stage]);
+    }, [stage, isExploding]);
 
     if (stage === 'done') {
         return null;
@@ -250,22 +247,17 @@ export default function FacadeAnimation() {
                         transition={{ duration: 2, ease: 'easeInOut' }}
                         className="absolute inset-0 flex items-center justify-center"
                     >
-                        <motion.h1
-                            initial={{
-                                backgroundImage: 'linear-gradient(90deg, #000 0%, #000 100%)'
+                        <h1
+                            className="text-9xl font-black tracking-tighter"
+                            style={{
+                                background: 'radial-gradient(ellipse at center, #DC143C 0%, #FF6B6B 30%, #FFB3B3 60%, rgba(255,179,179,0.3) 100%)',
+                                WebkitBackgroundClip: 'text',
+                                WebkitTextFillColor: 'transparent',
+                                backgroundClip: 'text'
                             }}
-                            animate={{
-                                backgroundImage: [
-                                    'linear-gradient(90deg, #000 0%, #000 100%)',
-                                    'linear-gradient(90deg, #FF0000 0%, #FF6B35 50%, #FF0000 100%)',
-                                ]
-                            }}
-                            transition={{ duration: 1.5, delay: 0.5 }}
-                            className="text-9xl font-black tracking-tighter bg-clip-text text-transparent"
-                            style={{ WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}
                         >
                             REDCORE
-                        </motion.h1>
+                        </h1>
                     </motion.div>
                 )}
             </AnimatePresence>

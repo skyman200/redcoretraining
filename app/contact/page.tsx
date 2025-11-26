@@ -242,10 +242,4 @@ function ContactPage() {
     );
 }
 
-export default function ContactPageWrapper() {
-    return (
-        <LanguageProvider>
-            <ContactPage />
-        </LanguageProvider>
-    );
-}
+export default ContactPage;

@@ -219,10 +219,4 @@ function BoardDetailPage({ params }: { params: Promise<{ slug: string }> }) {
     );
 }
 
-export default function BoardDetailPageWrapper({ params }: { params: Promise<{ slug: string }> }) {
-    return (
-        <LanguageProvider>
-            <BoardDetailPage params={params} />
-        </LanguageProvider>
-    );
-}
+export default BoardDetailPage;

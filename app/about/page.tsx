@@ -162,10 +162,4 @@ function AboutPage() {
     );
 }
 
-export default function AboutPageWrapper() {
-    return (
-        <LanguageProvider>
-            <AboutPage />
-        </LanguageProvider>
-    );
-}
+export default AboutPage;

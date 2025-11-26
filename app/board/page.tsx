@@ -117,10 +117,4 @@ function BoardPage() {
     );
 }
 
-export default function BoardPageWrapper() {
-    return (
-        <LanguageProvider>
-            <BoardPage />
-        </LanguageProvider>
-    );
-}
+export default BoardPage;

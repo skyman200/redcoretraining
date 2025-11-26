@@ -6,11 +6,12 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import BoardCard, { posts as defaultPosts } from '@/components/BoardCard';
 import { LanguageProvider } from '@/contexts/LanguageContext';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 function BoardPage() {
     const { t } = useLanguage();
     const [allPosts, setAllPosts] = useState(defaultPosts);
+    const [showAnimation, setShowAnimation] = useState(true);
 
     useEffect(() => {
         // Load admin posts from localStorage
@@ -20,6 +21,13 @@ function BoardPage() {
             // Combine admin posts with default posts
             setAllPosts([...adminPosts, ...defaultPosts]);
         }
+
+        // End animation after 2 seconds
+        const timer = setTimeout(() => {
+            setShowAnimation(false);
+        }, 2000);
+
+        return () => clearTimeout(timer);
     }, []);
 
     return (
@@ -32,8 +40,44 @@ function BoardPage() {
         >
             <Header />
 
-            <main className="pt-32 pb-20 px-6">
-                <div className="container mx-auto">
+            <main className="pt-32 pb-20 px-6 relative">
+                {/* Animated Title Overlay */}
+                <AnimatePresence>
+                    {showAnimation && (
+                        <motion.div
+                            initial={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.5 }}
+                            className="fixed inset-0 z-40 flex items-center justify-center bg-white"
+                        >
+                            <motion.h1
+                                initial={{ scale: 3, opacity: 1 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                exit={{ scale: 1, opacity: 0 }}
+                                transition={{
+                                    scale: { duration: 1.5, ease: "easeInOut" },
+                                    opacity: { duration: 0.3, delay: 1.5 }
+                                }}
+                                className="text-5xl md:text-7xl font-bold tracking-tighter"
+                            >
+                                <span className="bg-gradient-to-r from-black via-red-600 to-black bg-clip-text text-transparent">
+                                    {t.board.title}
+                                </span>
+                            </motion.h1>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
+                {/* Main Content */}
+                <motion.div
+                    initial={{ opacity: 0, filter: "blur(10px)" }}
+                    animate={{
+                        opacity: showAnimation ? 0 : 1,
+                        filter: showAnimation ? "blur(10px)" : "blur(0px)"
+                    }}
+                    transition={{ duration: 0.8, delay: 1.6 }}
+                    className="container mx-auto"
+                >
                     <div className="text-center mb-16">
                         <h1 className="text-5xl md:text-7xl font-bold tracking-tighter mb-6">
                             <span className="bg-gradient-to-r from-black via-red-600 to-black dark:from-white dark:via-red-400 dark:to-white bg-clip-text text-transparent">
@@ -51,13 +95,13 @@ function BoardPage() {
                                 key={post.id}
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: index * 0.1 }}
+                                transition={{ delay: 1.8 + (index * 0.1) }}
                             >
                                 <BoardCard post={post} />
                             </motion.div>
                         ))}
                     </div>
-                </div>
+                </motion.div>
             </main>
 
             <Footer />

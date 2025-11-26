@@ -57,7 +57,7 @@ function WorkPage() {
                         }}
                         className="text-5xl md:text-7xl font-bold tracking-tighter mb-8 leading-tight"
                     >
-                        <span className="bg-gradient-to-r from-black via-red-600 to-black bg-clip-text text-transparent">
+                        <span className="bg-gradient-to-r from-black via-red-600 to-black bg-clip-text text-transparent whitespace-pre-line block">
                             {t.work.hero.title}
                         </span>
                     </motion.h1>

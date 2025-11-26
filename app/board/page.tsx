@@ -62,10 +62,10 @@ function BoardPage() {
                                     <motion.h1
                                         layoutId="board-title"
                                         className="text-5xl md:text-7xl font-bold tracking-tighter"
-                                        initial={{ scale: 3 }}
-                                        animate={{ scale: 3 }}
-                                        exit={{ scale: 1 }}
-                                        transition={{ duration: 1.2, ease: "easeInOut" }}
+                                        initial={{ scale: 3, opacity: 0 }}
+                                        animate={{ scale: 3, opacity: 1 }}
+                                        exit={{ scale: 1, opacity: 0, transition: { duration: 0.8, ease: "easeInOut" } }}
+                                        transition={{ duration: 1.5, ease: "easeOut" }}
                                     >
                                         <span className="bg-gradient-to-r from-black via-red-600 to-black dark:from-white dark:via-red-400 dark:to-white bg-clip-text text-transparent">
                                             {t.board.title}
@@ -76,9 +76,9 @@ function BoardPage() {
                                 <motion.h1
                                     layoutId="board-title"
                                     className="text-5xl md:text-7xl font-bold tracking-tighter absolute inset-0 flex items-center justify-center"
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    transition={{ duration: 0.5 }}
+                                    initial={{ scale: 1.2, opacity: 0 }}
+                                    animate={{ scale: 1, opacity: 1 }}
+                                    transition={{ duration: 0.8, ease: "easeOut" }}
                                 >
                                     <span className="bg-gradient-to-r from-black via-red-600 to-black dark:from-white dark:via-red-400 dark:to-white bg-clip-text text-transparent">
                                         {t.board.title}

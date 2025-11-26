@@ -49,7 +49,7 @@ export const ko = {
     },
     work: {
         hero: {
-            title: "데이터와 임상, 실전 경험으로 만든 우리의 스토리",
+            title: "데이터와 임상, 실전 경험으로 만든\n우리의 스토리",
             subtitle: "실제 재활 데이터와 최첨단 디지털 헬스케어 혁신의 만남"
         },
         digitalHealth: {

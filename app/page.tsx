@@ -26,9 +26,9 @@ const translations = {
     features: {
       title: "Perfect Synergy Between",
       titleHighlight: "Center & App",
-      subtitle: "We are not just an app development company. We are a team of experts who research and train people's bodies in real-world settings.",
-      card1Title: "Professional Pilates Equipment",
-      card1Desc: "Training programs designed based on the professional equipment and expertise you see on our blog.",
+      subtitle: "We are a team of experts who research and train people's bodies in real-world settings, not just an app development company.",
+      card1Title: "Professional Pilates Instructors",
+      card1Desc: "Training programs designed by professional Pilates instructors with physical therapy backgrounds, based on years of field experience.",
       card2Title: "IT Technology Integration",
       card2Desc: "Beyond offline limitations, receive professional coaching anytime, anywhere through our app.",
       card3Title: "Breathing & Health Data",
@@ -40,7 +40,8 @@ const translations = {
       title2: "Creates the Best App.",
       desc1: "Redcore Training Center has practical data accumulated from directly caring for numerous members' bodies.",
       desc2: "Knowing better than anyone which postures are problematic and which breathing is needed, we develop digital healthcare solutions that create 'real change', not just another exercise app.",
-      link: "See More Facilities"
+      link: "See More Facilities",
+      linkUrl: "https://blog.naver.com/PostView.naver?blogId=redcore2021&logNo=222317997696&categoryNo=10&parentCategoryNo=&from=thumbnailList"
     },
     cta: {
       title1: "Start Now,",
@@ -70,9 +71,9 @@ const translations = {
     features: {
       title: "센터와 앱의",
       titleHighlight: "완벽한 시너지",
-      subtitle: "우리는 단순한 앱 개발사가 아닙니다. 실제 현장에서 사람들의 몸을 연구하고 트레이닝하는 전문가 그룹입니다.",
-      card1Title: "전문적인 필라테스 장비",
-      card1Desc: "블로그에서 보신 바로 그 전문 장비와 노하우를 기반으로 트레이닝 프로그램을 설계했습니다.",
+      subtitle: "우리는 실제 현장에서 사람들의 몸을 연구하고 트레이닝하는 전문가 그룹입니다. 단순한 앱 개발사가 아닙니다.",
+      card1Title: "전문적인 필라테스 강사진",
+      card1Desc: "전문 물리치료사 출신의 필라테스 강사가 다년간 필드에서 쌓은 경험을 바탕으로 탄생했습니다.",
       card2Title: "IT 기술과의 결합",
       card2Desc: "오프라인의 한계를 넘어, 언제 어디서나 전문적인 코칭을 받을 수 있도록 앱으로 구현했습니다.",
       card3Title: "호흡과 건강 데이터",
@@ -84,7 +85,8 @@ const translations = {
       title2: "최고의 앱을 만듭니다.",
       desc1: "레드코어 트레이닝 센터는 수많은 회원님들의 몸을 직접 케어하며 쌓아온 실전 데이터가 있습니다.",
       desc2: "어떤 자세가 문제인지, 어떤 호흡이 필요한지 누구보다 잘 알기에, 그저 그런 운동 앱이 아닌 '진짜 변화'를 만들어내는 디지털 헬스케어 솔루션을 개발합니다.",
-      link: "센터 시설 더 보기"
+      link: "센터 시설 더 보기",
+      linkUrl: "https://blog.naver.com/PostView.naver?blogId=redcore2021&logNo=222317997696&categoryNo=10&parentCategoryNo=&from=thumbnailList"
     },
     cta: {
       title1: "지금 바로,",
@@ -100,7 +102,44 @@ const translations = {
 // --- Main Page Component ---
 export default function Home() {
   const [lang, setLang] = useState<'en' | 'ko'>('en');
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [touchStart, setTouchStart] = useState(0);
+  const [touchEnd, setTouchEnd] = useState(0);
+  
   const t = translations[lang];
+  const heroImages = ['/hero.jpg', '/app.jpg'];
+
+  // 스와이프 핸들러
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > 50;
+    const isRightSwipe = distance < -50;
+
+    if (isLeftSwipe && currentImageIndex < heroImages.length - 1) {
+      setCurrentImageIndex(currentImageIndex + 1);
+    }
+    if (isRightSwipe && currentImageIndex > 0) {
+      setCurrentImageIndex(currentImageIndex - 1);
+    }
+  };
+
+  // 구글맵 URL 생성
+  const getGoogleMapsUrl = () => {
+    const address = lang === 'ko' 
+      ? '양산시 물금읍 증산역로 163 6층 레드코어운동센터'
+      : '6F, 163 Jeungsanyeok-ro, Mulgeum-eup, Yangsan-si, Redcore Training Center';
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
+  };
 
   return (
     <main className="min-h-screen bg-zinc-950 text-white selection:bg-red-500/30">
@@ -187,21 +226,59 @@ export default function Home() {
               </div>
               <div className="flex items-center justify-center md:justify-start gap-2 text-sm text-zinc-500 pt-4">
                 <MapPin size={16} className="text-red-500" />
-                <span>{t.hero.location}</span>
+                <a
+                  href={getGoogleMapsUrl()}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-red-400 transition cursor-pointer"
+                >
+                  {t.hero.location}
+                </a>
               </div>
             </div>
-            {/* Right: Main Image */}
+            {/* Right: Main Image with Swipe */}
             <div className="flex-1 relative w-full max-w-xl">
               <div className="absolute inset-0 bg-gradient-to-tr from-red-500/20 to-orange-500/20 blur-2xl rounded-3xl transform rotate-3 scale-105 opacity-70" />
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-white/10">
-                <Image
-                  src="/hero.jpg"
-                  alt="Redcore Center Main"
-                  width={800}
-                  height={600}
-                  className="object-cover w-full h-full transform hover:scale-105 transition duration-700"
-                  priority
-                />
+              <div 
+                className="relative rounded-2xl overflow-hidden shadow-2xl border border-white/10"
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+              >
+                <div className="relative w-full aspect-[4/3] overflow-hidden">
+                  <div 
+                    className="flex transition-transform duration-500 ease-in-out"
+                    style={{ transform: `translateX(-${currentImageIndex * 100}%)` }}
+                  >
+                    {heroImages.map((img, index) => (
+                      <div key={index} className="min-w-full">
+                        <Image
+                          src={img}
+                          alt={index === 0 ? "Redcore Center Main" : "Redcore App"}
+                          width={800}
+                          height={600}
+                          className="object-cover w-full h-full transform hover:scale-105 transition duration-700"
+                          priority={index === 0}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                {/* Swipe Indicators */}
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+                  {heroImages.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentImageIndex(index)}
+                      className={`h-2 rounded-full transition-all ${
+                        index === currentImageIndex 
+                          ? 'w-8 bg-red-500' 
+                          : 'w-2 bg-white/30 hover:bg-white/50'
+                      }`}
+                      aria-label={`Go to image ${index + 1}`}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
           </div>
@@ -271,7 +348,7 @@ export default function Home() {
               </p>
               <div className="pt-4">
                 <Link
-                  href="https://blog.naver.com/redcore2021"
+                  href={t.center.linkUrl}
                   target="_blank"
                   className="text-red-400 flex items-center gap-1 hover:gap-2 transition-all font-medium"
                 >
@@ -309,9 +386,14 @@ export default function Home() {
               <Mail size={18} />
               <span>admin@redcoretraining.com</span>
             </a>
-            <p className="text-sm text-zinc-500">
+            <a
+              href={getGoogleMapsUrl()}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block text-sm text-zinc-500 hover:text-red-400 transition-colors cursor-pointer"
+            >
               {t.cta.address}
-            </p>
+            </a>
             <p className="text-sm text-zinc-500">
               {t.cta.copyright}
             </p>

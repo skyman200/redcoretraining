@@ -15,7 +15,7 @@ interface Particle {
 
 export default function FacadeAnimation() {
     const [stage, setStage] = useState<'text' | 'particles' | 'done'>('text');
-    const canvasRef = useRef<HTMLHTMLCanvasElement>(null);
+    const canvasRef = useRef<HTMLCanvasElement>(null);
 
     useEffect(() => {
         const timer = setTimeout(() => setStage('particles'), 2500);

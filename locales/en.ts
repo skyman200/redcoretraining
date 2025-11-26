@@ -38,8 +38,8 @@ export const en = {
         addressDetail: "Yangsan-si, Mulgeum-eup, Jeungsanyeok-ro 163, 6F",
         blog: "Naver Blog",
         instagram: "Instagram",
-        copyright: "© 2025 Redcore Training Center. All rights reserved.",
-        designed: "Designed by Antigravity"
+        copyright: "© 2016 Redcore Training Center. All rights reserved.",
+        designed: "Designed by Kim cook"
     },
     board: {
         title: "Training Resources",

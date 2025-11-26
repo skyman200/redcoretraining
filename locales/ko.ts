@@ -38,8 +38,8 @@ export const ko = {
         addressDetail: "양산시 물금읍 증산역로 163 6층",
         blog: "네이버 블로그",
         instagram: "인스타그램",
-        copyright: "© 2025 레드코어 트레이닝 센터. All rights reserved.",
-        designed: "Designed by Antigravity"
+        copyright: "© 2016 레드코어 트레이닝 센터. All rights reserved.",
+        designed: "Designed by Kim cook"
     },
     board: {
         title: "트레이닝 자료",

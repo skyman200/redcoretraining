@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import PageTransitionLink from '@/components/PageTransitionLink';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Globe } from 'lucide-react';
+import { Globe, Lock } from 'lucide-react';
 
 export default function Header() {
   const { language, setLanguage, t } = useLanguage();
@@ -29,6 +29,14 @@ export default function Header() {
           </PageTransitionLink>
         </nav>
         <div className="flex items-center gap-4">
+          <PageTransitionLink
+            href="/admin"
+            className="flex items-center gap-2 text-sm font-medium uppercase tracking-widest hover:opacity-70 transition-opacity"
+            aria-label="Admin"
+          >
+            <Lock size={16} />
+            <span className="hidden md:inline">Admin</span>
+          </PageTransitionLink>
           <button
             onClick={() => setLanguage(language === 'en' ? 'ko' : 'en')}
             className="flex items-center gap-2 text-sm font-medium uppercase tracking-widest hover:opacity-70 transition-opacity"

@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Activity, HeartPulse, Smartphone, ChevronRight, MapPin, Languages, Mail } from 'lucide-react';
+import { Activity, HeartPulse, Smartphone, ChevronRight, MapPin, Languages, Mail, Download, FileText, Image as ImageIcon } from 'lucide-react';
 
 // Translation data
 const translations = {
@@ -12,7 +12,8 @@ const translations = {
       center: "About Center",
       app: "About App",
       blog: "Blog",
-      download: "Download App"
+      download: "Download App",
+      resources: "Resources"
     },
     hero: {
       title1: "Professional Offline",
@@ -43,6 +44,15 @@ const translations = {
       link: "See More Facilities",
       linkUrl: "https://blog.naver.com/PostView.naver?blogId=redcore2021&logNo=222317997696&categoryNo=10&parentCategoryNo=&from=thumbnailList"
     },
+    resources: {
+      title: "Resources & Downloads",
+      subtitle: "Download training materials, guides, and resources from our Google Drive",
+      loading: "Loading files...",
+      error: "Failed to load files",
+      download: "Download",
+      view: "View",
+      noFiles: "No files available"
+    },
     cta: {
       title1: "Start Now,",
       title2: "Begin Healthier Breathing.",
@@ -57,7 +67,8 @@ const translations = {
       center: "센터 소개",
       app: "앱 소개",
       blog: "블로그",
-      download: "앱 다운로드"
+      download: "앱 다운로드",
+      resources: "자료실"
     },
     hero: {
       title1: "오프라인의",
@@ -88,6 +99,15 @@ const translations = {
       link: "센터 시설 더 보기",
       linkUrl: "https://blog.naver.com/PostView.naver?blogId=redcore2021&logNo=222317997696&categoryNo=10&parentCategoryNo=&from=thumbnailList"
     },
+    resources: {
+      title: "자료실",
+      subtitle: "구글 드라이브에서 트레이닝 자료, 가이드, 리소스를 다운로드하세요",
+      loading: "파일 로딩 중...",
+      error: "파일을 불러오는데 실패했습니다",
+      download: "다운로드",
+      view: "보기",
+      noFiles: "사용 가능한 파일이 없습니다"
+    },
     cta: {
       title1: "지금 바로,",
       title2: "더 건강한 호흡을 시작하세요.",
@@ -99,39 +119,56 @@ const translations = {
   }
 };
 
+// Google Drive 파일 타입
+interface DriveFile {
+  id: string;
+  name: string;
+  mimeType: string;
+  webViewLink: string;
+  webContentLink?: string;
+  size?: string;
+  modifiedTime?: string;
+}
+
 // --- Main Page Component ---
 export default function Home() {
   const [lang, setLang] = useState<'en' | 'ko'>('en');
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [touchStart, setTouchStart] = useState(0);
-  const [touchEnd, setTouchEnd] = useState(0);
+  const [driveFiles, setDriveFiles] = useState<DriveFile[]>([]);
+  const [loadingFiles, setLoadingFiles] = useState(true);
   
   const t = translations[lang];
   const heroImages = ['/hero.jpg', '/app.jpg'];
 
-  // 스와이프 핸들러
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setTouchStart(e.targetTouches[0].clientX);
-  };
+  // 자동 이미지 전환 (5초마다)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prev) => (prev + 1) % heroImages.length);
+    }, 5000);
 
-  const handleTouchMove = (e: React.TouchEvent) => {
-    setTouchEnd(e.targetTouches[0].clientX);
-  };
+    return () => clearInterval(interval);
+  }, []);
 
-  const handleTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
-    
-    const distance = touchStart - touchEnd;
-    const isLeftSwipe = distance > 50;
-    const isRightSwipe = distance < -50;
+  // Google Drive 파일 목록 가져오기
+  useEffect(() => {
+    const fetchFiles = async () => {
+      try {
+        const response = await fetch('/api/drive');
+        if (response.ok) {
+          const files = await response.json();
+          setDriveFiles(files);
+        } else {
+          console.error('Failed to fetch files');
+        }
+      } catch (error) {
+        console.error('Failed to fetch files:', error);
+      } finally {
+        setLoadingFiles(false);
+      }
+    };
 
-    if (isLeftSwipe && currentImageIndex < heroImages.length - 1) {
-      setCurrentImageIndex(currentImageIndex + 1);
-    }
-    if (isRightSwipe && currentImageIndex > 0) {
-      setCurrentImageIndex(currentImageIndex - 1);
-    }
-  };
+    fetchFiles();
+  }, []);
 
   // 구글맵 URL 생성
   const getGoogleMapsUrl = () => {
@@ -139,6 +176,22 @@ export default function Home() {
       ? '양산시 물금읍 증산역로 163 6층 레드코어운동센터'
       : '6F, 163 Jeungsanyeok-ro, Mulgeum-eup, Yangsan-si, Redcore Training Center';
     return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
+  };
+
+  // 파일 아이콘 가져오기
+  const getFileIcon = (mimeType: string) => {
+    if (mimeType.includes('image')) return <ImageIcon size={20} />;
+    if (mimeType.includes('pdf')) return <FileText size={20} />;
+    return <FileText size={20} />;
+  };
+
+  // 파일 크기 포맷팅
+  const formatFileSize = (bytes?: string) => {
+    if (!bytes) return '';
+    const size = parseInt(bytes);
+    if (size < 1024) return size + ' B';
+    if (size < 1024 * 1024) return (size / 1024).toFixed(1) + ' KB';
+    return (size / (1024 * 1024)).toFixed(1) + ' MB';
   };
 
   return (
@@ -159,6 +212,7 @@ export default function Home() {
             <Link href="#features" className="hover:text-red-400 transition">{t.nav.center}</Link>
             <Link href="#app" className="hover:text-red-400 transition">{t.nav.app}</Link>
             <Link href="https://blog.naver.com/redcore2021" target="_blank" className="hover:text-red-400 transition">{t.nav.blog}</Link>
+            <Link href="#resources" className="hover:text-red-400 transition">{t.nav.resources}</Link>
           </nav>
           {/* Language Toggle & Download Button */}
           <div className="flex items-center gap-3">
@@ -236,35 +290,29 @@ export default function Home() {
                 </a>
               </div>
             </div>
-            {/* Right: Main Image with Swipe */}
+            {/* Right: Main Image with Auto Fade */}
             <div className="flex-1 relative w-full max-w-xl">
               <div className="absolute inset-0 bg-gradient-to-tr from-red-500/20 to-orange-500/20 blur-2xl rounded-3xl transform rotate-3 scale-105 opacity-70" />
-              <div 
-                className="relative rounded-2xl overflow-hidden shadow-2xl border border-white/10"
-                onTouchStart={handleTouchStart}
-                onTouchMove={handleTouchMove}
-                onTouchEnd={handleTouchEnd}
-              >
-                <div className="relative w-full aspect-[4/3] overflow-hidden">
-                  <div 
-                    className="flex transition-transform duration-500 ease-in-out"
-                    style={{ transform: `translateX(-${currentImageIndex * 100}%)` }}
-                  >
-                    {heroImages.map((img, index) => (
-                      <div key={index} className="min-w-full">
-                        <Image
-                          src={img}
-                          alt={index === 0 ? "Redcore Center Main" : "Redcore App"}
-                          width={800}
-                          height={600}
-                          className="object-cover w-full h-full transform hover:scale-105 transition duration-700"
-                          priority={index === 0}
-                        />
-                      </div>
-                    ))}
-                  </div>
+              <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-white/10">
+                <div className="relative w-full aspect-[4/3]">
+                  {heroImages.map((img, index) => (
+                    <div
+                      key={index}
+                      className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+                        index === currentImageIndex ? 'opacity-100' : 'opacity-0'
+                      }`}
+                    >
+                      <Image
+                        src={img}
+                        alt={index === 0 ? "Redcore Center Main" : "Redcore App"}
+                        fill
+                        className="object-cover"
+                        priority={index === 0}
+                      />
+                    </div>
+                  ))}
                 </div>
-                {/* Swipe Indicators */}
+                {/* Image Indicators */}
                 <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
                   {heroImages.map((_, index) => (
                     <button
@@ -360,7 +408,78 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 5. CTA Section */}
+      {/* 5. Resources Section - Google Drive 연동 */}
+      <section id="resources" className="py-20 bg-zinc-900/50 relative overflow-hidden">
+        <div className="container mx-auto px-6 relative z-10">
+          <div className="text-center max-w-2xl mx-auto mb-16 space-y-4">
+            <h2 className="text-3xl md:text-4xl font-bold">
+              {t.resources.title}
+            </h2>
+            <p className="text-zinc-400 leading-relaxed">
+              {t.resources.subtitle}
+            </p>
+          </div>
+
+          {loadingFiles ? (
+            <div className="text-center py-12">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-red-500"></div>
+              <p className="text-zinc-400 mt-4">{t.resources.loading}</p>
+            </div>
+          ) : driveFiles.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-zinc-400">{t.resources.noFiles}</p>
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {driveFiles.map((file) => (
+                <div
+                  key={file.id}
+                  className="p-6 rounded-2xl bg-zinc-800/50 border border-white/5 hover:border-red-500/30 hover:bg-zinc-800/80 transition duration-300 group"
+                >
+                  <div className="flex items-start gap-4 mb-4">
+                    <div className="p-3 bg-zinc-900/80 rounded-xl text-red-500">
+                      {getFileIcon(file.mimeType)}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-bold text-white mb-1 truncate group-hover:text-red-400 transition">
+                        {file.name}
+                      </h3>
+                      {file.size && (
+                        <p className="text-xs text-zinc-500">
+                          {formatFileSize(file.size)}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    {file.webContentLink && (
+                      <a
+                        href={file.webContentLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition"
+                      >
+                        <Download size={16} />
+                        {t.resources.download}
+                      </a>
+                    )}
+                    <a
+                      href={file.webViewLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-zinc-300 border border-zinc-700 rounded-lg hover:border-red-500 hover:text-red-400 transition"
+                    >
+                      {t.resources.view}
+                    </a>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* 6. CTA Section */}
       <section id="download" className="py-24 relative overflow-hidden bg-red-900/20">
         <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-transparent z-0" />
         <div className="absolute top-1/2 left-1/2 w-[800px] h-[800px] bg-red-600/30 blur-[100px] rounded-full pointer-events-none transform -translate-y-1/2 -translate-x-1/2 z-0 opacity-50" />

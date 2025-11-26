@@ -171,7 +171,7 @@ export default function FacadeAnimation() {
                 setTimeout(() => {
                     exploding = true;
                     setTimeout(() => setStage('done'), 1500);
-                }, 5000); // 5 seconds spiral
+                }, 1000); // 1 second after logo forms
 
                 animate();
             };

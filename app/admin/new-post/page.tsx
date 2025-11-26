@@ -6,6 +6,14 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Save, Upload, X } from 'lucide-react';
 
+// Google Picker API types
+declare global {
+    interface Window {
+        gapi: any;
+        google: any;
+    }
+}
+
 export default function NewPostPage() {
     const router = useRouter();
     const [formData, setFormData] = useState({
@@ -18,8 +26,8 @@ export default function NewPostPage() {
     const [files, setFiles] = useState<Array<{ name: string; url: string }>>([]);
     const [newFileName, setNewFileName] = useState('');
     const [newFileUrl, setNewFileUrl] = useState('');
-    const [uploading, setUploading] = useState(false);
-    const [uploadProgress, setUploadProgress] = useState<string>('');
+    const [pickerApiLoaded, setPickerApiLoaded] = useState(false);
+    const [oauthToken, setOauthToken] = useState<string | null>(null);
 
     useEffect(() => {
         // Check authentication
@@ -27,6 +35,23 @@ export default function NewPostPage() {
         if (!isAuth) {
             router.push('/admin');
         }
+
+        // Load Google API
+        const script = document.createElement('script');
+        script.src = 'https://apis.google.com/js/api.js';
+        script.onload = () => {
+            window.gapi.load('client:picker', () => {
+                window.gapi.client.load('https://www.googleapis.com/discovery/v1/apis/drive/v3/rest')
+                    .then(() => {
+                        setPickerApiLoaded(true);
+                    });
+            });
+        };
+        document.body.appendChild(script);
+
+        return () => {
+            document.body.removeChild(script);
+        };
     }, [router]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -46,6 +71,69 @@ export default function NewPostPage() {
 
     const handleRemoveFile = (index: number) => {
         setFiles(prev => prev.filter((_, i) => i !== index));
+    };
+
+    const handleGoogleDrivePicker = () => {
+        const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+        const apiKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
+
+        if (!clientId || !apiKey) {
+            alert('Google API 인증 정보가 설정되지 않았습니다.');
+            return;
+        }
+
+        if (!pickerApiLoaded) {
+            alert('Google API가 아직 로드 중입니다. 잠시 후 다시 시도해주세요.');
+            return;
+        }
+
+        // Create and render a Picker object for uploading files
+        const tokenClient = window.google.accounts.oauth2.initTokenClient({
+            client_id: clientId,
+            scope: 'https://www.googleapis.com/auth/drive.file',
+            callback: (response: any) => {
+                if (response.access_token) {
+                    setOauthToken(response.access_token);
+                    createPicker(response.access_token);
+                }
+            },
+        });
+
+        tokenClient.requestAccessToken();
+    };
+
+    const createPicker = (token: string) => {
+        const apiKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
+
+        const view = new window.google.picker.DocsView()
+            .setIncludeFolders(true)
+            .setSelectFolderEnabled(false);
+
+        const uploadView = new window.google.picker.DocsUploadView();
+
+        const picker = new window.google.picker.PickerBuilder()
+            .setAppId('831055186990')
+            .setOAuthToken(token)
+            .setDeveloperKey(apiKey)
+            .addView(view)
+            .addView(uploadView)
+            .setCallback(pickerCallback)
+            .build();
+
+        picker.setVisible(true);
+    };
+
+    const pickerCallback = (data: any) => {
+        if (data.action === window.google.picker.Action.PICKED) {
+            const file = data.docs[0];
+            const fileUrl = `https://drive.google.com/file/d/${file.id}/view`;
+            const downloadUrl = `https://drive.google.com/uc?export=download&id=${file.id}`;
+
+            setFiles(prev => [...prev, {
+                name: file.name,
+                url: downloadUrl
+            }]);
+        }
     };
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -71,6 +159,9 @@ export default function NewPostPage() {
 
     return (
         <div className="min-h-screen bg-gray-50">
+            {/* Load Google Identity Services */}
+            <script src="https://accounts.google.com/gsi/client" async defer></script>
+
             {/* Header */}
             <header className="bg-black text-white py-6 px-6">
                 <div className="container mx-auto">
@@ -176,7 +267,7 @@ export default function NewPostPage() {
                                                 </div>
                                                 <div className="min-w-0">
                                                     <p className="font-medium truncate">{file.name}</p>
-                                                    <p className="text-xs text-gray-500 truncate">{file.url.startsWith('data:') ? '로컬 파일 (Base64)' : file.url}</p>
+                                                    <p className="text-xs text-gray-500 truncate">Google Drive</p>
                                                 </div>
                                             </div>
                                             <button
@@ -193,80 +284,19 @@ export default function NewPostPage() {
 
                             {/* Add new file */}
                             <div className="space-y-4">
-                                {/* Upload Progress */}
-                                {uploading && (
-                                    <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                                        <div className="flex items-center gap-3">
-                                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
-                                            <p className="text-sm font-medium text-blue-900">{uploadProgress}</p>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* Local File Upload */}
-                                <div className="p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-black transition-colors text-center group cursor-pointer relative">
-                                    <input
-                                        type="file"
-                                        disabled={uploading}
-                                        onChange={async (e) => {
-                                            const file = e.target.files?.[0];
-                                            if (file) {
-                                                // Check file size (limit to 300MB)
-                                                const maxSize = 300 * 1024 * 1024; // 300MB
-                                                if (file.size > maxSize) {
-                                                    alert('파일 크기가 너무 큽니다. 300MB 이하의 파일만 업로드 가능합니다.');
-                                                    return;
-                                                }
-
-                                                setUploading(true);
-                                                setUploadProgress('Google Drive에 업로드 중...');
-
-                                                try {
-                                                    const formData = new FormData();
-                                                    formData.append('file', file);
-
-                                                    const response = await fetch('/api/upload', {
-                                                        method: 'POST',
-                                                        body: formData,
-                                                    });
-
-                                                    const data = await response.json().catch(() => ({ error: 'Server error' }));
-
-                                                    if (response.ok && data.success) {
-                                                        setFiles(prev => [...prev, {
-                                                            name: data.file.name,
-                                                            url: data.file.downloadLink || data.file.url
-                                                        }]);
-                                                        setUploadProgress('업로드 완료!');
-                                                        setTimeout(() => setUploadProgress(''), 2000);
-                                                    } else if (response.status === 413) {
-                                                        alert('파일이 너무 큽니다.\n\n로컬 개발 환경에서는 300MB까지 지원하지만,\n배포된 환경에서는 호스팅 플랫폼의 제한(일반적으로 4.5MB)이 적용됩니다.\n\n해결 방법:\n1. Google Drive에 직접 업로드 후 링크를 "링크 직접 입력"에 붙여넣기\n2. 파일 크기를 줄이기');
-                                                        setUploadProgress('');
-                                                    } else {
-                                                        alert(`업로드 실패: ${data.error || '알 수 없는 오류'}`);
-                                                        setUploadProgress('');
-                                                    }
-                                                } catch (error) {
-                                                    console.error('Upload error:', error);
-                                                    alert('파일 업로드 중 오류가 발생했습니다.\n\nGoogle Drive 인증 정보가 설정되어 있는지 확인해주세요.\n(.env.local 파일 참조)');
-                                                    setUploadProgress('');
-                                                } finally {
-                                                    setUploading(false);
-                                                    // Reset input
-                                                    e.target.value = '';
-                                                }
-                                            }
-                                        }}
-                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
-                                    />
-                                    <div className={`flex flex-col items-center gap-2 transition-colors ${uploading ? 'text-gray-400' : 'text-gray-500 group-hover:text-black'}`}>
-                                        <div className={`p-3 bg-gray-100 rounded-full transition-colors ${!uploading && 'group-hover:bg-gray-200'}`}>
+                                {/* Google Drive Picker */}
+                                <div className="p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-black transition-colors text-center">
+                                    <button
+                                        type="button"
+                                        onClick={handleGoogleDrivePicker}
+                                        className="w-full flex flex-col items-center gap-2 text-gray-500 hover:text-black transition-colors"
+                                    >
+                                        <div className="p-3 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors">
                                             <Upload size={24} />
                                         </div>
-                                        <p className="font-medium">내 컴퓨터에서 파일 선택</p>
-                                        <p className="text-xs text-gray-400">클릭하거나 파일을 여기로 드래그하세요 (최대 300MB)</p>
-                                        <p className="text-xs text-gray-400 mt-1">파일은 Google Drive에 자동으로 저장됩니다</p>
-                                    </div>
+                                        <p className="font-medium">Google Drive에서 파일 선택 또는 업로드</p>
+                                        <p className="text-xs text-gray-400">클릭하여 Google Drive 창 열기 (파일 크기 제한 없음)</p>
+                                    </button>
                                 </div>
 
                                 <div className="relative">

@@ -2,20 +2,18 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #000000;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #000000;
+    --foreground: #ffffff;
   }
 }
 
@@ -23,40 +21,113 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* 역동적인 이미지 애니메이션 */
-/* Hero Container - 역동적인 3D 움직임 */
-@keyframes heroContainerFloat {
-  0%, 100% {
-    transform: translateY(0) translateX(0) rotate(0deg) scale(1);
-  }
-  20% {
-    transform: translateY(-15px) translateX(10px) rotate(3deg) scale(1.05);
-  }
-  40% {
-    transform: translateY(10px) translateX(-8px) rotate(-2deg) scale(0.98);
-  }
-  60% {
-    transform: translateY(-8px) translateX(-12px) rotate(-3deg) scale(1.02);
-  }
-  80% {
-    transform: translateY(12px) translateX(8px) rotate(2deg) scale(0.95);
-  }
+/* Custom Utilities for the minimalist design */
+.text-balance {
+  text-wrap: balance;
 }
 
-/* App Container - 역동적인 3D 움직임 (다른 패턴) */
-@keyframes appContainerFloat {
-  0%, 100% {
-    transform: translateY(0) translateX(0) rotate(0deg) scale(1);
+/* Gradient Animation */
+@keyframes gradient {
+
+  0%,
+  100% {
+    background-position: 0% 50%;
   }
-  25% {
-    transform: translateY(15px) translateX(-10px) rotate(-3deg) scale(1.05);
-  }
+
   50% {
-    transform: translateY(-10px) translateX(12px) rotate(2deg) scale(0.98);
+    background-position: 100% 50%;
   }
-  75% {
-    transform: translateY(8px) translateX(8px) rotate(3deg) scale(1.02);
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient 3s ease infinite;
+}
+
+/* Facade Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.8s ease-out forwards;
+}
+
+.fade-out {
+  animation: fadeOut 0.5s ease-out forwards;
+}
+
+/* Page Transition */
+@keyframes pageIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-transition {
+  animation: pageIn 0.6s ease-out;
+}
+
+/* Page Transition Overlay - lordin.net inspired */
+.page-transition-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #000000;
+  z-index: 9999;
+  animation: overlayFadeIn 0.5s ease-out forwards;
+}
+
+.page-transition-overlay.fade-out {
+  animation: overlayFadeOut 0.5s ease-out forwards;
+}
+
+@keyframes overlayFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes overlayFadeOut {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
   }
 }

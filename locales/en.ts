@@ -1,0 +1,134 @@
+export const en = {
+    header: {
+        work: "Work",
+        about: "About",
+        contact: "Contact",
+        board: "Board"
+    },
+    hero: {
+        title1: "Professional",
+        title2: "Offline",
+        title3: "Excellence",
+        subtitle: "Experience years of expertise and data from Redcore Training Center. Professional Pilates and breathing training, now available at home.",
+        scrollDown: "Scroll Down"
+    },
+    projectGrid: {
+        title: "Selected Works",
+        years: "2016 — 2025",
+        projects: {
+            pilates: {
+                title: "Pilates Expertise",
+                category: "Training"
+            },
+            digital: {
+                title: "Digital Healthcare",
+                category: "App Development"
+            },
+            breathing: {
+                title: "Breathing Data",
+                category: "Research"
+            }
+        }
+    },
+    footer: {
+        title1: "Let's work",
+        title2: "together.",
+        email: "admin@redcoretraining.com",
+        address: "Redcore Training Center & Lab.",
+        addressDetail: "Yangsan-si, Mulgeum-eup, Jeungsanyeok-ro 163, 6F",
+        blog: "Naver Blog",
+        instagram: "Instagram",
+        copyright: "© 2025 Redcore Training Center. All rights reserved.",
+        designed: "Designed by Antigravity"
+    },
+    board: {
+        title: "Training Resources",
+        subtitle: "Professional guides and materials from Redcore",
+        viewPost: "View Post",
+        backToList: "Back to List"
+    },
+    work: {
+        hero: {
+            title: "Our Story, Built on Data and Clinical Experience",
+            subtitle: "Real-world rehabilitation data meets cutting-edge digital healthcare innovation"
+        },
+        digitalHealth: {
+            title: "Digital Healthcare Revolution",
+            subtitle: "Beyond Traditional Training",
+            description: "Redcore accumulates and analyzes pain, posture changes, and exercise data to provide personalized recommendations and quantifiable improvements through our digital healthcare system.",
+            appDevelopment: "We are developing our own mobile application based on accumulated customer data. Clients can easily track and manage their health records and transformation journey on mobile devices.",
+            dataValidation: "All data and feedback are continuously upgraded based on expert group meetings, latest medical research, and international training experience."
+        },
+        expertise: {
+            title: "Evidence-Based Programs",
+            item1Title: "Rehabilitation Focus",
+            item1Desc: "Programs designed by physical therapist-certified Pilates specialists",
+            item2Title: "Data-Driven Approach",
+            item2Desc: "Real customer transformation data accumulated since 2016",
+            item3Title: "Clinical Integration",
+            item3Desc: "Latest research and DNS methodology applied to every session"
+        },
+        transformation: {
+            title: "Client Transformation Data",
+            subtitle: "Measurable Results, Real Changes",
+            comingSoon: "Interactive data visualization coming soon"
+        }
+    },
+    about: {
+        hero: {
+            title: "About Redcore",
+            subtitle: "Science-Based Movement, Data-Driven Results",
+            since: "Est. 2016"
+        },
+        professional: {
+            title: "Pilates Expertise",
+            description: "All Redcore instructors are Pilates specialists with physical therapy backgrounds. Based on clinical experience and scientific rehabilitation methodologies, we take responsibility for musculoskeletal pain management, posture correction, and functional recovery.",
+            detail1: "Every session provides customized solutions through systematic movement analysis based on anatomy and rehabilitation medicine.",
+            detail2: "We integrate the latest rehabilitation trends, research papers, and DNS (Dynamic Neuromuscular Stabilization) techniques into Pilates for optimal programs for general health improvement, post-surgery recovery, chronic pain, and special conditions."
+        },
+        digital: {
+            title: "Digital Healthcare & Data-Driven Training Center",
+            description: "Redcore goes one step further than simple exercise guidance.",
+            features: [
+                "We accumulate and analyze customer pain, posture changes, and exercise data to provide personalized exercise recommendations and numerically verifiable transformations through our digital healthcare system.",
+                "Based on this accumulated data, we are developing our own application where customers can easily check and manage their health records and transformation progress on mobile.",
+                "All data and feedback are continuously upgraded based on expert meetings, latest medical research, and international training experience."
+            ]
+        },
+        breathing: {
+            title: "Breathing & Movement Research",
+            description: "Redcore emphasizes the impact of 'breathing quality' on movement quality and overall health.",
+            methods: "At our center, we implement evidence-based spine stabilization (core activation) and breathing training through DNS, Pilates, and fascial research, continuously recording and studying breathing patterns, Range of Motion, and muscle activation with various measurement devices.",
+            application: "This clinical data is shared at research papers, conferences, and seminars, and immediately reflected in actual programs to experience the best improvement effects."
+        },
+        values: {
+            value1: "Clinical Excellence",
+            value2: "Data-Driven Innovation",
+            value3: "Continuous Research",
+            value4: "Personalized Care"
+        }
+    },
+    contact: {
+        hero: {
+            title: "Get in Touch",
+            subtitle: "Start your transformation journey with Redcore"
+        },
+        form: {
+            title: "Send us a message",
+            name: "Name",
+            email: "Email",
+            phone: "Phone",
+            message: "Message",
+            submit: "Send Message",
+            success: "Thank you! We'll get back to you soon.",
+            error: "Something went wrong. Please try again."
+        },
+        info: {
+            title: "Visit Us",
+            address: "6F, 163 Jeungsanyeok-ro, Mulgeum-eup, Yangsan-si",
+            phone: "Contact",
+            hours: "Operating Hours",
+            hoursDetail: "Please contact for consultation"
+        }
+    }
+};

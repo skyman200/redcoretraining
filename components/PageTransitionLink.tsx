@@ -38,9 +38,9 @@ export default function PageTransitionLink({ href, children, className }: PageTr
                 setTimeout(() => {
                     document.body.removeChild(overlay);
                     setIsTransitioning(false);
-                }, 500);
-            }, 100);
-        }, 500);
+                }, 300);
+            }, 50);
+        }, 300);
     };
 
     return (

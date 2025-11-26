@@ -133,21 +133,34 @@ interface DriveFile {
 // --- Main Page Component ---
 export default function Home() {
   const [lang, setLang] = useState<'en' | 'ko'>('en');
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [showAppImage, setShowAppImage] = useState(false);
   const [driveFiles, setDriveFiles] = useState<DriveFile[]>([]);
   const [loadingFiles, setLoadingFiles] = useState(true);
   
   const t = translations[lang];
   const heroImages = ['/hero.jpg', '/app.jpg'];
 
-  // 자동 이미지 전환 (5초마다)
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentImageIndex((prev) => (prev + 1) % heroImages.length);
-    }, 5000);
+  // "About App" 클릭 핸들러
+  const handleAppClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    setShowAppImage(true);
+    // 스크롤을 Hero 섹션으로 이동
+    const heroSection = document.getElementById('hero');
+    if (heroSection) {
+      heroSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
 
-    return () => clearInterval(interval);
-  }, []);
+  // "About Center" 클릭 핸들러
+  const handleCenterClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    setShowAppImage(false);
+    // 스크롤을 Hero 섹션으로 이동
+    const heroSection = document.getElementById('hero');
+    if (heroSection) {
+      heroSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
 
   // Google Drive 파일 목록 가져오기
   useEffect(() => {
@@ -209,8 +222,8 @@ export default function Home() {
           </div>
           {/* Navigation Links (Desktop) */}
           <nav className="hidden md:flex items-center space-x-8 text-sm font-medium text-zinc-300">
-            <Link href="#features" className="hover:text-red-400 transition">{t.nav.center}</Link>
-            <Link href="#app" className="hover:text-red-400 transition">{t.nav.app}</Link>
+            <Link href="#hero" onClick={handleCenterClick} className="hover:text-red-400 transition">{t.nav.center}</Link>
+            <Link href="#hero" onClick={handleAppClick} className="hover:text-red-400 transition">{t.nav.app}</Link>
             <Link href="https://blog.naver.com/redcore2021" target="_blank" className="hover:text-red-400 transition">{t.nav.blog}</Link>
             <Link href="#resources" className="hover:text-red-400 transition">{t.nav.resources}</Link>
           </nav>
@@ -243,7 +256,7 @@ export default function Home() {
       </header>
 
       {/* 2. Hero Section */}
-      <section className="relative pt-32 pb-20 md:pt-40 md:pb-32 overflow-hidden">
+      <section id="hero" className="relative pt-32 pb-20 md:pt-40 md:pb-32 overflow-hidden">
         {/* Background glow effect */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[1000px] opacity-30 pointer-events-none">
           <div className="absolute top-1/2 left-1/2 w-full h-full bg-gradient-radial from-red-500/40 to-transparent blur-3xl transform -translate-y-1/2 -translate-x-1/2" />
@@ -290,42 +303,46 @@ export default function Home() {
                 </a>
               </div>
             </div>
-            {/* Right: Main Image with Auto Fade */}
+            {/* Right: Dynamic Dual Images */}
             <div className="flex-1 relative w-full max-w-xl">
               <div className="absolute inset-0 bg-gradient-to-tr from-red-500/20 to-orange-500/20 blur-2xl rounded-3xl transform rotate-3 scale-105 opacity-70" />
               <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-white/10">
                 <div className="relative w-full aspect-[4/3]">
-                  {heroImages.map((img, index) => (
-                    <div
-                      key={index}
-                      className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-                        index === currentImageIndex ? 'opacity-100' : 'opacity-0'
-                      }`}
-                    >
-                      <Image
-                        src={img}
-                        alt={index === 0 ? "Redcore Center Main" : "Redcore App"}
-                        fill
-                        className="object-cover"
-                        priority={index === 0}
-                      />
-                    </div>
-                  ))}
-                </div>
-                {/* Image Indicators */}
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
-                  {heroImages.map((_, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setCurrentImageIndex(index)}
-                      className={`h-2 rounded-full transition-all ${
-                        index === currentImageIndex 
-                          ? 'w-8 bg-red-500' 
-                          : 'w-2 bg-white/30 hover:bg-white/50'
-                      }`}
-                      aria-label={`Go to image ${index + 1}`}
+                  {/* Hero Image - 역동적인 애니메이션 */}
+                  <div
+                    className={`absolute inset-0 transition-all duration-1000 ease-in-out ${
+                      showAppImage ? 'opacity-0 scale-95 translate-y-4' : 'opacity-100 scale-100 translate-y-0'
+                    }`}
+                    style={{
+                      animation: showAppImage ? 'none' : 'floatUpDown 4s ease-in-out infinite',
+                    }}
+                  >
+                    <Image
+                      src="/hero.jpg"
+                      alt="Redcore Center Main"
+                      fill
+                      className="object-cover"
+                      priority
                     />
-                  ))}
+                  </div>
+                  
+                  {/* App Image - 역동적인 애니메이션 */}
+                  <div
+                    className={`absolute inset-0 transition-all duration-1000 ease-in-out ${
+                      showAppImage ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 -translate-y-4'
+                    }`}
+                    style={{
+                      animation: showAppImage ? 'floatLeftRight 4s ease-in-out infinite' : 'none',
+                    }}
+                  >
+                    <Image
+                      src="/app.jpg"
+                      alt="Redcore App"
+                      fill
+                      className="object-cover"
+                      priority
+                    />
+                  </div>
                 </div>
               </div>
             </div>

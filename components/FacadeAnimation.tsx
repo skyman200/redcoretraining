@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// Gemini Gradient Colors
+// --- Gemini Gradient Utils ---
 const GRADIENT_COLORS = [
     { r: 76, g: 29, b: 149 },   // Deep Purple
     { r: 220, g: 20, b: 60 },   // Crimson
@@ -13,6 +13,7 @@ const GRADIENT_COLORS = [
 ];
 
 function getGradientColor(t: number): string {
+    // t is 0 to 1
     const scaled = t * (GRADIENT_COLORS.length - 1);
     const idx = Math.floor(scaled);
     const nextIdx = Math.min(idx + 1, GRADIENT_COLORS.length - 1);
@@ -42,6 +43,7 @@ export default function FacadeAnimation() {
     const [stage, setStage] = useState<'text' | 'particles' | 'done'>('text');
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
+    // Start particle phase after 2 seconds
     useEffect(() => {
         const timer = setTimeout(() => setStage('particles'), 2000);
         return () => clearTimeout(timer);
@@ -56,6 +58,7 @@ export default function FacadeAnimation() {
         const ctx = canvas.getContext('2d', { alpha: false });
         if (!ctx) return;
 
+        // Setup canvas with correct DPR
         const dpr = window.devicePixelRatio || 1;
         canvas.width = window.innerWidth * dpr;
         canvas.height = window.innerHeight * dpr;
@@ -73,55 +76,62 @@ export default function FacadeAnimation() {
         let exploding = false;
         let explosionFrame = 0;
 
-        // Generate R text emblem particles
-        const generateRParticles = () => {
-            const tempCanvas = document.createElement('canvas');
-            const logoSize = Math.min(width, height) * 0.6;
-            tempCanvas.width = logoSize;
-            tempCanvas.height = logoSize;
-            const tCtx = tempCanvas.getContext('2d');
+        // --- Particle Generation Logic ---
+        const generateParticlesFromCanvas = (sourceCanvas: HTMLCanvasElement, size: number) => {
+            const tempCtx = sourceCanvas.getContext('2d');
+            if (!tempCtx) return;
 
-            if (!tCtx) return [];
+            // Try to get pixel data. This might fail if the image is tainted (CORS).
+            let pixels: Uint8ClampedArray;
+            try {
+                const imageData = tempCtx.getImageData(0, 0, size, size);
+                pixels = imageData.data;
+            } catch (e) {
+                console.error("Failed to get image data (likely CORS). Using fallback generator.", e);
+                // Fallback: Clear and draw text instead
+                tempCtx.clearRect(0, 0, size, size);
+                tempCtx.fillStyle = '#000000';
+                tempCtx.font = `900 ${size * 0.6}px serif`;
+                tempCtx.textAlign = 'center';
+                tempCtx.textBaseline = 'middle';
+                tempCtx.fillText('R', size / 2, size / 2); // Fallback to 'R' logo shape
 
-            // Draw R text
-            tCtx.fillStyle = '#FFFFFF';
-            tCtx.fillRect(0, 0, logoSize, logoSize);
-            tCtx.fillStyle = '#000000';
-            tCtx.font = `italic 900 ${logoSize * 0.8}px serif`;
-            tCtx.textAlign = 'center';
-            tCtx.textBaseline = 'middle';
-            tCtx.fillText('R', logoSize / 2, logoSize / 2);
+                const imageData = tempCtx.getImageData(0, 0, size, size);
+                pixels = imageData.data;
+            }
 
-            const imageData = tCtx.getImageData(0, 0, logoSize, logoSize);
-            const pixels = imageData.data;
-
-            const particleList: Particle[] = [];
-            const step = 1;
+            const step = 1; // High density (check every pixel)
             let count = 0;
+            const particleList: Particle[] = [];
 
-            for (let y = 0; y < logoSize && count < 80000; y += step) {
-                for (let x = 0; x < logoSize && count < 80000; x += step) {
-                    const i = (y * logoSize + x) * 4;
+            for (let y = 0; y < size && count < 80000; y += step) {
+                for (let x = 0; x < size && count < 80000; x += step) {
+                    const i = (y * size + x) * 4;
+                    // Check darkness (assuming dark logo on light background or alpha)
                     const r = pixels[i];
                     const g = pixels[i + 1];
                     const b = pixels[i + 2];
                     const a = pixels[i + 3];
                     const brightness = (r + g + b) / 3;
 
+                    // Valid pixel condition: Dark pixel OR High Alpha (if transparent bg)
+                    // Adjust logic: if using fallback text (black), brightness will be low.
                     if (a > 128 && brightness < 200) {
-                        const targetX = (width - logoSize) / 2 + x;
-                        const targetY = (height - logoSize) / 2 + y;
+                        const targetX = (width - size) / 2 + x;
+                        const targetY = (height - size) / 2 + y;
 
                         const dx = targetX - centerX;
                         const dy = targetY - centerY;
                         const angle = Math.atan2(dy, dx);
                         const dist = Math.sqrt(dx * dx + dy * dy);
 
-                        const gradientPos = x / logoSize;
+                        // Gemini Gradient: Map X position (0-1) to gradient color
+                        const gradientPos = x / size;
                         const color = getGradientColor(gradientPos);
 
-                        const startAngle = angle + Math.PI * 5;
-                        const startDist = dist + Math.max(width, height);
+                        // Spiral start position
+                        const startAngle = angle + Math.PI * 5; // More rotations
+                        const startDist = dist + Math.max(width, height); // Further out
 
                         particleList.push({
                             x: centerX + Math.cos(startAngle) * startDist,
@@ -137,20 +147,73 @@ export default function FacadeAnimation() {
                     }
                 }
             }
-
             return particleList;
         };
 
-        particles = generateRParticles();
-        console.log(`Animation starting with ${particles.length} particles.`);
+        // --- Source Loading ---
+        const loadSource = () => {
+            const tempCanvas = document.createElement('canvas');
+            const logoSize = Math.min(width, height) * 0.6; // Logo size
+            tempCanvas.width = logoSize;
+            tempCanvas.height = logoSize;
+            const tCtx = tempCanvas.getContext('2d');
 
-        // Explosion after 5 seconds
-        setTimeout(() => {
-            exploding = true;
-            setTimeout(() => setStage('done'), 1500);
-        }, 5000);
+            if (!tCtx) return;
+
+            const img = new Image();
+            img.crossOrigin = "Anonymous";
+
+            const start = (generatedParticles: Particle[]) => {
+                particles = generatedParticles;
+                console.log(`Animation starting with ${particles.length} particles.`);
+
+                // Explosion timer
+                setTimeout(() => {
+                    exploding = true;
+                    setTimeout(() => setStage('done'), 1500);
+                }, 5000); // 5 seconds spiral
+
+                animate();
+            };
+
+            img.onload = () => {
+                // Draw image to temp canvas
+                tCtx.fillStyle = '#FFFFFF'; // White background for contrast
+                tCtx.fillRect(0, 0, logoSize, logoSize);
+
+                // Fit image
+                const scale = Math.min(logoSize / img.width, logoSize / img.height);
+                const w = img.width * scale;
+                const h = img.height * scale;
+                tCtx.drawImage(img, (logoSize - w) / 2, (logoSize - h) / 2, w, h);
+
+                const generated = generateParticlesFromCanvas(tempCanvas, logoSize);
+                start(generated);
+            };
+
+            img.onerror = () => {
+                console.warn("Image load failed, using fallback text.");
+                // Fallback: Draw 'R' text
+                tCtx.fillStyle = '#FFFFFF';
+                tCtx.fillRect(0, 0, logoSize, logoSize);
+                tCtx.fillStyle = '#000000';
+                tCtx.font = `italic 900 ${logoSize * 0.8}px serif`; // Serif for the "R" style
+                tCtx.textAlign = 'center';
+                tCtx.textBaseline = 'middle';
+                tCtx.fillText('R', logoSize / 2, logoSize / 2);
+
+                const generated = generateParticlesFromCanvas(tempCanvas, logoSize);
+                start(generated);
+            };
+
+            // URL from previous context.
+            // If this fails (403/CORS), onerror handles it.
+            img.src = 'https://file-service.goog/file/get/%25ED%2594%2584%25EB%25A1%259C%25ED%2595%2584 (1).jpeg-a05eaeb4-6643-4b14-990e-9f83b1b05ca8';
+        };
 
         function animate() {
+            if (!ctx) return;
+            // Use white trail or clear rect
             ctx.clearRect(0, 0, width, height);
 
             if (exploding) {
@@ -158,10 +221,12 @@ export default function FacadeAnimation() {
                 const opacity = Math.max(0, 1 - explosionFrame / 60);
 
                 particles.forEach(p => {
+                    // Explode outward logic
                     const dx = p.x - centerX;
                     const dy = p.y - centerY;
                     const angle = Math.atan2(dy, dx);
 
+                    // Add some noise to explosion
                     p.vx = Math.cos(angle) * 15 + (Math.random() - 0.5) * 5;
                     p.vy = Math.sin(angle) * 15 + (Math.random() - 0.5) * 5;
 
@@ -170,13 +235,16 @@ export default function FacadeAnimation() {
 
                     ctx.globalAlpha = opacity;
                     ctx.fillStyle = p.color;
-                    ctx.fillRect(p.x, p.y, 0.3, 0.3);
+                    ctx.fillRect(p.x, p.y, 0.3, 0.3); // Slightly larger for visibility during explosion
                 });
 
                 if (opacity > 0) {
                     animationId = requestAnimationFrame(animate);
                 }
             } else {
+                // Spiral Convergence Logic
+                let arrivedCount = 0;
+
                 particles.forEach(p => {
                     const dx = p.targetX - p.x;
                     const dy = p.targetY - p.y;
@@ -187,24 +255,31 @@ export default function FacadeAnimation() {
                         const currentDist = Math.sqrt(Math.pow(p.x - centerX, 2) + Math.pow(p.y - centerY, 2));
                         const targetDist = Math.sqrt(Math.pow(p.targetX - centerX, 2) + Math.pow(p.targetY - centerY, 2));
 
-                        const newAngle = currentAngle - 0.08;
+                        // Spiral inwards
+                        const newAngle = currentAngle - 0.08; // Rotation speed
+                        // Smoothly approach target distance
                         const newDist = currentDist - (currentDist - targetDist) * 0.05 - 2;
 
                         const spiralX = centerX + Math.cos(newAngle) * Math.max(newDist, targetDist);
                         const spiralY = centerY + Math.sin(newAngle) * Math.max(newDist, targetDist);
 
+                        // Lerp towards spiral path + pull to target
                         p.x += (spiralX - p.x) * 0.3;
                         p.y += (spiralY - p.y) * 0.3;
 
+                        // Final snap pull
                         p.x += (p.targetX - p.x) * 0.05;
                         p.y += (p.targetY - p.y) * 0.05;
                     } else {
                         p.x = p.targetX;
                         p.y = p.targetY;
+                        arrivedCount++;
                     }
 
                     ctx.globalAlpha = 1;
                     ctx.fillStyle = p.color;
+                    // "1px보다 10배 작은" -> 0.1px ~ 0.2px
+                    // But 0.1px is often invisible on screens. Using 0.25px for balance.
                     ctx.fillRect(p.x, p.y, 0.25, 0.25);
                 });
 
@@ -212,7 +287,7 @@ export default function FacadeAnimation() {
             }
         }
 
-        animate();
+        loadSource();
 
         return () => {
             cancelAnimationFrame(animationId);

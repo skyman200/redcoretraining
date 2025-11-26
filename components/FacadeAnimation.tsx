@@ -79,7 +79,7 @@ export default function FacadeAnimation() {
         // --- Particle Generation Logic ---
         const generateParticlesFromCanvas = (sourceCanvas: HTMLCanvasElement, size: number) => {
             const tempCtx = sourceCanvas.getContext('2d');
-            if (!tempCtx) return;
+            if (!tempCtx) return [];
 
             // Try to get pixel data. This might fail if the image is tainted (CORS).
             let pixels: Uint8ClampedArray;

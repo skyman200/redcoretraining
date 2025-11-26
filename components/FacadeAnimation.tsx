@@ -235,7 +235,7 @@ export default function FacadeAnimation() {
 
                     ctx!.globalAlpha = opacity;
                     ctx!.fillStyle = p.color;
-                    ctx!.fillRect(p.x, p.y, 0.3, 0.3); // Slightly larger for visibility during explosion
+                    ctx!.fillRect(p.x, p.y, 1.5, 1.5);
                 });
 
                 if (opacity > 0) {
@@ -278,9 +278,8 @@ export default function FacadeAnimation() {
 
                     ctx!.globalAlpha = 1;
                     ctx!.fillStyle = p.color;
-                    // "1px보다 10배 작은" -> 0.1px ~ 0.2px
-                    // But 0.1px is often invisible on screens. Using 0.25px for balance.
-                    ctx!.fillRect(p.x, p.y, 0.25, 0.25);
+                    // Increased particle size for better visibility
+                    ctx!.fillRect(p.x, p.y, 1.5, 1.5);
                 });
 
                 animationId = requestAnimationFrame(animate);

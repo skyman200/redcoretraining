@@ -230,7 +230,7 @@ export default function NewPostPage() {
                                                         body: formData,
                                                     });
 
-                                                    const data = await response.json();
+                                                    const data = await response.json().catch(() => ({ error: 'Server error' }));
 
                                                     if (response.ok && data.success) {
                                                         setFiles(prev => [...prev, {
@@ -239,13 +239,16 @@ export default function NewPostPage() {
                                                         }]);
                                                         setUploadProgress('업로드 완료!');
                                                         setTimeout(() => setUploadProgress(''), 2000);
+                                                    } else if (response.status === 413) {
+                                                        alert('파일이 너무 큽니다.\n\n로컬 개발 환경에서는 300MB까지 지원하지만,\n배포된 환경에서는 호스팅 플랫폼의 제한(일반적으로 4.5MB)이 적용됩니다.\n\n해결 방법:\n1. Google Drive에 직접 업로드 후 링크를 "링크 직접 입력"에 붙여넣기\n2. 파일 크기를 줄이기');
+                                                        setUploadProgress('');
                                                     } else {
                                                         alert(`업로드 실패: ${data.error || '알 수 없는 오류'}`);
                                                         setUploadProgress('');
                                                     }
                                                 } catch (error) {
                                                     console.error('Upload error:', error);
-                                                    alert('파일 업로드 중 오류가 발생했습니다.');
+                                                    alert('파일 업로드 중 오류가 발생했습니다.\n\nGoogle Drive 인증 정보가 설정되어 있는지 확인해주세요.\n(.env.local 파일 참조)');
                                                     setUploadProgress('');
                                                 } finally {
                                                     setUploading(false);

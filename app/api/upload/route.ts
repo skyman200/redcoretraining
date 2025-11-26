@@ -101,9 +101,10 @@ export async function POST(request: NextRequest) {
     }
 }
 
-// Increase the body size limit for file uploads
-export const config = {
-    api: {
-        bodyParser: false,
-    },
-};
+// Note: Next.js App Router doesn't support body size limits in route handlers
+// For production deployment on Vercel, the default limit is 4.5MB
+// For larger files, consider using:
+// 1. Vercel Pro plan (increases limit to 100MB)
+// 2. Direct client-to-Google Drive upload using Google Picker API
+// 3. Chunked upload implementation
+export const maxDuration = 300; // 5 minutes timeout for large uploads

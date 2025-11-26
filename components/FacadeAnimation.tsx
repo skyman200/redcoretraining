@@ -214,7 +214,7 @@ export default function FacadeAnimation() {
         function animate() {
             if (!ctx) return;
             // Use white trail or clear rect
-            ctx.clearRect(0, 0, width, height);
+            ctx!.clearRect(0, 0, width, height);
 
             if (exploding) {
                 explosionFrame++;
@@ -233,9 +233,9 @@ export default function FacadeAnimation() {
                     p.x += p.vx;
                     p.y += p.vy;
 
-                    ctx.globalAlpha = opacity;
-                    ctx.fillStyle = p.color;
-                    ctx.fillRect(p.x, p.y, 0.3, 0.3); // Slightly larger for visibility during explosion
+                    ctx!.globalAlpha = opacity;
+                    ctx!.fillStyle = p.color;
+                    ctx!.fillRect(p.x, p.y, 0.3, 0.3); // Slightly larger for visibility during explosion
                 });
 
                 if (opacity > 0) {
@@ -276,11 +276,11 @@ export default function FacadeAnimation() {
                         arrivedCount++;
                     }
 
-                    ctx.globalAlpha = 1;
-                    ctx.fillStyle = p.color;
+                    ctx!.globalAlpha = 1;
+                    ctx!.fillStyle = p.color;
                     // "1px보다 10배 작은" -> 0.1px ~ 0.2px
                     // But 0.1px is often invisible on screens. Using 0.25px for balance.
-                    ctx.fillRect(p.x, p.y, 0.25, 0.25);
+                    ctx!.fillRect(p.x, p.y, 0.25, 0.25);
                 });
 
                 animationId = requestAnimationFrame(animate);

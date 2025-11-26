@@ -36,7 +36,7 @@ export default function Footer() {
                             <Link href="https://blog.naver.com/redcore2021" target="_blank" className="text-lg font-medium hover:text-gray-400 transition-colors">
                                 {t.footer.blog}
                             </Link>
-                            <Link href="#" className="text-lg font-medium hover:text-gray-400 transition-colors">
+                            <Link href="https://www.instagram.com/redcore_pilates/" target="_blank" className="text-lg font-medium hover:text-gray-400 transition-colors">
                                 {t.footer.instagram}
                             </Link>
                         </div>

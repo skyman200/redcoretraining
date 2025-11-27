@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Save, Upload, X } from 'lucide-react';
+import FileUpload from '@/components/FileUpload';
 
 // Google Picker API types
 declare global {
@@ -289,14 +290,26 @@ export default function NewPostPage() {
                                     <button
                                         type="button"
                                         onClick={handleGoogleDrivePicker}
-                                        className="w-full flex flex-col items-center gap-2 text-gray-500 hover:text-black transition-colors"
+                                        className="w-full flex flex-col items-center gap-2 text-gray-500 hover:text-black transition-colors mb-6"
                                     >
                                         <div className="p-3 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors">
                                             <Upload size={24} />
                                         </div>
-                                        <p className="font-medium">Google Drive에서 파일 선택 또는 업로드</p>
-                                        <p className="text-xs text-gray-400">클릭하여 Google Drive 창 열기 (파일 크기 제한 없음)</p>
+                                        <p className="font-medium">Google Drive에서 기존 파일 선택</p>
+                                        <p className="text-xs text-gray-400">이미 드라이브에 있는 파일을 선택합니다</p>
                                     </button>
+
+                                    <div className="border-t border-gray-200 my-4 pt-4">
+                                        <p className="font-medium mb-4 text-gray-700">또는 새 파일 업로드</p>
+                                        <FileUpload
+                                            onUploadComplete={(file) => {
+                                                setFiles(prev => [...prev, {
+                                                    name: file.name,
+                                                    url: file.downloadLink
+                                                }]);
+                                            }}
+                                        />
+                                    </div>
                                 </div>
 
                                 <div className="relative">

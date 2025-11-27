@@ -100,12 +100,12 @@ export default function FacadeAnimation() {
                 pixels = imageData.data;
             }
 
-            const step = 1; // High density (check every pixel)
+            const step = 4; // Reduced density for performance (check every 4th pixel)
             let count = 0;
             const particleList: Particle[] = [];
 
-            for (let y = 0; y < size && count < 80000; y += step) {
-                for (let x = 0; x < size && count < 80000; x += step) {
+            for (let y = 0; y < size && count < 4000; y += step) {
+                for (let x = 0; x < size && count < 4000; x += step) {
                     const i = (y * size + x) * 4;
                     // Check darkness (assuming dark logo on light background or alpha)
                     const r = pixels[i];

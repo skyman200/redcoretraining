@@ -208,7 +208,8 @@ export default function FacadeAnimation() {
 
             // URL from previous context.
             // If this fails (403/CORS), onerror handles it.
-            img.src = 'https://file-service.goog/file/get/%25ED%2594%2584%25EB%25A1%259C%25ED%2595%2584 (1).jpeg-a05eaeb4-6643-4b14-990e-9f83b1b05ca8';
+            // Use local logo image
+            img.src = '/logo-mark.jpg';
         };
 
         function animate() {

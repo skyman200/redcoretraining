@@ -7,13 +7,7 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, Save, Upload, X } from 'lucide-react';
 import FileUpload from '@/components/FileUpload';
 
-// Google Picker API types
-declare global {
-    interface Window {
-        gapi: any;
-        google: any;
-    }
-}
+
 
 export default function NewPostPage() {
     const router = useRouter();
@@ -27,8 +21,6 @@ export default function NewPostPage() {
     const [files, setFiles] = useState<Array<{ name: string; url: string }>>([]);
     const [newFileName, setNewFileName] = useState('');
     const [newFileUrl, setNewFileUrl] = useState('');
-    const [pickerApiLoaded, setPickerApiLoaded] = useState(false);
-    const [oauthToken, setOauthToken] = useState<string | null>(null);
 
     useEffect(() => {
         // Check authentication
@@ -36,23 +28,6 @@ export default function NewPostPage() {
         if (!isAuth) {
             router.push('/admin');
         }
-
-        // Load Google API
-        const script = document.createElement('script');
-        script.src = 'https://apis.google.com/js/api.js';
-        script.onload = () => {
-            window.gapi.load('client:picker', () => {
-                window.gapi.client.load('https://www.googleapis.com/discovery/v1/apis/drive/v3/rest')
-                    .then(() => {
-                        setPickerApiLoaded(true);
-                    });
-            });
-        };
-        document.body.appendChild(script);
-
-        return () => {
-            document.body.removeChild(script);
-        };
     }, [router]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -74,68 +49,7 @@ export default function NewPostPage() {
         setFiles(prev => prev.filter((_, i) => i !== index));
     };
 
-    const handleGoogleDrivePicker = () => {
-        const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
-        const apiKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
 
-        if (!clientId || !apiKey) {
-            alert('Google API 인증 정보가 설정되지 않았습니다.');
-            return;
-        }
-
-        if (!pickerApiLoaded) {
-            alert('Google API가 아직 로드 중입니다. 잠시 후 다시 시도해주세요.');
-            return;
-        }
-
-        // Create and render a Picker object for uploading files
-        const tokenClient = window.google.accounts.oauth2.initTokenClient({
-            client_id: clientId,
-            scope: 'https://www.googleapis.com/auth/drive.file',
-            callback: (response: any) => {
-                if (response.access_token) {
-                    setOauthToken(response.access_token);
-                    createPicker(response.access_token);
-                }
-            },
-        });
-
-        tokenClient.requestAccessToken();
-    };
-
-    const createPicker = (token: string) => {
-        const apiKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
-
-        const view = new window.google.picker.DocsView()
-            .setIncludeFolders(true)
-            .setSelectFolderEnabled(false);
-
-        const uploadView = new window.google.picker.DocsUploadView();
-
-        const picker = new window.google.picker.PickerBuilder()
-            .setAppId('831055186990')
-            .setOAuthToken(token)
-            .setDeveloperKey(apiKey)
-            .addView(view)
-            .addView(uploadView)
-            .setCallback(pickerCallback)
-            .build();
-
-        picker.setVisible(true);
-    };
-
-    const pickerCallback = (data: any) => {
-        if (data.action === window.google.picker.Action.PICKED) {
-            const file = data.docs[0];
-            const fileUrl = `https://drive.google.com/file/d/${file.id}/view`;
-            const downloadUrl = `https://drive.google.com/uc?export=download&id=${file.id}`;
-
-            setFiles(prev => [...prev, {
-                name: file.name,
-                url: downloadUrl
-            }]);
-        }
-    };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -160,8 +74,6 @@ export default function NewPostPage() {
 
     return (
         <div className="min-h-screen bg-gray-50">
-            {/* Load Google Identity Services */}
-            <script src="https://accounts.google.com/gsi/client" async defer></script>
 
             {/* Header */}
             <header className="bg-black text-white py-6 px-6">
@@ -285,31 +197,17 @@ export default function NewPostPage() {
 
                             {/* Add new file */}
                             <div className="space-y-4">
-                                {/* Google Drive Picker */}
-                                <div className="p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-black transition-colors text-center">
-                                    <button
-                                        type="button"
-                                        onClick={handleGoogleDrivePicker}
-                                        className="w-full flex flex-col items-center gap-2 text-gray-500 hover:text-black transition-colors mb-6"
-                                    >
-                                        <div className="p-3 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors">
-                                            <Upload size={24} />
-                                        </div>
-                                        <p className="font-medium">Google Drive에서 기존 파일 선택</p>
-                                        <p className="text-xs text-gray-400">이미 드라이브에 있는 파일을 선택합니다</p>
-                                    </button>
-
-                                    <div className="border-t border-gray-200 my-4 pt-4">
-                                        <p className="font-medium mb-4 text-gray-700">또는 새 파일 업로드</p>
-                                        <FileUpload
-                                            onUploadComplete={(file) => {
-                                                setFiles(prev => [...prev, {
-                                                    name: file.name,
-                                                    url: file.downloadLink
-                                                }]);
-                                            }}
-                                        />
-                                    </div>
+                                {/* File Upload */}
+                                <div className="p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-black transition-colors">
+                                    <p className="font-medium mb-4 text-gray-700 text-center">파일 업로드</p>
+                                    <FileUpload
+                                        onUploadComplete={(file) => {
+                                            setFiles(prev => [...prev, {
+                                                name: file.name,
+                                                url: file.downloadLink
+                                            }]);
+                                        }}
+                                    />
                                 </div>
 
                                 <div className="relative">

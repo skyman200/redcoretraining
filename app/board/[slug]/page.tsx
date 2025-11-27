@@ -103,6 +103,7 @@ AI 기반 분석으로 개인에게 최적화된 운동과 호흡 프로그램�
 
 function BoardDetailPage({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = use(params);
+    const decodedSlug = decodeURIComponent(slug);
     const { t } = useLanguage();
     const [post, setPost] = useState<any>(null);
     const [detail, setDetail] = useState<any>(null);
@@ -112,7 +113,7 @@ function BoardDetailPage({ params }: { params: Promise<{ slug: string }> }) {
         const savedPosts = localStorage.getItem('admin_posts');
         if (savedPosts) {
             const adminPosts = JSON.parse(savedPosts);
-            const adminPost = adminPosts.find((p: any) => p.id === slug);
+            const adminPost = adminPosts.find((p: any) => p.id === decodedSlug);
             if (adminPost) {
                 setPost(adminPost);
                 setDetail({ content: adminPost.content, files: adminPost.files || [] });
@@ -121,12 +122,12 @@ function BoardDetailPage({ params }: { params: Promise<{ slug: string }> }) {
         }
 
         // Fallback to default posts
-        const defaultPost = defaultPosts.find(p => p.id === slug);
+        const defaultPost = defaultPosts.find(p => p.id === decodedSlug);
         if (defaultPost) {
             setPost(defaultPost);
-            setDetail(postContent[slug]);
+            setDetail(postContent[decodedSlug]);
         }
-    }, [slug]);
+    }, [decodedSlug]);
 
     if (!post || !detail) {
         return (

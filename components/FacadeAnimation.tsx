@@ -279,7 +279,7 @@ export default function FacadeAnimation() {
                     ctx!.globalAlpha = 1;
                     ctx!.fillStyle = p.color;
                     // Increased particle size for better visibility
-                    ctx!.fillRect(p.x, p.y, 1.5, 1.5);
+                    ctx!.fillRect(p.x, p.y, 3, 3);
                 });
 
                 animationId = requestAnimationFrame(animate);

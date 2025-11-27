@@ -240,18 +240,18 @@ function WorkPage() {
                         <DataChart
                             title={t.work.transformation.painReduction}
                             data={[
-                                { label: 'Neck', value: 85 },
-                                { label: 'Back', value: 92 },
-                                { label: 'Shoulder', value: 78 },
-                                { label: 'Knee', value: 88 }
+                                { label: 'Neck', value: 92 },
+                                { label: 'Back', value: 96 },
+                                { label: 'Shoulder', value: 88 },
+                                { label: 'Knee', value: 94 }
                             ]}
                         />
                         <DataChart
                             title={t.work.transformation.postureImprovement}
                             data={[
-                                { label: 'Spine', value: 95, color: 'bg-black' },
-                                { label: 'Pelvis', value: 82, color: 'bg-black' },
-                                { label: 'Shoulder', value: 89, color: 'bg-black' }
+                                { label: 'Spine', value: 97, color: 'bg-black' },
+                                { label: 'Pelvis', value: 89, color: 'bg-black' },
+                                { label: 'Shoulder', value: 93, color: 'bg-black' }
                             ]}
                         />
                     </div>

@@ -8,6 +8,7 @@ import BoardCard, { posts as defaultPosts } from '@/components/BoardCard';
 import DataChart from '@/components/DataChart';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { motion, AnimatePresence } from 'framer-motion';
+import FileUpload from '@/components/FileUpload';
 
 function BoardPage() {
     const { t } = useLanguage();
@@ -35,6 +36,25 @@ function BoardPage() {
 
         return () => clearTimeout(timer);
     }, []);
+
+    const handleUploadComplete = (file: any) => {
+        const newPost = {
+            id: `upload-${Date.now()}`,
+            title: file.name,
+            excerpt: 'User uploaded file via Board page.',
+            date: new Date().toISOString().split('T')[0],
+            category: 'Uploads',
+            image: '/hero.jpg', // Default image
+            files: [{ name: file.name, url: file.downloadLink }]
+        };
+
+        const updatedPosts = [newPost, ...allPosts];
+        setAllPosts(updatedPosts);
+
+        // Update localStorage
+        const currentAdminPosts = JSON.parse(localStorage.getItem('admin_posts') || '[]');
+        localStorage.setItem('admin_posts', JSON.stringify([newPost, ...currentAdminPosts]));
+    };
 
     return (
         <motion.div
@@ -108,21 +128,32 @@ function BoardPage() {
                             title="Pain Reduction Rate"
                             variant="gemini"
                             data={[
-                                { label: 'Neck', value: 95 },
-                                { label: 'Back', value: 88 },
-                                { label: 'Shoulder', value: 78 },
-                                { label: 'Knee', value: 65 },
+                                { label: 'Neck', value: 92 },
+                                { label: 'Back', value: 96 },
+                                { label: 'Shoulder', value: 88 },
+                                { label: 'Knee', value: 94 },
                             ]}
                         />
                         <DataChart
                             title="Posture Improvement"
                             variant="gemini"
                             data={[
-                                { label: 'Spine', value: 92 },
-                                { label: 'Pelvis', value: 85 },
-                                { label: 'Shoulder', value: 75 },
+                                { label: 'Spine', value: 97 },
+                                { label: 'Pelvis', value: 89 },
+                                { label: 'Shoulder', value: 93 },
                             ]}
                         />
+                    </motion.div>
+
+                    {/* File Upload Section */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 2.0, duration: 0.8 }}
+                        className="max-w-2xl mx-auto mb-16 p-6 bg-white rounded-xl shadow-sm border border-gray-100"
+                    >
+                        <h3 className="text-xl font-bold mb-4">Upload New Resource</h3>
+                        <FileUpload onUploadComplete={handleUploadComplete} />
                     </motion.div>
 
                     <motion.div

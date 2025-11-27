@@ -3,16 +3,23 @@ import { google } from 'googleapis';
 import { Readable } from 'stream';
 
 // Configure Google Drive API
-const getDriveClient = () => {
-    const auth = new google.auth.GoogleAuth({
-        credentials: {
-            client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-            private_key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-        },
-        scopes: ['https://www.googleapis.com/auth/drive.file'],
-    });
-
-    return google.drive({ version: 'v3', auth });
+const getDriveClient = (accessToken?: string) => {
+    if (accessToken) {
+        // Use OAuth token (user's personal drive)
+        const auth = new google.auth.OAuth2();
+        auth.setCredentials({ access_token: accessToken });
+        return google.drive({ version: 'v3', auth });
+    } else {
+        // Use service account (for shared drives)
+        const auth = new google.auth.GoogleAuth({
+            credentials: {
+                client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+                private_key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+            },
+            scopes: ['https://www.googleapis.com/auth/drive.file'],
+        });
+        return google.drive({ version: 'v3', auth });
+    }
 };
 
 export async function POST(request: NextRequest) {
@@ -27,17 +34,17 @@ export async function POST(request: NextRequest) {
 
         const formData = await request.formData();
         const file = formData.get('file') as File;
+        const accessToken = formData.get('access_token') as string | null;
 
         if (!file) {
             return NextResponse.json({ error: 'No file provided' }, { status: 400 });
         }
 
-        // Check file size (300MB limit)
-        const maxSize = 300 * 1024 * 1024; // 300MB in bytes
-        if (file.size > maxSize) {
+        // Check credentials
+        if (!accessToken && (!process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL || !process.env.GOOGLE_PRIVATE_KEY)) {
             return NextResponse.json(
-                { error: 'File size exceeds 300MB limit' },
-                { status: 400 }
+                { error: 'Google Drive API credentials not configured. Please authorize with Google or set up service account.' },
+                { status: 500 }
             );
         }
 
@@ -49,41 +56,61 @@ export async function POST(request: NextRequest) {
         const stream = Readable.from(buffer);
 
         // Upload to Google Drive
-        const drive = getDriveClient();
+        const drive = getDriveClient(accessToken || undefined);
 
-        const fileMetadata = {
+        const fileMetadata: any = {
             name: file.name,
-            parents: [process.env.GOOGLE_DRIVE_FOLDER_ID!],
         };
+
+        // Only set parents if using service account with folder
+        if (!accessToken && process.env.GOOGLE_DRIVE_FOLDER_ID) {
+            fileMetadata.parents = [process.env.GOOGLE_DRIVE_FOLDER_ID];
+        }
 
         const media = {
             mimeType: file.type,
             body: stream,
         };
 
-        const response = await drive.files.create({
+        const createParams: any = {
             requestBody: fileMetadata,
             media: media,
             fields: 'id, name, webViewLink, webContentLink',
-            supportsAllDrives: true, // Enable shared drive support
-        });
+        };
+
+        // Only use supportsAllDrives for service account with shared drives
+        if (!accessToken) {
+            createParams.supportsAllDrives = true;
+        }
+
+        const response = await drive.files.create(createParams);
 
         // Make the file publicly accessible
-        await drive.permissions.create({
+        const permissionsParams: any = {
             fileId: response.data.id!,
             requestBody: {
                 role: 'reader',
                 type: 'anyone',
             },
-            supportsAllDrives: true, // Enable shared drive support
-        });
+        };
+
+        if (!accessToken) {
+            permissionsParams.supportsAllDrives = true;
+        }
+
+        await drive.permissions.create(permissionsParams);
 
         // Get the file with updated permissions
-        const fileData = await drive.files.get({
+        const getParams: any = {
             fileId: response.data.id!,
             fields: 'id, name, webViewLink, webContentLink',
-            supportsAllDrives: true, // Enable shared drive support
-        });
+        };
+
+        if (!accessToken) {
+            getParams.supportsAllDrives = true;
+        }
+
+        const fileData = await drive.files.get(getParams);
 
         return NextResponse.json({
             success: true,

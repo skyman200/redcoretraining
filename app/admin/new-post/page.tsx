@@ -18,7 +18,7 @@ export default function NewPostPage() {
         category: 'Training',
         date: new Date().toISOString().split('T')[0]
     });
-    const [files, setFiles] = useState<Array<{ name: string; url: string }>>([]);
+    const [files, setFiles] = useState<Array<{ name: string; url: string; id?: string; resourceType?: string }>>([]);
     const [newFileName, setNewFileName] = useState('');
     const [newFileUrl, setNewFileUrl] = useState('');
 
@@ -48,8 +48,6 @@ export default function NewPostPage() {
     const handleRemoveFile = (index: number) => {
         setFiles(prev => prev.filter((_, i) => i !== index));
     };
-
-
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -180,7 +178,7 @@ export default function NewPostPage() {
                                                 </div>
                                                 <div className="min-w-0">
                                                     <p className="font-medium truncate">{file.name}</p>
-                                                    <p className="text-xs text-gray-500 truncate">Google Drive</p>
+                                                    <p className="text-xs text-gray-500 truncate">Cloudinary</p>
                                                 </div>
                                             </div>
                                             <button
@@ -204,7 +202,9 @@ export default function NewPostPage() {
                                         onUploadComplete={(file) => {
                                             setFiles(prev => [...prev, {
                                                 name: file.name,
-                                                url: file.downloadLink
+                                                url: file.downloadLink,
+                                                id: file.id, // Store Cloudinary public_id
+                                                resourceType: file.resourceType // Store resource_type
                                             }]);
                                         }}
                                     />

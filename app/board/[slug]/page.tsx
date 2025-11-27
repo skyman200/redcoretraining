@@ -201,6 +201,8 @@ function BoardDetailPage({ params }: { params: Promise<{ slug: string }> }) {
                                     <a
                                         key={index}
                                         href={file.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
                                         className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg hover:border-red-600 hover:shadow-lg transition-all group"
                                     >
                                         <span className="font-medium group-hover:text-red-600 transition-colors">

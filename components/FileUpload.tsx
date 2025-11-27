@@ -10,6 +10,7 @@ interface UploadedFile {
     url: string;
     viewLink: string;
     downloadLink: string;
+    resourceType?: string;
 }
 
 interface FileUploadProps {
@@ -83,10 +84,11 @@ export default function FileUpload({ onUploadComplete }: FileUploadProps) {
                         // Map Cloudinary response to UploadedFile interface
                         const uploadedFile: UploadedFile = {
                             id: response.public_id,
-                            name: response.original_filename + '.' + response.format, // or use file.name
+                            name: file.name,
                             url: response.secure_url,
                             viewLink: response.secure_url,
-                            downloadLink: response.secure_url // Cloudinary URLs are directly downloadable/viewable
+                            downloadLink: response.secure_url,
+                            resourceType: response.resource_type // Capture resource_type (image, raw, video)
                         };
                         resolve(uploadedFile);
                     } else {

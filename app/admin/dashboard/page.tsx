@@ -39,8 +39,34 @@ export default function AdminDashboard() {
         setShowDeleteModal(true);
     };
 
-    const confirmDelete = () => {
+    const confirmDelete = async () => {
         if (postToDelete) {
+            // Find the post to get its files
+            const post = posts.find(p => p.id === postToDelete);
+
+            // Delete associated files from Cloudinary
+            if (post && post.files && post.files.length > 0) {
+                for (const file of post.files) {
+                    if (file.id) {
+                        try {
+                            await fetch('/api/delete-file', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({
+                                    public_id: file.id,
+                                    resource_type: file.resourceType || 'image' // Default to image if missing
+                                }),
+                            });
+                            console.log(`Deleted file: ${file.name}`);
+                        } catch (err) {
+                            console.error(`Failed to delete file ${file.name}:`, err);
+                        }
+                    }
+                }
+            }
+
             const updatedPosts = posts.filter(p => p.id !== postToDelete);
             setPosts(updatedPosts);
             localStorage.setItem('admin_posts', JSON.stringify(updatedPosts));

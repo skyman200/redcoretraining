@@ -160,8 +160,14 @@ export default function FacadeAnimation() {
 
             if (!tCtx) return;
 
-            const img = new Image();
-            img.crossOrigin = "Anonymous";
+            // Draw 'R' text directly
+            tCtx.fillStyle = '#FFFFFF'; // White background
+            tCtx.fillRect(0, 0, logoSize, logoSize);
+            tCtx.fillStyle = '#000000'; // Black text
+            tCtx.font = `italic 900 ${logoSize * 0.8}px serif`; // Serif for the "R" style
+            tCtx.textAlign = 'center';
+            tCtx.textBaseline = 'middle';
+            tCtx.fillText('R', logoSize / 2, logoSize / 2);
 
             const start = (generatedParticles: Particle[]) => {
                 particles = generatedParticles;
@@ -176,40 +182,8 @@ export default function FacadeAnimation() {
                 animate();
             };
 
-            img.onload = () => {
-                // Draw image to temp canvas
-                tCtx.fillStyle = '#FFFFFF'; // White background for contrast
-                tCtx.fillRect(0, 0, logoSize, logoSize);
-
-                // Fit image
-                const scale = Math.min(logoSize / img.width, logoSize / img.height);
-                const w = img.width * scale;
-                const h = img.height * scale;
-                tCtx.drawImage(img, (logoSize - w) / 2, (logoSize - h) / 2, w, h);
-
-                const generated = generateParticlesFromCanvas(tempCanvas, logoSize);
-                start(generated);
-            };
-
-            img.onerror = () => {
-                console.warn("Image load failed, using fallback text.");
-                // Fallback: Draw 'R' text
-                tCtx.fillStyle = '#FFFFFF';
-                tCtx.fillRect(0, 0, logoSize, logoSize);
-                tCtx.fillStyle = '#000000';
-                tCtx.font = `italic 900 ${logoSize * 0.8}px serif`; // Serif for the "R" style
-                tCtx.textAlign = 'center';
-                tCtx.textBaseline = 'middle';
-                tCtx.fillText('R', logoSize / 2, logoSize / 2);
-
-                const generated = generateParticlesFromCanvas(tempCanvas, logoSize);
-                start(generated);
-            };
-
-            // URL from previous context.
-            // If this fails (403/CORS), onerror handles it.
-            // Use local logo image
-            img.src = '/logo-mark.jpg';
+            const generated = generateParticlesFromCanvas(tempCanvas, logoSize);
+            start(generated);
         };
 
         function animate() {

@@ -10,6 +10,8 @@ export default function AdminDashboard() {
     const router = useRouter();
     const [posts, setPosts] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [postToDelete, setPostToDelete] = useState<string | null>(null);
 
     useEffect(() => {
         // Check authentication
@@ -32,11 +34,18 @@ export default function AdminDashboard() {
         router.push('/admin');
     };
 
-    const handleDelete = (id: string) => {
-        if (confirm('이 게시글을 삭제하시겠습니까?')) {
-            const updatedPosts = posts.filter(p => p.id !== id);
+    const handleDeleteClick = (id: string) => {
+        setPostToDelete(id);
+        setShowDeleteModal(true);
+    };
+
+    const confirmDelete = () => {
+        if (postToDelete) {
+            const updatedPosts = posts.filter(p => p.id !== postToDelete);
             setPosts(updatedPosts);
             localStorage.setItem('admin_posts', JSON.stringify(updatedPosts));
+            setShowDeleteModal(false);
+            setPostToDelete(null);
         }
     };
 
@@ -132,7 +141,7 @@ export default function AdminDashboard() {
                                             <FileText size={20} />
                                         </Link>
                                         <button
-                                            onClick={() => handleDelete(post.id)}
+                                            onClick={() => handleDeleteClick(post.id)}
                                             className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded transition-colors"
                                             title="삭제"
                                         >
@@ -145,6 +154,36 @@ export default function AdminDashboard() {
                     </div>
                 )}
             </main>
+
+            {/* Delete Confirmation Modal */}
+            {showDeleteModal && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="bg-white rounded-xl p-6 max-w-md w-full shadow-xl"
+                    >
+                        <h3 className="text-xl font-bold mb-4">게시글 삭제</h3>
+                        <p className="text-gray-600 mb-6">
+                            정말로 이 게시글을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.
+                        </p>
+                        <div className="flex justify-end gap-3">
+                            <button
+                                onClick={() => setShowDeleteModal(false)}
+                                className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors font-medium"
+                            >
+                                취소
+                            </button>
+                            <button
+                                onClick={confirmDelete}
+                                className="px-4 py-2 bg-red-600 text-white hover:bg-red-700 rounded-lg transition-colors font-medium"
+                            >
+                                삭제하기
+                            </button>
+                        </div>
+                    </motion.div>
+                </div>
+            )}
         </div>
     );
 }

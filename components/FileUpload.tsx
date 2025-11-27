@@ -192,7 +192,7 @@ export default function FileUpload({ onUploadComplete }: FileUploadProps) {
                                     <Upload size={24} />
                                 </div>
                                 <p className="text-lg font-medium mb-1">
-                                    Drop files here or <button onClick={() => fileInputRef.current?.click()} className="text-red-600 hover:underline font-bold">browse</button>
+                                    Drop files here or <button type="button" onClick={(e) => { e.preventDefault(); e.stopPropagation(); fileInputRef.current?.click(); }} className="text-red-600 hover:underline font-bold">browse</button>
                                 </p>
                                 <p className="text-sm text-gray-500">
                                     Supports PDF, Images, Zip, Video (Max 100MB)

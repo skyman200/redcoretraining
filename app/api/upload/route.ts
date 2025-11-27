@@ -65,6 +65,7 @@ export async function POST(request: NextRequest) {
             requestBody: fileMetadata,
             media: media,
             fields: 'id, name, webViewLink, webContentLink',
+            supportsAllDrives: true, // Enable shared drive support
         });
 
         // Make the file publicly accessible
@@ -74,12 +75,14 @@ export async function POST(request: NextRequest) {
                 role: 'reader',
                 type: 'anyone',
             },
+            supportsAllDrives: true, // Enable shared drive support
         });
 
         // Get the file with updated permissions
         const fileData = await drive.files.get({
             fileId: response.data.id!,
             fields: 'id, name, webViewLink, webContentLink',
+            supportsAllDrives: true, // Enable shared drive support
         });
 
         return NextResponse.json({

@@ -100,12 +100,12 @@ export default function FacadeAnimation() {
                 pixels = imageData.data;
             }
 
-            const step = 4; // Reduced density for performance (check every 4th pixel)
+            const step = 2; // Balanced density for R shape visibility
             let count = 0;
             const particleList: Particle[] = [];
 
-            for (let y = 0; y < size && count < 4000; y += step) {
-                for (let x = 0; x < size && count < 4000; x += step) {
+            for (let y = 0; y < size && count < 12000; y += step) {
+                for (let x = 0; x < size && count < 12000; x += step) {
                     const i = (y * size + x) * 4;
                     // Check darkness (assuming dark logo on light background or alpha)
                     const r = pixels[i];

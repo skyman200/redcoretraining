@@ -100,42 +100,41 @@ export default function FacadeAnimation() {
                 pixels = imageData.data;
             }
 
-            const step = 2; // Balanced density for R shape visibility
+            const step = 4; // Check every 4th pixel on the high-res 800x800 canvas
             let count = 0;
             const particleList: Particle[] = [];
 
-            for (let y = 0; y < size && count < 12000; y += step) {
-                for (let x = 0; x < size && count < 12000; x += step) {
+            // Center of the source canvas
+            const sourceCenter = size / 2;
+
+            for (let y = 0; y < size && count < 20000; y += step) {
+                for (let x = 0; x < size && count < 20000; x += step) {
                     const i = (y * size + x) * 4;
-                    // Check darkness (assuming dark logo on light background or alpha)
                     const r = pixels[i];
                     const g = pixels[i + 1];
                     const b = pixels[i + 2];
-                    const a = pixels[i + 3];
                     const brightness = (r + g + b) / 3;
 
-                    // Valid pixel condition: Dark pixel OR High Alpha (if transparent bg)
-                    // Adjust logic: if using fallback text (black), brightness will be low.
-                    if (a > 128 && brightness < 200) {
-                        const targetX = (width - size) / 2 + x;
-                        const targetY = (height - size) / 2 + y;
+                    // If dark pixel (text)
+                    if (brightness < 128) {
+                        // Calculate position relative to screen center
+                        // We initially map it to the center of the screen based on source size
+                        // The loadSource function will rescale this later, but we need valid initial coords
+                        const targetX = centerX - sourceCenter + x;
+                        const targetY = centerY - sourceCenter + y;
 
                         const dx = targetX - centerX;
                         const dy = targetY - centerY;
                         const angle = Math.atan2(dy, dx);
                         const dist = Math.sqrt(dx * dx + dy * dy);
 
-                        // Gemini Gradient: Map X position (0-1) to gradient color
+                        // Gemini Gradient based on X position in the letter
                         const gradientPos = x / size;
                         const color = getGradientColor(gradientPos);
 
-                        // Spiral start position
-                        const startAngle = angle + Math.PI * 5; // More rotations
-                        const startDist = dist + Math.max(width, height); // Further out
-
                         particleList.push({
-                            x: centerX + Math.cos(startAngle) * startDist,
-                            y: centerY + Math.sin(startAngle) * startDist,
+                            x: 0, // Will be reset in loadSource
+                            y: 0,
                             targetX,
                             targetY,
                             vx: 0,
@@ -153,37 +152,74 @@ export default function FacadeAnimation() {
         // --- Source Loading ---
         const loadSource = () => {
             const tempCanvas = document.createElement('canvas');
-            const logoSize = Math.min(width, height) * 0.6; // Logo size
-            tempCanvas.width = logoSize;
-            tempCanvas.height = logoSize;
+            // Use a fixed, large size for the source to ensure high resolution
+            const sourceSize = 800;
+            tempCanvas.width = sourceSize;
+            tempCanvas.height = sourceSize;
             const tCtx = tempCanvas.getContext('2d');
 
             if (!tCtx) return;
 
-            // Draw 'R' text directly
+            // Draw 'R' text directly with high precision
             tCtx.fillStyle = '#FFFFFF'; // White background
-            tCtx.fillRect(0, 0, logoSize, logoSize);
+            tCtx.fillRect(0, 0, sourceSize, sourceSize);
+
             tCtx.fillStyle = '#000000'; // Black text
-            tCtx.font = `italic 900 ${logoSize * 0.8}px serif`; // Serif for the "R" style
+            // Use Arial Black for a thick, solid shape that generates good particles
+            tCtx.font = `900 ${sourceSize * 0.7}px "Arial Black", "Helvetica Neue", sans-serif`;
             tCtx.textAlign = 'center';
             tCtx.textBaseline = 'middle';
-            tCtx.fillText('R', logoSize / 2, logoSize / 2);
+            tCtx.fillText('R', sourceSize / 2, sourceSize / 2);
 
-            const start = (generatedParticles: Particle[]) => {
-                particles = generatedParticles;
-                console.log(`Animation starting with ${particles.length} particles.`);
+            const generated = generateParticlesFromCanvas(tempCanvas, sourceSize);
 
-                // Explosion timer
-                setTimeout(() => {
-                    exploding = true;
-                    setTimeout(() => setStage('done'), 1500);
-                }, 1500); // 1.5 seconds after logo forms
+            // Adjust particle positions to match current screen size
+            const logoSize = Math.min(width, height) * 0.6;
+            const scale = logoSize / sourceSize;
 
-                animate();
-            };
+            const scaledParticles = generated.map(p => ({
+                ...p,
+                targetX: (p.targetX - (width - sourceSize) / 2) * scale + (width - logoSize) / 2,
+                targetY: (p.targetY - (height - sourceSize) / 2) * scale + (height - logoSize) / 2,
+                // Recalculate start positions based on new targets if needed, 
+                // but the original logic uses targetX/Y for spiral, so we just need to update targets.
+                // Actually, generateParticlesFromCanvas uses 'width' and 'height' from closure to center things.
+                // Let's refactor generateParticlesFromCanvas to be simpler or just map here.
+            }));
 
-            const generated = generateParticlesFromCanvas(tempCanvas, logoSize);
-            start(generated);
+            // Re-center logic:
+            // The generateParticlesFromCanvas created particles centered on the screen based on 'sourceSize'.
+            // We need to scale them to 'logoSize'.
+
+            const finalParticles = generated.map(p => {
+                // p.targetX is currently centered for a screen of 'width'x'height' but using 'sourceSize' box.
+                // We want to scale the relative position from center.
+                const relX = p.targetX - centerX;
+                const relY = p.targetY - centerY;
+
+                const scaledRelX = relX * scale;
+                const scaledRelY = relY * scale;
+
+                return {
+                    ...p,
+                    targetX: centerX + scaledRelX,
+                    targetY: centerY + scaledRelY,
+                    // Reset start position to be far out
+                    x: centerX + Math.cos(Math.atan2(relY, relX) + Math.PI * 5) * (Math.sqrt(relX * relX + relY * relY) + Math.max(width, height)),
+                    y: centerY + Math.sin(Math.atan2(relY, relX) + Math.PI * 5) * (Math.sqrt(relX * relX + relY * relY) + Math.max(width, height))
+                };
+            });
+
+            particles = finalParticles;
+            console.log(`Animation starting with ${particles.length} particles.`);
+
+            // Explosion timer
+            setTimeout(() => {
+                exploding = true;
+                setTimeout(() => setStage('done'), 1500);
+            }, 2000); // Hold for 2 seconds
+
+            animate();
         };
 
         function animate() {

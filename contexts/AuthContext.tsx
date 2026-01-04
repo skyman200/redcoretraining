@@ -24,12 +24,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        // Skip auth if Firebase is not initialized (SSG build or missing config)
+        if (!auth) {
+            setLoading(false);
+            return;
+        }
+
         let unsubscribePartner: (() => void) | null = null;
 
         const unsubscribeAuth = onAuthStateChanged(auth, async (firebaseUser) => {
             setUser(firebaseUser);
 
-            if (firebaseUser) {
+            if (firebaseUser && db) {
                 // Listen to partner application updates
                 unsubscribePartner = onSnapshot(
                     doc(db, "partner_applications", firebaseUser.uid),

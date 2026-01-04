@@ -19,6 +19,9 @@ const COLLECTION_NAME = "posts";
 
 export const postsApi = {
     async create(data: PostFormData): Promise<ApiResult<Post>> {
+        if (!db) {
+            return { error: new Error("Firebase not initialized") };
+        }
         try {
             const id = data.title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-가-힣]/g, '');
             const post: Post = {
@@ -40,16 +43,19 @@ export const postsApi = {
     },
 
     async getAll(): Promise<ApiResult<Post[]>> {
+        if (!db) {
+            return { data: [], error: null };
+        }
         try {
             const q = query(collection(db, COLLECTION_NAME), orderBy("date", "desc"));
             const querySnapshot = await getDocs(q);
             const posts: Post[] = [];
 
-            querySnapshot.forEach((doc) => {
-                const data = doc.data();
+            querySnapshot.forEach((docSnap) => {
+                const data = docSnap.data();
                 posts.push({
                     ...data,
-                    id: doc.id,
+                    id: docSnap.id,
                     createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate().toISOString() : data.createdAt,
                 } as Post);
             });
@@ -62,6 +68,9 @@ export const postsApi = {
     },
 
     async getByCategory(category: PostCategory): Promise<ApiResult<Post[]>> {
+        if (!db) {
+            return { data: [], error: null };
+        }
         try {
             const q = query(
                 collection(db, COLLECTION_NAME),
@@ -71,11 +80,11 @@ export const postsApi = {
             const querySnapshot = await getDocs(q);
             const posts: Post[] = [];
 
-            querySnapshot.forEach((doc) => {
-                const data = doc.data();
+            querySnapshot.forEach((docSnap) => {
+                const data = docSnap.data();
                 posts.push({
                     ...data,
-                    id: doc.id,
+                    id: docSnap.id,
                     createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate().toISOString() : data.createdAt,
                 } as Post);
             });
@@ -88,6 +97,9 @@ export const postsApi = {
     },
 
     async getById(id: string): Promise<ApiResult<Post>> {
+        if (!db) {
+            return { error: new Error("Firebase not initialized") };
+        }
         try {
             const docSnap = await getDoc(doc(db, COLLECTION_NAME, id));
             if (docSnap.exists()) {
@@ -109,6 +121,9 @@ export const postsApi = {
     },
 
     async delete(id: string): Promise<ApiResult<void>> {
+        if (!db) {
+            return { error: new Error("Firebase not initialized") };
+        }
         try {
             await deleteDoc(doc(db, COLLECTION_NAME, id));
             return { data: undefined, error: null };

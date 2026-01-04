@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { LanguageProvider } from '@/contexts/LanguageContext';
 import { motion } from 'framer-motion';
 import { Mail, MapPin, Clock, Send } from 'lucide-react';
 
@@ -29,7 +28,7 @@ function ContactPage() {
             setFormData({ name: '', email: '', phone: '', message: '' });
 
             setTimeout(() => setStatus('idle'), 5000);
-        } catch (error) {
+        } catch {
             setStatus('error');
             setTimeout(() => setStatus('idle'), 5000);
         }

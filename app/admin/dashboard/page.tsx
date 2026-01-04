@@ -4,11 +4,27 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Plus, FileText, LogOut, Edit, Trash2 } from 'lucide-react';
+import { Plus, FileText, LogOut, Trash2 } from 'lucide-react';
+
+interface Post {
+    id: string;
+    title: string;
+    excerpt: string;
+    category: string;
+    date: string;
+    content: string;
+    image: string;
+    files?: Array<{
+        name: string;
+        url: string;
+        id?: string;
+        resourceType?: 'image' | 'video' | 'raw';
+    }>;
+}
 
 export default function AdminDashboard() {
     const router = useRouter();
-    const [posts, setPosts] = useState<any[]>([]);
+    const [posts, setPosts] = useState<Post[]>([]);
     const [loading, setLoading] = useState(true);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [postToDelete, setPostToDelete] = useState<string | null>(null);
@@ -23,10 +39,12 @@ export default function AdminDashboard() {
 
         // Load posts from localStorage
         const savedPosts = localStorage.getItem('admin_posts');
-        if (savedPosts) {
-            setPosts(JSON.parse(savedPosts));
-        }
-        setLoading(false);
+        setTimeout(() => {
+            if (savedPosts) {
+                setPosts(JSON.parse(savedPosts));
+            }
+            setLoading(false);
+        }, 0);
     }, [router]);
 
     const handleLogout = () => {
@@ -90,6 +108,12 @@ export default function AdminDashboard() {
                 <div className="container mx-auto flex justify-between items-center">
                     <h1 className="text-3xl font-bold">Admin Dashboard</h1>
                     <div className="flex items-center gap-4">
+                        <Link
+                            href="/admin/partners"
+                            className="px-4 py-2 border border-white/20 hover:bg-white/10 transition-colors rounded text-sm font-medium"
+                        >
+                            파트너 관리
+                        </Link>
                         <Link
                             href="/"
                             className="px-4 py-2 bg-white/10 hover:bg-white/20 transition-colors rounded text-sm font-medium"

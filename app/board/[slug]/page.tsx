@@ -4,13 +4,25 @@ import { useState, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { LanguageProvider } from '@/contexts/LanguageContext';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowLeft, Calendar, Download } from 'lucide-react';
 import { posts as defaultPosts } from '@/components/BoardCard';
 import { use } from 'react';
+
+interface Post {
+    id: string;
+    category: string;
+    title: string;
+    date: string;
+    image: string;
+}
+
+interface PostDetail {
+    content: string;
+    files: Array<{ name: string; url: string }>;
+}
 
 // Detailed content for default posts
 const postContent: Record<string, {
@@ -105,8 +117,8 @@ function BoardDetailPage({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = use(params);
     const decodedSlug = decodeURIComponent(slug);
     const { t } = useLanguage();
-    const [post, setPost] = useState<any>(null);
-    const [detail, setDetail] = useState<any>(null);
+    const [post, setPost] = useState<Post | null>(null);
+    const [detail, setDetail] = useState<PostDetail | null>(null);
 
     useEffect(() => {
         // Try to find in admin posts first
@@ -115,8 +127,10 @@ function BoardDetailPage({ params }: { params: Promise<{ slug: string }> }) {
             const adminPosts = JSON.parse(savedPosts);
             const adminPost = adminPosts.find((p: any) => p.id === decodedSlug);
             if (adminPost) {
-                setPost(adminPost);
-                setDetail({ content: adminPost.content, files: adminPost.files || [] });
+                setTimeout(() => {
+                    setPost(adminPost);
+                    setDetail({ content: adminPost.content, files: adminPost.files || [] });
+                }, 0);
                 return;
             }
         }
@@ -124,8 +138,10 @@ function BoardDetailPage({ params }: { params: Promise<{ slug: string }> }) {
         // Fallback to default posts
         const defaultPost = defaultPosts.find(p => p.id === decodedSlug);
         if (defaultPost) {
-            setPost(defaultPost);
-            setDetail(postContent[decodedSlug]);
+            setTimeout(() => {
+                setPost(defaultPost);
+                setDetail(postContent[decodedSlug]);
+            }, 0);
         }
     }, [decodedSlug]);
 

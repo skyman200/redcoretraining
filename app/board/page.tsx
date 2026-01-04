@@ -6,32 +6,29 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import BoardCard, { posts as defaultPosts } from '@/components/BoardCard';
 import DataChart from '@/components/DataChart';
-import { LanguageProvider } from '@/contexts/LanguageContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
 
 function BoardPage() {
     const { t } = useLanguage();
-    const [allPosts, setAllPosts] = useState(defaultPosts);
-    const [showAnimation, setShowAnimation] = useState(true);
+    const [allPosts] = useState(() => {
+        if (typeof window !== 'undefined') {
+            const savedPosts = localStorage.getItem('admin_posts');
+            if (savedPosts) {
+                const adminPosts = JSON.parse(savedPosts);
+                return [...adminPosts, ...defaultPosts];
+            }
+        }
+        return defaultPosts;
+    });
     const [animationComplete, setAnimationComplete] = useState(false);
+    const [showAnimation, setShowAnimation] = useState(true);
 
     useEffect(() => {
-        // Load admin posts from localStorage
-        const savedPosts = localStorage.getItem('admin_posts');
-        if (savedPosts) {
-            const adminPosts = JSON.parse(savedPosts);
-            setAllPosts([...adminPosts, ...defaultPosts]);
-        }
-
-        // Start animation
-        setShowAnimation(true);
-        setAnimationComplete(false);
-
         // End animation after duration
         const timer = setTimeout(() => {
-            setShowAnimation(false);
             setAnimationComplete(true);
+            setShowAnimation(false);
         }, 1200);
 
         return () => clearTimeout(timer);

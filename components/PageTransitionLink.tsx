@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
 
 interface PageTransitionLinkProps {
     href: string;
@@ -12,8 +11,6 @@ interface PageTransitionLinkProps {
 
 export default function PageTransitionLink({ href, children, className }: PageTransitionLinkProps) {
     const router = useRouter();
-    const [isTransitioning, setIsTransitioning] = useState(false);
-
     const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
         // Don't intercept for external links or hash links
         if (href.startsWith('http') || href.startsWith('#')) {
@@ -21,7 +18,6 @@ export default function PageTransitionLink({ href, children, className }: PageTr
         }
 
         e.preventDefault();
-        setIsTransitioning(true);
 
         // Trigger transition overlay
         const overlay = document.createElement('div');
@@ -37,7 +33,6 @@ export default function PageTransitionLink({ href, children, className }: PageTr
                 overlay.classList.add('fade-out');
                 setTimeout(() => {
                     document.body.removeChild(overlay);
-                    setIsTransitioning(false);
                 }, 300);
             }, 50);
         }, 300);

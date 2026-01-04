@@ -45,7 +45,18 @@ export default function FacadeAnimation() {
 
     // Start particle phase after 2 seconds
     useEffect(() => {
-        const timer = setTimeout(() => setStage('particles'), 2000);
+        // Check if animation has been shown this session
+        const hasShown = sessionStorage.getItem('facadeShown');
+
+        if (hasShown) {
+            setStage('done');
+            return;
+        }
+
+        const timer = setTimeout(() => {
+            setStage('particles');
+            sessionStorage.setItem('facadeShown', 'true');
+        }, 2000);
         return () => clearTimeout(timer);
     }, []);
 

@@ -40,7 +40,7 @@ export default function PartnerOnboardingForm() {
         setLocalError("");
 
         if (user) {
-            const result = await submitApplication(user.uid, user.email, formData);
+            const result = await submitApplication(user.id, user.email ?? null, formData);
             if (!result.error) {
                 setSubmitted(true);
             }

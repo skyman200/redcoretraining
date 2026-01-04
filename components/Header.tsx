@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import PageTransitionLink from '@/components/PageTransitionLink';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Globe, Lock } from 'lucide-react';

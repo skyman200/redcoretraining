@@ -4,13 +4,25 @@ import { useState, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { LanguageProvider } from '@/contexts/LanguageContext';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowLeft, Calendar, Download } from 'lucide-react';
 import { posts as defaultPosts } from '@/components/BoardCard';
 import { use } from 'react';
+
+interface Post {
+    id: string;
+    category: string;
+    title: string;
+    date: string;
+    image: string;
+}
+
+interface PostDetail {
+    content: string;
+    files: Array<{ name: string; url: string }>;
+}
 
 // Detailed content for default posts
 const postContent: Record<string, {
@@ -104,18 +116,20 @@ AI 기반 분석으로 개인에게 최적화된 운동과 호흡 프로그램�
 function BoardDetailPage({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = use(params);
     const { t } = useLanguage();
-    const [post, setPost] = useState<any>(null);
-    const [detail, setDetail] = useState<any>(null);
+    const [post, setPost] = useState<Post | null>(null);
+    const [detail, setDetail] = useState<PostDetail | null>(null);
 
     useEffect(() => {
         // Try to find in admin posts first
         const savedPosts = localStorage.getItem('admin_posts');
         if (savedPosts) {
             const adminPosts = JSON.parse(savedPosts);
-            const adminPost = adminPosts.find((p: any) => p.id === slug);
+            const adminPost = adminPosts.find((p: Post) => p.id === slug);
             if (adminPost) {
-                setPost(adminPost);
-                setDetail({ content: adminPost.content, files: adminPost.files || [] });
+                setTimeout(() => {
+                    setPost(adminPost);
+                    setDetail({ content: adminPost.content, files: adminPost.files || [] });
+                }, 0);
                 return;
             }
         }
@@ -123,8 +137,10 @@ function BoardDetailPage({ params }: { params: Promise<{ slug: string }> }) {
         // Fallback to default posts
         const defaultPost = defaultPosts.find(p => p.id === slug);
         if (defaultPost) {
-            setPost(defaultPost);
-            setDetail(postContent[slug]);
+            setTimeout(() => {
+                setPost(defaultPost);
+                setDetail(postContent[slug]);
+            }, 0);
         }
     }, [slug]);
 
@@ -219,10 +235,4 @@ function BoardDetailPage({ params }: { params: Promise<{ slug: string }> }) {
     );
 }
 
-export default function BoardDetailPageWrapper({ params }: { params: Promise<{ slug: string }> }) {
-    return (
-        <LanguageProvider>
-            <BoardDetailPage params={params} />
-        </LanguageProvider>
-    );
-}
+export default BoardDetailPage;

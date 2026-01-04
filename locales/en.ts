@@ -132,5 +132,44 @@ export const en = {
             hours: "Operating Hours",
             hoursDetail: "Please contact for consultation"
         }
+    },
+    partners: {
+        login: {
+            title: "Partners Center",
+            subtitle: "Join us as a partner to innovate together with Redcore.",
+            email: "Email",
+            password: "Password",
+            login: "Log In",
+            signup: "Sign Up",
+            google: "Continue with Google",
+            noAccount: "Don't have an account?",
+            hasAccount: "Already have an account?",
+            loginError: "Login failed. Please check your email and password.",
+            signupError: "Sign up failed.",
+        },
+        onboarding: {
+            title: "Partner Settlement Information",
+            subtitle: "Please enter the information required for secure settlement processing.",
+            agreementTitle: "Partnership Terms & Conditions",
+            agreeCheckbox: "I have read and agree to the terms. (Required)",
+            name: "Full Name",
+            contact: "Contact Number",
+            bankName: "Bank Name (or SWIFT code)",
+            accountNumber: "Account Number",
+            birthDate: "Date of Birth (YYMMDD)",
+            submit: "Submit & Complete",
+            submitting: "Submitting...",
+            success: "Application completed! We will contact you after review.",
+            error: "An error occurred. Please try again.",
+        },
+        agreement: {
+            title: "Partnership Service Terms of Use",
+            article1: "Article 1 (Purpose)",
+            article1Desc: "These terms aim to regulate matters concerning profit distribution and settlement operations between Redcore Training Center (the 'Center') and its partners.",
+            article2: "Article 2 (Collection and Use of Personal Information)",
+            article2Desc: "The Center collects information such as name, contact details, and bank account for withholding tax receipt issuance and settlement processing. Collected information is destroyed without delay after the legal retention period ends.",
+            article3: "Article 3 (Settlement Method)",
+            article3Desc: "Settlement is paid monthly to the account designated by the partner on a specified date. (Refer to the separate contract for specific ratios)"
+        }
     }
 };

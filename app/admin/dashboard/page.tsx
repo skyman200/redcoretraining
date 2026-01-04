@@ -4,11 +4,22 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Plus, FileText, LogOut, Edit, Trash2 } from 'lucide-react';
+import { Plus, FileText, LogOut, Trash2 } from 'lucide-react';
+
+interface Post {
+    id: string;
+    title: string;
+    excerpt: string;
+    category: string;
+    date: string;
+    content: string;
+    image: string;
+    files?: Array<{ name: string; url: string }>;
+}
 
 export default function AdminDashboard() {
     const router = useRouter();
-    const [posts, setPosts] = useState<any[]>([]);
+    const [posts, setPosts] = useState<Post[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -21,10 +32,12 @@ export default function AdminDashboard() {
 
         // Load posts from localStorage
         const savedPosts = localStorage.getItem('admin_posts');
-        if (savedPosts) {
-            setPosts(JSON.parse(savedPosts));
-        }
-        setLoading(false);
+        setTimeout(() => {
+            if (savedPosts) {
+                setPosts(JSON.parse(savedPosts));
+            }
+            setLoading(false);
+        }, 0);
     }, [router]);
 
     const handleLogout = () => {

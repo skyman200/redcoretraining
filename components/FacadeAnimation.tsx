@@ -11,7 +11,7 @@ export default function FacadeAnimation() {
         const hasShown = sessionStorage.getItem('facadeShown');
 
         if (hasShown) {
-            setIsVisible(false);
+            setTimeout(() => setIsVisible(false), 0);
             return;
         }
 

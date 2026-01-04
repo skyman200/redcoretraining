@@ -132,5 +132,44 @@ export const ko = {
             hours: "운영 시간",
             hoursDetail: "상담을 위해 연락 주시기 바랍니다"
         }
+    },
+    partners: {
+        login: {
+            title: "파트너스 센터",
+            subtitle: "레드코어와 함께 혁신을 만들어갈 파트너를 모십니다.",
+            email: "이메일",
+            password: "비밀번호",
+            login: "로그인",
+            signup: "회원가입",
+            google: "Google로 시작하기",
+            noAccount: "계정이 없으신가요?",
+            hasAccount: "이미 계정이 있으신가요?",
+            loginError: "로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.",
+            signupError: "회원가입에 실패했습니다.",
+        },
+        onboarding: {
+            title: "파트너스 정산 정보 입력",
+            subtitle: "안전한 정산 처리를 위해 필요한 정보를 입력해 주세요.",
+            agreementTitle: "파트너십 약관",
+            agreeCheckbox: "약관을 읽었으며 이에 동의합니다. (필수)",
+            name: "성함",
+            contact: "연락처",
+            bankName: "은행명 (또는 SWIFT 코드)",
+            accountNumber: "계좌번호",
+            birthDate: "생년월일 (YYMMDD)",
+            submit: "정보 제출 및 신청 완료",
+            submitting: "제출 중...",
+            success: "신청이 완료되었습니다! 검토 후 연락드리겠습니다.",
+            error: "오류가 발생했습니다. 다시 시도해 주세요.",
+        },
+        agreement: {
+            title: "파트너십 서비스 이용약관",
+            article1: "제1조 (목적)",
+            article1Desc: "본 약관은 레드코어 트레이닝 센터(이하 '센터')와 파트너 간의 수익 배분 및 정산 업무에 관한 제반 사항을 규정함을 목적으로 합니다.",
+            article2: "제2조 (개인정보 수집 및 이용)",
+            article2Desc: "센터는 원천징수 영수증 발행 및 정산 대금 입금을 위해 이름, 연락처, 계좌번호 등의 정보를 수집합니다. 수집된 정보는 법령에 따른 보존 기간 종료 후 지체 없이 파기합니다.",
+            article3: "제3조 (정산 방식)",
+            article3Desc: "정산은 매월 정해진 기일에 파트너가 지정한 계좌로 지급됩니다. (자세한 비율은 별도 계약서 참조)"
+        }
     }
 };

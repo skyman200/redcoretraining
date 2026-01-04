@@ -3,7 +3,6 @@
 import { useLanguage } from '@/contexts/LanguageContext';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { LanguageProvider } from '@/contexts/LanguageContext';
 import { motion } from 'framer-motion';
 import { Activity, Heart, TrendingUp, Target } from 'lucide-react';
 
@@ -162,10 +161,4 @@ function AboutPage() {
     );
 }
 
-export default function AboutPageWrapper() {
-    return (
-        <LanguageProvider>
-            <AboutPage />
-        </LanguageProvider>
-    );
-}
+export default AboutPage;

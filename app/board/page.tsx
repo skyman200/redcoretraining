@@ -5,30 +5,25 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import BoardCard, { posts as defaultPosts } from '@/components/BoardCard';
-import { LanguageProvider } from '@/contexts/LanguageContext';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 function BoardPage() {
     const { t } = useLanguage();
-    const [allPosts, setAllPosts] = useState(defaultPosts);
-    const [showAnimation, setShowAnimation] = useState(true);
+    const [allPosts] = useState(() => {
+        if (typeof window !== 'undefined') {
+            const savedPosts = localStorage.getItem('admin_posts');
+            if (savedPosts) {
+                const adminPosts = JSON.parse(savedPosts);
+                return [...adminPosts, ...defaultPosts];
+            }
+        }
+        return defaultPosts;
+    });
     const [animationComplete, setAnimationComplete] = useState(false);
 
     useEffect(() => {
-        // Load admin posts from localStorage
-        const savedPosts = localStorage.getItem('admin_posts');
-        if (savedPosts) {
-            const adminPosts = JSON.parse(savedPosts);
-            setAllPosts([...adminPosts, ...defaultPosts]);
-        }
-
-        // Start animation
-        setShowAnimation(true);
-        setAnimationComplete(false);
-
         // End animation after duration
         const timer = setTimeout(() => {
-            setShowAnimation(false);
             setAnimationComplete(true);
         }, 1800);
 
@@ -117,10 +112,4 @@ function BoardPage() {
     );
 }
 
-export default function BoardPageWrapper() {
-    return (
-        <LanguageProvider>
-            <BoardPage />
-        </LanguageProvider>
-    );
-}
+export default BoardPage;

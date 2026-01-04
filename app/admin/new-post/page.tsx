@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
 import { ArrowLeft, Save, Upload, X } from 'lucide-react';
 
 export default function NewPostPage() {

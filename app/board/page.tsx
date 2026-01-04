@@ -1,30 +1,34 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import BoardCard, { posts as defaultPosts } from '@/components/BoardCard';
 import DataChart from '@/components/DataChart';
 import { motion, AnimatePresence } from 'framer-motion';
+import { postsApi } from '@/services/api/postsApi';
+import { Post } from '@/types/post';
 
 
 function BoardPage() {
     const { t } = useLanguage();
-    const [allPosts] = useState(() => {
-        if (typeof window !== 'undefined') {
-            const savedPosts = localStorage.getItem('admin_posts');
-            if (savedPosts) {
-                const adminPosts = JSON.parse(savedPosts);
-                return [...adminPosts, ...defaultPosts];
-            }
-        }
-        return defaultPosts;
-    });
+    const [posts, setPosts] = useState<Post[]>(defaultPosts as any[]);
     const [animationComplete, setAnimationComplete] = useState(false);
     const [showAnimation, setShowAnimation] = useState(true);
 
+    const loadPosts = useCallback(async () => {
+        const result = await postsApi.getAll();
+        if (result.data) {
+            // Filter out 'Partner' category for general board
+            const publicPosts = result.data.filter(p => p.category !== 'Partner');
+            setPosts([...publicPosts, ...defaultPosts] as any[]);
+        }
+    }, []);
+
     useEffect(() => {
+        loadPosts();
+
         // End animation after duration
         const timer = setTimeout(() => {
             setAnimationComplete(true);
@@ -32,7 +36,7 @@ function BoardPage() {
         }, 1200);
 
         return () => clearTimeout(timer);
-    }, []);
+    }, [loadPosts]);
 
     return (
         <motion.div
@@ -134,14 +138,14 @@ function BoardPage() {
                         transition={{ duration: 0.8 }}
                         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
                     >
-                        {allPosts.map((post, index) => (
+                        {posts.map((post, index) => (
                             <motion.div
                                 key={post.id}
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.2 + (index * 0.1) }}
                             >
-                                <BoardCard post={post} />
+                                <BoardCard post={post as any} />
                             </motion.div>
                         ))}
                     </motion.div>

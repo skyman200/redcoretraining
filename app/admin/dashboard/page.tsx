@@ -1,26 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Plus, FileText, LogOut, Trash2 } from 'lucide-react';
-
-interface Post {
-    id: string;
-    title: string;
-    excerpt: string;
-    category: string;
-    date: string;
-    content: string;
-    image: string;
-    files?: Array<{
-        name: string;
-        url: string;
-        id?: string;
-        resourceType?: 'image' | 'video' | 'raw';
-    }>;
-}
+import { postsApi } from '@/services/api/postsApi';
+import { Post } from '@/types/post';
 
 export default function AdminDashboard() {
     const router = useRouter();
@@ -28,6 +14,15 @@ export default function AdminDashboard() {
     const [loading, setLoading] = useState(true);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [postToDelete, setPostToDelete] = useState<string | null>(null);
+
+    const loadPosts = useCallback(async () => {
+        setLoading(true);
+        const result = await postsApi.getAll();
+        if (result.data) {
+            setPosts(result.data);
+        }
+        setLoading(false);
+    }, []);
 
     useEffect(() => {
         // Check authentication
@@ -37,15 +32,8 @@ export default function AdminDashboard() {
             return;
         }
 
-        // Load posts from localStorage
-        const savedPosts = localStorage.getItem('admin_posts');
-        setTimeout(() => {
-            if (savedPosts) {
-                setPosts(JSON.parse(savedPosts));
-            }
-            setLoading(false);
-        }, 0);
-    }, [router]);
+        loadPosts();
+    }, [router, loadPosts]);
 
     const handleLogout = () => {
         sessionStorage.removeItem('admin_auth');
@@ -58,38 +46,40 @@ export default function AdminDashboard() {
     };
 
     const confirmDelete = async () => {
-        if (postToDelete) {
-            // Find the post to get its files
-            const post = posts.find(p => p.id === postToDelete);
+        if (!postToDelete) return;
 
-            // Delete associated files from Cloudinary
-            if (post && post.files && post.files.length > 0) {
-                for (const file of post.files) {
-                    if (file.id) {
-                        try {
-                            await fetch('/api/delete-file', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                },
-                                body: JSON.stringify({
-                                    public_id: file.id,
-                                    resource_type: file.resourceType || 'image' // Default to image if missing
-                                }),
-                            });
-                            console.log(`Deleted file: ${file.name}`);
-                        } catch (err) {
-                            console.error(`Failed to delete file ${file.name}:`, err);
-                        }
+        // Find the post to get its files for Cloudinary deletion (optional but good)
+        const post = posts.find(p => p.id === postToDelete);
+
+        // Delete associated files from Cloudinary
+        if (post && post.files && post.files.length > 0) {
+            for (const file of post.files) {
+                if (file.id) {
+                    try {
+                        await fetch('/api/delete-file', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                public_id: file.id,
+                                resource_type: file.resourceType || 'image'
+                            }),
+                        });
+                    } catch (err) {
+                        console.error(`Failed to delete file ${file.name}:`, err);
                     }
                 }
             }
+        }
 
-            const updatedPosts = posts.filter(p => p.id !== postToDelete);
-            setPosts(updatedPosts);
-            localStorage.setItem('admin_posts', JSON.stringify(updatedPosts));
+        const result = await postsApi.delete(postToDelete);
+        if (!result.error) {
+            setPosts(prev => prev.filter(p => p.id !== postToDelete));
             setShowDeleteModal(false);
             setPostToDelete(null);
+        } else {
+            alert('Failed to delete post: ' + result.error.message);
         }
     };
 

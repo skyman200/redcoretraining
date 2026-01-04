@@ -1,28 +1,27 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { ArrowLeft, Save, Upload, X, HardDrive } from 'lucide-react';
-import FileUpload from '@/components/FileUpload';
-import GoogleDrivePicker from '@/components/GoogleDrivePicker';
-
-
+import { ArrowLeft, Save } from 'lucide-react';
+import { useNewPost } from './hooks/useNewPost';
+import { FileSection } from './components/FileSection';
 
 export default function NewPostPage() {
     const router = useRouter();
-    const [formData, setFormData] = useState({
-        title: '',
-        excerpt: '',
-        content: '',
-        category: 'Training',
-        date: new Date().toISOString().split('T')[0]
-    });
-    const [files, setFiles] = useState<Array<{ name: string; url: string; id?: string; resourceType?: string }>>([]);
-    const [newFileName, setNewFileName] = useState('');
-    const [newFileUrl, setNewFileUrl] = useState('');
-    const [isDrivePickerOpen, setIsDrivePickerOpen] = useState(false);
+    const {
+        formData,
+        isSubmitting,
+        newFileName,
+        newFileUrl,
+        setNewFileName,
+        setNewFileUrl,
+        handleChange,
+        handleFileUpload,
+        handleAddFile,
+        handleRemoveFile,
+        handleSubmit
+    } = useNewPost();
 
     useEffect(() => {
         // Check authentication
@@ -32,49 +31,8 @@ export default function NewPostPage() {
         }
     }, [router]);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        setFormData(prev => ({
-            ...prev,
-            [e.target.name]: e.target.value
-        }));
-    };
-
-    const handleAddFile = () => {
-        if (newFileName && newFileUrl) {
-            setFiles(prev => [...prev, { name: newFileName, url: newFileUrl }]);
-            setNewFileName('');
-            setNewFileUrl('');
-        }
-    };
-
-    const handleRemoveFile = (index: number) => {
-        setFiles(prev => prev.filter((_, i) => i !== index));
-    };
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-
-        // Create new post
-        const newPost = {
-            id: formData.title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-가-힣]/g, ''),
-            ...formData,
-            files,
-            image: '/hero.jpg' // Default image
-        };
-
-        // Save to localStorage
-        const savedPosts = localStorage.getItem('admin_posts');
-        const posts = savedPosts ? JSON.parse(savedPosts) : [];
-        posts.unshift(newPost);
-        localStorage.setItem('admin_posts', JSON.stringify(posts));
-
-        // Redirect to dashboard
-        router.push('/admin/dashboard');
-    };
-
     return (
         <div className="min-h-screen bg-gray-50">
-
             {/* Header */}
             <header className="bg-black text-white py-6 px-6">
                 <div className="container mx-auto">
@@ -122,6 +80,7 @@ export default function NewPostPage() {
                                     <option value="Breathing">Breathing</option>
                                     <option value="Digital Health">Digital Health</option>
                                     <option value="Research">Research</option>
+                                    <option value="Partner">Partner (파트너 전용)</option>
                                 </select>
                             </div>
                             <div>
@@ -165,121 +124,27 @@ export default function NewPostPage() {
                             />
                         </div>
 
-                        {/* Files */}
-                        <div>
-                            <label className="block text-sm font-bold mb-4">첨부 파일</label>
-
-                            {/* Existing files */}
-                            {files.length > 0 && (
-                                <div className="space-y-2 mb-4">
-                                    {files.map((file, index) => (
-                                        <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded border border-gray-200">
-                                            <div className="flex items-center gap-3 overflow-hidden">
-                                                <div className="bg-gray-200 p-2 rounded">
-                                                    <Save size={16} className="text-gray-600" />
-                                                </div>
-                                                <div className="min-w-0">
-                                                    <p className="font-medium truncate">{file.name}</p>
-                                                    <p className="text-xs text-gray-500 truncate">
-                                                        {file.url.includes('drive.google.com') ? 'Google Drive' : 'Cloudinary'}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <button
-                                                type="button"
-                                                onClick={() => handleRemoveFile(index)}
-                                                className="text-red-600 hover:text-red-700 p-1"
-                                            >
-                                                <X size={20} />
-                                            </button>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-
-                            {/* Add new file */}
-                            <div className="space-y-4">
-                                {/* Google Drive Picker Button */}
-                                <button
-                                    type="button"
-                                    onClick={() => setIsDrivePickerOpen(true)}
-                                    className="w-full flex items-center justify-center gap-2 p-4 border-2 border-gray-300 rounded-lg hover:border-black hover:bg-gray-50 transition-all group"
-                                >
-                                    <HardDrive size={24} className="text-gray-500 group-hover:text-black" />
-                                    <span className="font-medium text-gray-700 group-hover:text-black">Google Drive에서 파일 선택</span>
-                                </button>
-
-                                <div className="relative">
-                                    <div className="absolute inset-0 flex items-center">
-                                        <div className="w-full border-t border-gray-200"></div>
-                                    </div>
-                                    <div className="relative flex justify-center text-sm">
-                                        <span className="px-2 bg-white text-gray-500">또는 파일 업로드</span>
-                                    </div>
-                                </div>
-
-                                {/* File Upload */}
-                                <div className="p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-black transition-colors">
-                                    <p className="font-medium mb-4 text-gray-700 text-center">파일 업로드 (Cloudinary)</p>
-                                    <FileUpload
-                                        onUploadComplete={(file) => {
-                                            setFiles(prev => [...prev, {
-                                                name: file.name,
-                                                url: file.downloadLink,
-                                                id: file.id, // Store Cloudinary public_id
-                                                resourceType: file.resourceType // Store resource_type
-                                            }]);
-                                        }}
-                                    />
-                                </div>
-
-                                <div className="relative">
-                                    <div className="absolute inset-0 flex items-center">
-                                        <div className="w-full border-t border-gray-200"></div>
-                                    </div>
-                                    <div className="relative flex justify-center text-sm">
-                                        <span className="px-2 bg-white text-gray-500">또는 링크 직접 입력</span>
-                                    </div>
-                                </div>
-
-                                {/* Manual URL Input */}
-                                <div className="p-4 bg-gray-50 rounded border border-gray-200 space-y-3">
-                                    <input
-                                        type="text"
-                                        value={newFileName}
-                                        onChange={(e) => setNewFileName(e.target.value)}
-                                        className="w-full px-4 py-2 border border-gray-300 focus:outline-none focus:border-black transition-colors bg-white"
-                                        placeholder="파일 이름 (예: pilates-guide.pdf)"
-                                    />
-                                    <div className="flex gap-2">
-                                        <input
-                                            type="text"
-                                            value={newFileUrl}
-                                            onChange={(e) => setNewFileUrl(e.target.value)}
-                                            className="w-full px-4 py-2 border border-gray-300 focus:outline-none focus:border-black transition-colors bg-white"
-                                            placeholder="파일 URL (Google Drive 링크 등)"
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={handleAddFile}
-                                            disabled={!newFileName || !newFileUrl}
-                                            className="px-4 py-2 bg-black text-white hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed rounded whitespace-nowrap"
-                                        >
-                                            추가
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        {/* Files Section */}
+                        <FileSection
+                            files={formData.files}
+                            onRemove={handleRemoveFile}
+                            onUploadComplete={handleFileUpload}
+                            newFileName={newFileName}
+                            setNewFileName={setNewFileName}
+                            newFileUrl={newFileUrl}
+                            setNewFileUrl={setNewFileUrl}
+                            onAddManual={handleAddFile}
+                        />
 
                         {/* Submit */}
                         <div className="flex gap-4 pt-6">
                             <button
                                 type="submit"
-                                className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-black text-white hover:bg-gray-800 transition-colors rounded font-bold uppercase tracking-wider"
+                                disabled={isSubmitting}
+                                className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-black text-white hover:bg-gray-800 transition-colors rounded font-bold uppercase tracking-wider disabled:opacity-50"
                             >
                                 <Save size={20} />
-                                게시글 저장
+                                {isSubmitting ? '저장 중...' : '게시글 저장'}
                             </button>
                             <Link
                                 href="/admin/dashboard"
@@ -291,18 +156,6 @@ export default function NewPostPage() {
                     </form>
                 </div>
             </main>
-
-            <GoogleDrivePicker
-                isOpen={isDrivePickerOpen}
-                onClose={() => setIsDrivePickerOpen(false)}
-                onSelect={(file) => {
-                    setFiles(prev => [...prev, {
-                        name: file.name,
-                        url: file.url,
-                        id: file.id
-                    }]);
-                }}
-            />
         </div>
     );
 }

@@ -10,14 +10,8 @@ import Link from 'next/link';
 import { ArrowLeft, Calendar, Download } from 'lucide-react';
 import { posts as defaultPosts } from '@/components/BoardCard';
 import { use } from 'react';
-
-interface Post {
-    id: string;
-    category: string;
-    title: string;
-    date: string;
-    image: string;
-}
+import { postsApi } from '@/services/api/postsApi';
+import { Post } from '@/types/post';
 
 interface PostDetail {
     content: string;
@@ -25,7 +19,7 @@ interface PostDetail {
 }
 
 // Detailed content for default posts
-const postContent: Record<string, {
+const defaultPostContent: Record<string, {
     content: string;
     files: Array<{ name: string; url: string; }>;
 }> = {
@@ -119,31 +113,40 @@ function BoardDetailPage({ params }: { params: Promise<{ slug: string }> }) {
     const { t } = useLanguage();
     const [post, setPost] = useState<Post | null>(null);
     const [detail, setDetail] = useState<PostDetail | null>(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Try to find in admin posts first
-        const savedPosts = localStorage.getItem('admin_posts');
-        if (savedPosts) {
-            const adminPosts = JSON.parse(savedPosts);
-            const adminPost = adminPosts.find((p: any) => p.id === decodedSlug);
-            if (adminPost) {
-                setTimeout(() => {
-                    setPost(adminPost);
-                    setDetail({ content: adminPost.content, files: adminPost.files || [] });
-                }, 0);
+        const loadPost = async () => {
+            setLoading(true);
+
+            // Try Firestore first
+            const result = await postsApi.getById(decodedSlug);
+            if (result.data) {
+                setPost(result.data);
+                setDetail({ content: result.data.content, files: result.data.files || [] });
+                setLoading(false);
                 return;
             }
-        }
 
-        // Fallback to default posts
-        const defaultPost = defaultPosts.find(p => p.id === decodedSlug);
-        if (defaultPost) {
-            setTimeout(() => {
-                setPost(defaultPost);
-                setDetail(postContent[decodedSlug]);
-            }, 0);
-        }
+            // Fallback to default posts
+            const defaultPost = defaultPosts.find(p => p.id === decodedSlug);
+            if (defaultPost) {
+                setPost(defaultPost as any);
+                setDetail(defaultPostContent[decodedSlug]);
+            }
+            setLoading(false);
+        };
+
+        loadPost();
     }, [decodedSlug]);
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="w-8 h-8 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+            </div>
+        );
+    }
 
     if (!post || !detail) {
         return (
@@ -173,13 +176,19 @@ function BoardDetailPage({ params }: { params: Promise<{ slug: string }> }) {
                         {t.board.backToList}
                     </Link>
 
-                    <div className="relative aspect-[21/9] mb-12 overflow-hidden rounded-lg">
-                        <Image
-                            src={post.image}
-                            alt={post.title}
-                            fill
-                            className="object-cover"
-                        />
+                    <div className="relative aspect-[21/9] mb-12 overflow-hidden rounded-lg bg-gray-100">
+                        {post.image ? (
+                            <Image
+                                src={post.image}
+                                alt={post.title}
+                                fill
+                                className="object-cover"
+                            />
+                        ) : (
+                            <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                No Image
+                            </div>
+                        )}
                     </div>
 
                     <div className="flex items-center justify-between mb-6 pb-6 border-b border-gray-200">
@@ -188,8 +197,10 @@ function BoardDetailPage({ params }: { params: Promise<{ slug: string }> }) {
                                 {post.category}
                             </span>
                             <div className="flex items-center gap-2 text-gray-500">
-                                <Calendar size={16} />
-                                <time dateTime={post.date}>{post.date}</time>
+                                <span className="flex items-center gap-1">
+                                    <Calendar size={16} />
+                                    <time dateTime={post.date}>{post.date}</time>
+                                </span>
                             </div>
                         </div>
                     </div>

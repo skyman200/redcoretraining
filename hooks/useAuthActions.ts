@@ -1,6 +1,5 @@
 import { useState, useCallback } from "react";
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
-import { auth } from "@/services/firebase/client";
+import { supabase } from "@/services/supabase/client";
 import { useRouter } from "next/navigation";
 
 export function useAuthActions() {
@@ -9,10 +8,18 @@ export function useAuthActions() {
     const router = useRouter();
 
     const login = useCallback(async (email: string, pass: string) => {
+        if (!supabase) {
+            setError("Supabase not initialized");
+            return;
+        }
         setLoading(true);
         setError(null);
         try {
-            await signInWithEmailAndPassword(auth, email, pass);
+            const { error } = await supabase.auth.signInWithPassword({
+                email,
+                password: pass,
+            });
+            if (error) throw error;
             router.push("/partners/onboarding");
         } catch (err: unknown) {
             setError(err instanceof Error ? err.message : "An unknown error occurred");
@@ -22,10 +29,18 @@ export function useAuthActions() {
     }, [router]);
 
     const signup = useCallback(async (email: string, pass: string) => {
+        if (!supabase) {
+            setError("Supabase not initialized");
+            return;
+        }
         setLoading(true);
         setError(null);
         try {
-            await createUserWithEmailAndPassword(auth, email, pass);
+            const { error } = await supabase.auth.signUp({
+                email,
+                password: pass,
+            });
+            if (error) throw error;
             router.push("/partners/onboarding");
         } catch (err: unknown) {
             setError(err instanceof Error ? err.message : "An unknown error occurred");
@@ -35,18 +50,24 @@ export function useAuthActions() {
     }, [router]);
 
     const googleSignIn = useCallback(async () => {
+        if (!supabase) {
+            setError("Supabase not initialized");
+            return;
+        }
         setLoading(true);
         setError(null);
         try {
-            const provider = new GoogleAuthProvider();
-            await signInWithPopup(auth, provider);
-            router.push("/partners/onboarding");
+            const { error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+            });
+            if (error) throw error;
+            // OAuth redirects automatically, so no need to push
         } catch (err: unknown) {
             setError(err instanceof Error ? err.message : "An unknown error occurred");
         } finally {
             setLoading(false);
         }
-    }, [router]);
+    }, []);
 
     return { loading, error, login, signup, googleSignIn };
 }

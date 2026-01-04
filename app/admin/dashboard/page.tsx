@@ -69,6 +69,12 @@ export default function AdminDashboard() {
                     <h1 className="text-3xl font-bold">Admin Dashboard</h1>
                     <div className="flex items-center gap-4">
                         <Link
+                            href="/admin/partners"
+                            className="px-4 py-2 border border-white/20 hover:bg-white/10 transition-colors rounded text-sm font-medium"
+                        >
+                            파트너 관리
+                        </Link>
+                        <Link
                             href="/"
                             className="px-4 py-2 bg-white/10 hover:bg-white/20 transition-colors rounded text-sm font-medium"
                         >

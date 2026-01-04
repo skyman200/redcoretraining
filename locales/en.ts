@@ -170,6 +170,26 @@ export const en = {
             article2Desc: "The Center collects information such as name, contact details, and bank account for withholding tax receipt issuance and settlement processing. Collected information is destroyed without delay after the legal retention period ends.",
             article3: "Article 3 (Settlement Method)",
             article3Desc: "Settlement is paid monthly to the account designated by the partner on a specified date. (Refer to the separate contract for specific ratios)"
+        },
+        board: {
+            title: "Partner Board",
+            subtitle: "Exclusive information and resources for Redcore and its partners.",
+            accessDenied: "Access Denied",
+            accessDeniedDesc: "The partner board is only available to approved partners. Please wait for admin approval or contact support.",
+            sections: {
+                notice: "Partner Notices",
+                resources: "Marketing Resources",
+                network: "Network & Collaboration"
+            }
+        }
+    },
+    admin: {
+        managePartners: "Manage Partners",
+        deleteConfirm: "Are you sure you want to delete this partner? All related data will be removed.",
+        status: {
+            approved: "Approved",
+            pending: "Pending",
+            rejected: "Rejected"
         }
     }
-};
+}

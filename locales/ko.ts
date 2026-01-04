@@ -170,6 +170,26 @@ export const ko = {
             article2Desc: "센터는 원천징수 영수증 발행 및 정산 대금 입금을 위해 이름, 연락처, 계좌번호 등의 정보를 수집합니다. 수집된 정보는 법령에 따른 보존 기간 종료 후 지체 없이 파기합니다.",
             article3: "제3조 (정산 방식)",
             article3Desc: "정산은 매월 정해진 기일에 파트너가 지정한 계좌로 지급됩니다. (자세한 비율은 별도 계약서 참조)"
+        },
+        board: {
+            title: "파트너스 게시판",
+            subtitle: "레드코어와 파트너를 위한 전용 정보 및 자료실입니다.",
+            accessDenied: "접근 제한",
+            accessDeniedDesc: "파트너 전용 게시판은 승인된 파트너만 이용 가능합니다. 관리자의 승인을 기다려 주시거나 고객센터로 문의해 주세요.",
+            sections: {
+                notice: "파트너 공지사항",
+                resources: "마케팅 자료실",
+                network: "네트워크 & 협업"
+            }
+        }
+    },
+    admin: {
+        managePartners: "파트너 관리",
+        deleteConfirm: "정말로 이 파트너를 삭제하시겠습니까? 관련 데이터가 모두 삭제됩니다.",
+        status: {
+            approved: "승인됨",
+            pending: "대기 중",
+            rejected: "거절됨"
         }
     }
-};
+}

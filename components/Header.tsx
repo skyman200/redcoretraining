@@ -2,10 +2,14 @@
 
 import PageTransitionLink from '@/components/PageTransitionLink';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { Globe, Lock } from 'lucide-react';
 
 export default function Header() {
   const { language, setLanguage, t } = useLanguage();
+  const { partnerData } = useAuth();
+
+  const isApprovedPartner = partnerData?.status === "approved";
 
   return (
     <header className="fixed top-0 left-0 w-full z-50 mix-blend-difference text-white">
@@ -20,6 +24,11 @@ export default function Header() {
           <PageTransitionLink href="/board" className="hover:underline underline-offset-4 decoration-1">
             {t.header.board}
           </PageTransitionLink>
+          {isApprovedPartner && (
+            <PageTransitionLink href="/partners/board" className="hover:underline underline-offset-4 decoration-1 text-red-500 font-bold">
+              Partners
+            </PageTransitionLink>
+          )}
           <PageTransitionLink href="/about" className="hover:underline underline-offset-4 decoration-1">
             {t.header.about}
           </PageTransitionLink>

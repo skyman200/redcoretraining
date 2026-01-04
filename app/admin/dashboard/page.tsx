@@ -14,7 +14,12 @@ interface Post {
     date: string;
     content: string;
     image: string;
-    files?: Array<{ name: string; url: string }>;
+    files?: Array<{
+        name: string;
+        url: string;
+        id?: string;
+        resourceType?: 'image' | 'video' | 'raw';
+    }>;
 }
 
 export default function AdminDashboard() {

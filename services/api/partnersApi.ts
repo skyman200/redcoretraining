@@ -1,9 +1,8 @@
-import { db } from "../firebase/client";
-import { doc, setDoc, getDoc, getDocs, collection, query, orderBy, updateDoc, deleteDoc } from "firebase/firestore";
+import { supabase } from "../supabase/client";
 import { PartnerApplication, PartnerApplicationFormData } from "@/types/partner";
 import { ApiResult } from "@/types/api";
 
-const COLLECTION_NAME = "partner_applications";
+const TABLE_NAME = "partner_applications";
 
 export const partnersApi = {
     async submitApplication(
@@ -11,6 +10,9 @@ export const partnersApi = {
         email: string | null,
         data: PartnerApplicationFormData
     ): Promise<ApiResult<PartnerApplication>> {
+        if (!supabase) {
+            return { error: new Error("Supabase not initialized") };
+        }
         try {
             const application: PartnerApplication = {
                 ...data,
@@ -21,7 +23,20 @@ export const partnersApi = {
                 agreedAt: new Date().toISOString(),
             };
 
-            await setDoc(doc(db, COLLECTION_NAME, uid), application);
+            const { error } = await supabase
+                .from(TABLE_NAME)
+                .upsert({
+                    uid,
+                    email,
+                    name: data.name,
+                    contact: data.contact,
+                    bank_name: data.bankName,
+                    account_number: data.accountNumber,
+                    birth_date: data.birthDate,
+                    status: 'pending',
+                });
+
+            if (error) throw error;
             return { data: application, error: null };
         } catch (error) {
             return { error: error as Error };
@@ -29,12 +44,34 @@ export const partnersApi = {
     },
 
     async getApplication(uid: string): Promise<ApiResult<PartnerApplication>> {
+        if (!supabase) {
+            return { error: new Error("Supabase not initialized") };
+        }
         try {
-            const docSnap = await getDoc(doc(db, COLLECTION_NAME, uid));
-            if (docSnap.exists()) {
-                return { data: docSnap.data() as PartnerApplication, error: null };
-            }
-            return { error: new Error("Application not found") };
+            const { data, error } = await supabase
+                .from(TABLE_NAME)
+                .select('*')
+                .eq('uid', uid)
+                .single();
+
+            if (error) throw error;
+            if (!data) return { error: new Error("Application not found") };
+
+            return {
+                data: {
+                    uid: data.uid,
+                    email: data.email,
+                    name: data.name,
+                    contact: data.contact,
+                    bankName: data.bank_name,
+                    accountNumber: data.account_number,
+                    birthDate: data.birth_date,
+                    status: data.status,
+                    createdAt: data.created_at,
+                    agreedAt: data.agreed_at,
+                },
+                error: null
+            };
         } catch (error) {
             return { error: error as Error };
         }
@@ -42,13 +79,30 @@ export const partnersApi = {
 
     // Admin Functions
     async getAllApplications(): Promise<ApiResult<PartnerApplication[]>> {
+        if (!supabase) {
+            return { data: [], error: null };
+        }
         try {
-            const q = query(collection(db, COLLECTION_NAME), orderBy("createdAt", "desc"));
-            const querySnapshot = await getDocs(q);
-            const applications: PartnerApplication[] = [];
-            querySnapshot.forEach((doc) => {
-                applications.push(doc.data() as PartnerApplication);
-            });
+            const { data, error } = await supabase
+                .from(TABLE_NAME)
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) throw error;
+
+            const applications: PartnerApplication[] = (data || []).map(row => ({
+                uid: row.uid,
+                email: row.email,
+                name: row.name,
+                contact: row.contact,
+                bankName: row.bank_name,
+                accountNumber: row.account_number,
+                birthDate: row.birth_date,
+                status: row.status,
+                createdAt: row.created_at,
+                agreedAt: row.agreed_at,
+            }));
+
             return { data: applications, error: null };
         } catch (error) {
             return { error: error as Error };
@@ -56,8 +110,16 @@ export const partnersApi = {
     },
 
     async updateStatus(uid: string, status: PartnerApplication["status"]): Promise<ApiResult<void>> {
+        if (!supabase) {
+            return { error: new Error("Supabase not initialized") };
+        }
         try {
-            await updateDoc(doc(db, COLLECTION_NAME, uid), { status });
+            const { error } = await supabase
+                .from(TABLE_NAME)
+                .update({ status })
+                .eq('uid', uid);
+
+            if (error) throw error;
             return { data: undefined, error: null };
         } catch (error) {
             return { error: error as Error };
@@ -65,8 +127,16 @@ export const partnersApi = {
     },
 
     async deleteApplication(uid: string): Promise<ApiResult<void>> {
+        if (!supabase) {
+            return { error: new Error("Supabase not initialized") };
+        }
         try {
-            await deleteDoc(doc(db, COLLECTION_NAME, uid));
+            const { error } = await supabase
+                .from(TABLE_NAME)
+                .delete()
+                .eq('uid', uid);
+
+            if (error) throw error;
             return { data: undefined, error: null };
         } catch (error) {
             return { error: error as Error };

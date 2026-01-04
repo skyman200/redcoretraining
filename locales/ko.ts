@@ -3,7 +3,8 @@ export const ko = {
         work: "작업",
         about: "소개",
         contact: "연락",
-        board: "게시판"
+        board: "게시판",
+        partners: "파트너스"
     },
     hero: {
         title1: "전문적인",

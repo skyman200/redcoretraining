@@ -7,7 +7,7 @@ import { Globe, Lock } from 'lucide-react';
 
 export default function Header() {
   const { language, setLanguage, t } = useLanguage();
-  const { partnerData } = useAuth();
+  const { user, partnerData } = useAuth();
 
   const isApprovedPartner = partnerData?.status === "approved";
 
@@ -24,11 +24,12 @@ export default function Header() {
           <PageTransitionLink href="/board" className="hover:underline underline-offset-4 decoration-1">
             {t.header.board}
           </PageTransitionLink>
-          {isApprovedPartner && (
-            <PageTransitionLink href="/partners/board" className="hover:underline underline-offset-4 decoration-1 text-red-500 font-bold">
-              Partners
-            </PageTransitionLink>
-          )}
+          <PageTransitionLink
+            href={user ? (isApprovedPartner ? "/partners/board" : "/partners/onboarding") : "/partners/login"}
+            className="hover:underline underline-offset-4 decoration-1"
+          >
+            {t.header.partners}
+          </PageTransitionLink>
           <PageTransitionLink href="/about" className="hover:underline underline-offset-4 decoration-1">
             {t.header.about}
           </PageTransitionLink>

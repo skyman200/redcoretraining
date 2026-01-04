@@ -3,7 +3,8 @@ export const en = {
         work: "Work",
         about: "About",
         contact: "Contact",
-        board: "Board"
+        board: "Board",
+        partners: "Partners"
     },
     hero: {
         title1: "Professional",

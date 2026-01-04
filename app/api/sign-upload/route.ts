@@ -1,11 +1,18 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 
-const CLOUD_NAME = 'dh9eykeo2';
-const API_KEY = '714146237553461';
-const API_SECRET = '8D2ABTvD7tPwL93u5KTx9Qz_wq4';
+// Use environment variables for security
+const CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME;
+const API_KEY = process.env.CLOUDINARY_API_KEY;
+const API_SECRET = process.env.CLOUDINARY_API_SECRET;
 
 export async function POST(request: Request) {
+    // Validate environment variables
+    if (!CLOUD_NAME || !API_KEY || !API_SECRET) {
+        console.error('Cloudinary credentials not configured');
+        return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
+    }
+
     try {
         const body = await request.json();
         const { paramsToSign } = body;

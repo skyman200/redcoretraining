@@ -1,11 +1,18 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 
-const CLOUD_NAME = 'dh9eykeo2';
-const API_KEY = '714146237553461';
-const API_SECRET = '8D2ABTvD7tPwL93u5KTx9Qz_wq4';
+// Use environment variables for security
+const CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME;
+const API_KEY = process.env.CLOUDINARY_API_KEY;
+const API_SECRET = process.env.CLOUDINARY_API_SECRET;
 
 export async function POST(request: Request) {
+    // Validate environment variables
+    if (!CLOUD_NAME || !API_KEY || !API_SECRET) {
+        console.error('Cloudinary credentials not configured');
+        return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
+    }
+
     try {
         const { public_id, resource_type } = await request.json();
 
@@ -13,14 +20,10 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Missing public_id' }, { status: 400 });
         }
 
-        // Default to 'image' if not specified, but usually we should pass it
         const type = resource_type || 'image';
-
         const timestamp = Math.round((new Date()).getTime() / 1000);
 
         // Generate Signature
-        // String to sign: "public_id=...&timestamp=..." + api_secret
-        // Parameters must be sorted alphabetically
         const paramsToSign = `public_id=${public_id}&timestamp=${timestamp}`;
         const signature = crypto
             .createHash('sha1')
@@ -33,7 +36,6 @@ export async function POST(request: Request) {
         formData.append('timestamp', timestamp.toString());
         formData.append('signature', signature);
 
-        // URL depends on resource type
         const url = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/${type}/destroy`;
 
         const response = await fetch(url, {
@@ -47,7 +49,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ success: true, result: data.result });
         } else {
             console.error('Cloudinary deletion failed:', data);
-            return NextResponse.json({ error: 'Deletion failed', details: data }, { status: 500 });
+            return NextResponse.json({ error: 'Deletion failed' }, { status: 500 });
         }
 
     } catch (error) {

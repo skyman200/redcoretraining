@@ -16,9 +16,16 @@ export default function AdminLoginPage() {
         setLoading(true);
         setError('');
 
-        // Simple password check (in production, use proper authentication)
-        if (password === 'redcore2016') {
-            // Store auth in sessionStorage
+        // Use environment variable for admin password
+        const adminPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD;
+
+        if (!adminPassword) {
+            setError('관리자 설정이 완료되지 않았습니다.');
+            setLoading(false);
+            return;
+        }
+
+        if (password === adminPassword) {
             sessionStorage.setItem('admin_auth', 'true');
             router.push('/admin/dashboard');
         } else {
@@ -75,10 +82,6 @@ export default function AdminLoginPage() {
                         {loading ? '로그인 중...' : 'Login'}
                     </button>
                 </form>
-
-                <p className="text-center text-gray-500 text-sm mt-8">
-                    Default password: redcore2016
-                </p>
             </motion.div>
         </div>
     );

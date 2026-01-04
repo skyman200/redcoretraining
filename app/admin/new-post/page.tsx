@@ -4,8 +4,9 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Save, Upload, X } from 'lucide-react';
+import { ArrowLeft, Save, Upload, X, HardDrive } from 'lucide-react';
 import FileUpload from '@/components/FileUpload';
+import GoogleDrivePicker from '@/components/GoogleDrivePicker';
 
 
 
@@ -21,6 +22,7 @@ export default function NewPostPage() {
     const [files, setFiles] = useState<Array<{ name: string; url: string; id?: string; resourceType?: string }>>([]);
     const [newFileName, setNewFileName] = useState('');
     const [newFileUrl, setNewFileUrl] = useState('');
+    const [isDrivePickerOpen, setIsDrivePickerOpen] = useState(false);
 
     useEffect(() => {
         // Check authentication
@@ -178,7 +180,9 @@ export default function NewPostPage() {
                                                 </div>
                                                 <div className="min-w-0">
                                                     <p className="font-medium truncate">{file.name}</p>
-                                                    <p className="text-xs text-gray-500 truncate">Cloudinary</p>
+                                                    <p className="text-xs text-gray-500 truncate">
+                                                        {file.url.includes('drive.google.com') ? 'Google Drive' : 'Cloudinary'}
+                                                    </p>
                                                 </div>
                                             </div>
                                             <button
@@ -195,9 +199,28 @@ export default function NewPostPage() {
 
                             {/* Add new file */}
                             <div className="space-y-4">
+                                {/* Google Drive Picker Button */}
+                                <button
+                                    type="button"
+                                    onClick={() => setIsDrivePickerOpen(true)}
+                                    className="w-full flex items-center justify-center gap-2 p-4 border-2 border-gray-300 rounded-lg hover:border-black hover:bg-gray-50 transition-all group"
+                                >
+                                    <HardDrive size={24} className="text-gray-500 group-hover:text-black" />
+                                    <span className="font-medium text-gray-700 group-hover:text-black">Google Drive에서 파일 선택</span>
+                                </button>
+
+                                <div className="relative">
+                                    <div className="absolute inset-0 flex items-center">
+                                        <div className="w-full border-t border-gray-200"></div>
+                                    </div>
+                                    <div className="relative flex justify-center text-sm">
+                                        <span className="px-2 bg-white text-gray-500">또는 파일 업로드</span>
+                                    </div>
+                                </div>
+
                                 {/* File Upload */}
                                 <div className="p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-black transition-colors">
-                                    <p className="font-medium mb-4 text-gray-700 text-center">파일 업로드</p>
+                                    <p className="font-medium mb-4 text-gray-700 text-center">파일 업로드 (Cloudinary)</p>
                                     <FileUpload
                                         onUploadComplete={(file) => {
                                             setFiles(prev => [...prev, {
@@ -268,6 +291,18 @@ export default function NewPostPage() {
                     </form>
                 </div>
             </main>
+
+            <GoogleDrivePicker
+                isOpen={isDrivePickerOpen}
+                onClose={() => setIsDrivePickerOpen(false)}
+                onSelect={(file) => {
+                    setFiles(prev => [...prev, {
+                        name: file.name,
+                        url: file.url,
+                        id: file.id
+                    }]);
+                }}
+            />
         </div>
     );
 }

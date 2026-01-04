@@ -61,13 +61,34 @@ export default function FileUpload({ onUploadComplete }: FileUploadProps) {
         setError(null);
         setUploadProgress(0);
 
-        const url = `https://api.cloudinary.com/v1_1/dh9eykeo2/auto/upload`;
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('upload_preset', 'my_board_upload');
-        formData.append('folder', 'board_files');
-
         try {
+            // 1. Get signature from server
+            const timestamp = Math.round((new Date()).getTime() / 1000);
+            const paramsToSign = `folder=board_files&timestamp=${timestamp}`; // Parameters to sign, sorted alphabetically
+
+            const signResponse = await fetch('/api/sign-upload', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ paramsToSign })
+            });
+
+            if (!signResponse.ok) {
+                throw new Error('Failed to get upload signature');
+            }
+
+            const { signature, apiKey, cloudName } = await signResponse.json();
+
+            // 2. Upload to Cloudinary
+            const url = `https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`;
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('api_key', apiKey);
+            formData.append('timestamp', timestamp.toString());
+            formData.append('signature', signature);
+            formData.append('folder', 'board_files');
+            // Explicitly set access_mode to public if needed, but signed uploads are public by default unless specified otherwise
+            // formData.append('access_mode', 'public'); 
+
             const xhr = new XMLHttpRequest();
 
             const promise = new Promise<UploadedFile>((resolve, reject) => {
@@ -92,6 +113,7 @@ export default function FileUpload({ onUploadComplete }: FileUploadProps) {
                         };
                         resolve(uploadedFile);
                     } else {
+                        console.error('Cloudinary upload failed:', xhr.responseText);
                         reject(new Error('Upload failed'));
                     }
                 });

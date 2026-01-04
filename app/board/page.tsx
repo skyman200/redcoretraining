@@ -32,7 +32,7 @@ function BoardPage() {
         const timer = setTimeout(() => {
             setShowAnimation(false);
             setAnimationComplete(true);
-        }, 1800);
+        }, 1200);
 
         return () => clearTimeout(timer);
     }, []);
@@ -59,15 +59,15 @@ function BoardPage() {
                                     key="overlay-title"
                                     className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"
                                     initial={{ opacity: 1 }}
-                                    exit={{ opacity: 0, transition: { duration: 0.5, delay: 1 } }}
+                                    exit={{ opacity: 0, transition: { duration: 0.5, delay: 0.5 } }}
                                 >
                                     <motion.h1
                                         layoutId="board-title"
                                         className="text-5xl md:text-7xl font-bold tracking-tighter"
-                                        initial={{ scale: 3, opacity: 0 }}
-                                        animate={{ scale: 3, opacity: 1 }}
+                                        initial={{ scale: 1.5, opacity: 0 }}
+                                        animate={{ scale: 1.5, opacity: 1 }}
                                         exit={{ scale: 1, opacity: 0, transition: { duration: 0.8, ease: "easeInOut" } }}
-                                        transition={{ duration: 1.5, ease: "easeOut" }}
+                                        transition={{ duration: 1.0, ease: "easeInOut" }}
                                     >
                                         <span className="bg-gradient-to-r from-black via-red-600 to-black dark:from-white dark:via-red-400 dark:to-white bg-clip-text text-transparent">
                                             {t.board.title}

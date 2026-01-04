@@ -6,6 +6,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { motion } from 'framer-motion';
 import { Database, Smartphone, TrendingUp, Users } from 'lucide-react';
+import DataChart from '@/components/DataChart';
 
 function WorkPage() {
     const { t } = useLanguage();
@@ -33,30 +34,22 @@ function WorkPage() {
                     <motion.h1
                         initial={{
                             scale: 5,
-                            position: "fixed",
-                            top: "50%",
-                            left: "50%",
-                            x: "-50%",
-                            y: "-50%",
-                            zIndex: 50
+                            opacity: 0,
+                            y: "30vh"
                         }}
                         animate={{
                             scale: 1,
-                            position: "relative",
-                            top: "auto",
-                            left: "auto",
-                            x: 0,
-                            y: 0,
-                            zIndex: 1
+                            opacity: 1,
+                            y: 0
                         }}
                         transition={{
                             duration: 1.5,
-                            ease: "easeInOut",
+                            ease: "easeOut",
                             delay: 0.2
                         }}
                         className="text-5xl md:text-7xl font-bold tracking-tighter mb-8 leading-tight"
                     >
-                        <span className="bg-gradient-to-r from-black via-red-600 to-black bg-clip-text text-transparent">
+                        <span className="bg-gradient-to-r from-black via-red-600 to-black bg-clip-text text-transparent whitespace-pre-line block">
                             {t.work.hero.title}
                         </span>
                     </motion.h1>
@@ -186,29 +179,82 @@ function WorkPage() {
                 </div>
             </section>
 
-            {/* Transformation Data Section */}
+
+
+            {/* App Development Timeline */}
             <section className="py-20 bg-black text-white">
-                <div className="container mx-auto px-6 max-w-5xl text-center">
+                <div className="container mx-auto px-6 max-w-5xl">
                     <motion.div
                         initial={{ opacity: 0 }}
                         whileInView={{ opacity: 1 }}
                         viewport={{ once: true }}
+                        className="text-center mb-16"
                     >
                         <h2 className="text-4xl md:text-5xl font-bold mb-6">
+                            {t.work.app.title}
+                        </h2>
+                    </motion.div>
+
+                    <div className="relative border-l border-gray-700 ml-4 md:ml-0 md:pl-0 md:border-l-0 md:border-t md:pt-12 md:grid md:grid-cols-4 gap-8">
+                        {t.work.app.timeline.map((item, index) => (
+                            <motion.div
+                                key={index}
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: index * 0.1 }}
+                                className="mb-12 md:mb-0 pl-8 md:pl-0 relative"
+                            >
+                                <div className="absolute left-0 top-0 w-3 h-3 bg-red-600 rounded-full -translate-x-[7px] md:translate-x-0 md:-top-[53px] md:left-1/2 md:-translate-x-1/2" />
+                                <span className="text-red-500 font-bold text-sm tracking-wider block mb-2">
+                                    {item.year}
+                                </span>
+                                <h3 className="text-xl font-bold mb-2">{item.title}</h3>
+                                <p className="text-gray-400 text-sm leading-relaxed">
+                                    {item.desc}
+                                </p>
+                            </motion.div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* Transformation Data Section */}
+            <section className="py-20 bg-gray-50">
+                <div className="container mx-auto px-6 max-w-5xl">
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        whileInView={{ opacity: 1 }}
+                        viewport={{ once: true }}
+                        className="text-center mb-16"
+                    >
+                        <h2 className="text-4xl md:text-5xl font-bold mb-6 text-black">
                             {t.work.transformation.title}
                         </h2>
-                        <p className="text-xl text-gray-400 mb-12">
+                        <p className="text-xl text-gray-600">
                             {t.work.transformation.subtitle}
                         </p>
-
-                        {/* Placeholder for future data visualization */}
-                        <div className="p-20 border border-white/20 rounded-lg flex flex-col items-center justify-center gap-6 bg-white/5">
-                            <TrendingUp className="w-20 h-20 text-red-500" />
-                            <p className="text-2xl font-medium text-gray-300">
-                                {t.work.transformation.comingSoon}
-                            </p>
-                        </div>
                     </motion.div>
+
+                    <div className="grid md:grid-cols-2 gap-8">
+                        <DataChart
+                            title={t.work.transformation.painReduction}
+                            data={[
+                                { label: 'Neck', value: 92 },
+                                { label: 'Back', value: 96 },
+                                { label: 'Shoulder', value: 88 },
+                                { label: 'Knee', value: 94 }
+                            ]}
+                        />
+                        <DataChart
+                            title={t.work.transformation.postureImprovement}
+                            data={[
+                                { label: 'Spine', value: 97, color: 'bg-black' },
+                                { label: 'Pelvis', value: 89, color: 'bg-black' },
+                                { label: 'Shoulder', value: 93, color: 'bg-black' }
+                            ]}
+                        />
+                    </div>
                 </div>
             </section>
 

@@ -29,9 +29,14 @@ function AboutPage() {
                         <span className="inline-block px-4 py-2 bg-red-600 text-white text-xs uppercase font-bold tracking-wider mb-6">
                             {t.about.hero.since}
                         </span>
-                        <h1 className="text-5xl md:text-7xl font-bold tracking-tighter mb-8 leading-tight">
+                        <motion.h1
+                            className="text-5xl md:text-7xl font-bold tracking-tighter mb-8 leading-tight"
+                            initial={{ scale: 2.5, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            transition={{ duration: 1, ease: 'easeOut', delay: 0.3 }}
+                        >
                             {t.about.hero.title}
-                        </h1>
+                        </motion.h1>
                         <p className="text-xl md:text-2xl text-gray-400 max-w-3xl leading-relaxed">
                             {t.about.hero.subtitle}
                         </p>
@@ -92,6 +97,46 @@ function AboutPage() {
                             ))}
                         </div>
                     </motion.div>
+                </div>
+            </section>
+
+            {/* DNS & Rehab Section */}
+            <section className="py-20">
+                <div className="container mx-auto px-6 max-w-5xl">
+                    <div className="grid md:grid-cols-2 gap-16">
+                        <motion.div
+                            initial={{ opacity: 0, x: -30 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true }}
+                        >
+                            <h2 className="text-3xl font-bold mb-6">{t.about.dns.title}</h2>
+                            <p className="text-lg text-gray-700 leading-relaxed mb-6">
+                                {t.about.dns.description}
+                            </p>
+                            <p className="text-gray-600 leading-relaxed">
+                                {t.about.dns.detail}
+                            </p>
+                        </motion.div>
+
+                        <motion.div
+                            initial={{ opacity: 0, x: 30 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true }}
+                        >
+                            <h2 className="text-3xl font-bold mb-6">{t.about.rehab.title}</h2>
+                            <p className="text-lg text-gray-700 leading-relaxed mb-6">
+                                {t.about.rehab.description}
+                            </p>
+                            <ul className="space-y-4">
+                                {t.about.rehab.features.map((feature, index) => (
+                                    <li key={index} className="flex items-center gap-3">
+                                        <div className="w-2 h-2 bg-red-600 rounded-full" />
+                                        <span className="text-gray-700">{feature}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </motion.div>
+                    </div>
                 </div>
             </section>
 

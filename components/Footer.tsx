@@ -36,7 +36,7 @@ export default function Footer() {
                             <Link href="https://blog.naver.com/redcore2021" target="_blank" className="text-lg font-medium hover:text-gray-400 transition-colors">
                                 {t.footer.blog}
                             </Link>
-                            <Link href="#" className="text-lg font-medium hover:text-gray-400 transition-colors">
+                            <Link href="https://www.instagram.com/redcore_pilates/" target="_blank" className="text-lg font-medium hover:text-gray-400 transition-colors">
                                 {t.footer.instagram}
                             </Link>
                         </div>
@@ -45,7 +45,10 @@ export default function Footer() {
 
                 <div className="border-t border-white/20 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
                     <p>{t.footer.copyright}</p>
-                    <p className="mt-2 md:mt-0">{t.footer.designed}</p>
+                    <div className="flex gap-4 items-center mt-2 md:mt-0">
+                        <Link href="/admin" className="hover:text-gray-300 transition-colors">Admin</Link>
+                        <p>{t.footer.designed}</p>
+                    </div>
                 </div>
             </div>
         </footer>

@@ -4,6 +4,9 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Save, Upload, X } from 'lucide-react';
+import FileUpload from '@/components/FileUpload';
+
+
 
 export default function NewPostPage() {
     const router = useRouter();
@@ -14,7 +17,7 @@ export default function NewPostPage() {
         category: 'Training',
         date: new Date().toISOString().split('T')[0]
     });
-    const [files, setFiles] = useState<Array<{ name: string; url: string }>>([]);
+    const [files, setFiles] = useState<Array<{ name: string; url: string; id?: string; resourceType?: string }>>([]);
     const [newFileName, setNewFileName] = useState('');
     const [newFileUrl, setNewFileUrl] = useState('');
 
@@ -68,6 +71,7 @@ export default function NewPostPage() {
 
     return (
         <div className="min-h-screen bg-gray-50">
+
             {/* Header */}
             <header className="bg-black text-white py-6 px-6">
                 <div className="container mx-auto">
@@ -167,11 +171,19 @@ export default function NewPostPage() {
                                 <div className="space-y-2 mb-4">
                                     {files.map((file, index) => (
                                         <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded border border-gray-200">
-                                            <span className="font-medium">{file.name}</span>
+                                            <div className="flex items-center gap-3 overflow-hidden">
+                                                <div className="bg-gray-200 p-2 rounded">
+                                                    <Save size={16} className="text-gray-600" />
+                                                </div>
+                                                <div className="min-w-0">
+                                                    <p className="font-medium truncate">{file.name}</p>
+                                                    <p className="text-xs text-gray-500 truncate">Cloudinary</p>
+                                                </div>
+                                            </div>
                                             <button
                                                 type="button"
                                                 onClick={() => handleRemoveFile(index)}
-                                                className="text-red-600 hover:text-red-700"
+                                                className="text-red-600 hover:text-red-700 p-1"
                                             >
                                                 <X size={20} />
                                             </button>
@@ -181,34 +193,59 @@ export default function NewPostPage() {
                             )}
 
                             {/* Add new file */}
-                            <div className="p-4 border-2 border-dashed border-gray-300 rounded space-y-3">
-                                <input
-                                    type="text"
-                                    value={newFileName}
-                                    onChange={(e) => setNewFileName(e.target.value)}
-                                    className="w-full px-4 py-2 border border-gray-300 focus:outline-none focus:border-black transition-colors"
-                                    placeholder="파일 이름 (예: pilates-guide.pdf)"
-                                />
-                                <input
-                                    type="text"
-                                    value={newFileUrl}
-                                    onChange={(e) => setNewFileUrl(e.target.value)}
-                                    className="w-full px-4 py-2 border border-gray-300 focus:outline-none focus:border-black transition-colors"
-                                    placeholder="파일 URL (Google Drive 링크 등)"
-                                />
-                                <button
-                                    type="button"
-                                    onClick={handleAddFile}
-                                    disabled={!newFileName || !newFileUrl}
-                                    className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-gray-200 hover:bg-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed rounded"
-                                >
-                                    <Upload size={20} />
-                                    파일 추가
-                                </button>
+                            <div className="space-y-4">
+                                {/* File Upload */}
+                                <div className="p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-black transition-colors">
+                                    <p className="font-medium mb-4 text-gray-700 text-center">파일 업로드</p>
+                                    <FileUpload
+                                        onUploadComplete={(file) => {
+                                            setFiles(prev => [...prev, {
+                                                name: file.name,
+                                                url: file.downloadLink,
+                                                id: file.id, // Store Cloudinary public_id
+                                                resourceType: file.resourceType // Store resource_type
+                                            }]);
+                                        }}
+                                    />
+                                </div>
+
+                                <div className="relative">
+                                    <div className="absolute inset-0 flex items-center">
+                                        <div className="w-full border-t border-gray-200"></div>
+                                    </div>
+                                    <div className="relative flex justify-center text-sm">
+                                        <span className="px-2 bg-white text-gray-500">또는 링크 직접 입력</span>
+                                    </div>
+                                </div>
+
+                                {/* Manual URL Input */}
+                                <div className="p-4 bg-gray-50 rounded border border-gray-200 space-y-3">
+                                    <input
+                                        type="text"
+                                        value={newFileName}
+                                        onChange={(e) => setNewFileName(e.target.value)}
+                                        className="w-full px-4 py-2 border border-gray-300 focus:outline-none focus:border-black transition-colors bg-white"
+                                        placeholder="파일 이름 (예: pilates-guide.pdf)"
+                                    />
+                                    <div className="flex gap-2">
+                                        <input
+                                            type="text"
+                                            value={newFileUrl}
+                                            onChange={(e) => setNewFileUrl(e.target.value)}
+                                            className="w-full px-4 py-2 border border-gray-300 focus:outline-none focus:border-black transition-colors bg-white"
+                                            placeholder="파일 URL (Google Drive 링크 등)"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={handleAddFile}
+                                            disabled={!newFileName || !newFileUrl}
+                                            className="px-4 py-2 bg-black text-white hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed rounded whitespace-nowrap"
+                                        >
+                                            추가
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
-                            <p className="text-sm text-gray-500 mt-2">
-                                Google Drive에 파일을 업로드한 후 공유 링크를 붙여넣으세요.
-                            </p>
                         </div>
 
                         {/* Submit */}

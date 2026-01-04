@@ -115,6 +115,7 @@ AI 기반 분석으로 개인에게 최적화된 운동과 호흡 프로그램�
 
 function BoardDetailPage({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = use(params);
+    const decodedSlug = decodeURIComponent(slug);
     const { t } = useLanguage();
     const [post, setPost] = useState<Post | null>(null);
     const [detail, setDetail] = useState<PostDetail | null>(null);
@@ -124,7 +125,7 @@ function BoardDetailPage({ params }: { params: Promise<{ slug: string }> }) {
         const savedPosts = localStorage.getItem('admin_posts');
         if (savedPosts) {
             const adminPosts = JSON.parse(savedPosts);
-            const adminPost = adminPosts.find((p: Post) => p.id === slug);
+            const adminPost = adminPosts.find((p: any) => p.id === decodedSlug);
             if (adminPost) {
                 setTimeout(() => {
                     setPost(adminPost);
@@ -135,14 +136,14 @@ function BoardDetailPage({ params }: { params: Promise<{ slug: string }> }) {
         }
 
         // Fallback to default posts
-        const defaultPost = defaultPosts.find(p => p.id === slug);
+        const defaultPost = defaultPosts.find(p => p.id === decodedSlug);
         if (defaultPost) {
             setTimeout(() => {
                 setPost(defaultPost);
-                setDetail(postContent[slug]);
+                setDetail(postContent[decodedSlug]);
             }, 0);
         }
-    }, [slug]);
+    }, [decodedSlug]);
 
     if (!post || !detail) {
         return (
@@ -216,6 +217,8 @@ function BoardDetailPage({ params }: { params: Promise<{ slug: string }> }) {
                                     <a
                                         key={index}
                                         href={file.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
                                         className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg hover:border-red-600 hover:shadow-lg transition-all group"
                                     >
                                         <span className="font-medium group-hover:text-red-600 transition-colors">

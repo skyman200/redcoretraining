@@ -61,6 +61,15 @@ export const en = {
             appDevelopment: "We are developing our own mobile application based on accumulated customer data. Clients can easily track and manage their health records and transformation journey on mobile devices.",
             dataValidation: "All data and feedback are continuously upgraded based on expert group meetings, latest medical research, and international training experience."
         },
+        app: {
+            title: "Redcore Mobile App",
+            timeline: [
+                { year: "2024 Q1", title: "Concept & Design", desc: "UI/UX planning based on user feedback" },
+                { year: "2024 Q3", title: "Prototype", desc: "Core feature implementation and internal testing" },
+                { year: "2025 Q1", title: "Beta Launch", desc: "Selected client testing and data integration" },
+                { year: "2025 Q3", title: "Official Release", desc: "Full service launch on iOS & Android" }
+            ]
+        },
         expertise: {
             title: "Evidence-Based Programs",
             item1Title: "Rehabilitation Focus",
@@ -73,7 +82,9 @@ export const en = {
         transformation: {
             title: "Client Transformation Data",
             subtitle: "Measurable Results, Real Changes",
-            comingSoon: "Interactive data visualization coming soon"
+            comingSoon: "Interactive data visualization coming soon",
+            painReduction: "Pain Reduction Rate",
+            postureImprovement: "Posture Improvement"
         }
     },
     about: {
@@ -95,6 +106,21 @@ export const en = {
                 "We accumulate and analyze customer pain, posture changes, and exercise data to provide personalized exercise recommendations and numerically verifiable transformations through our digital healthcare system.",
                 "Based on this accumulated data, we are developing our own application where customers can easily check and manage their health records and transformation progress on mobile.",
                 "All data and feedback are continuously upgraded based on expert meetings, latest medical research, and international training experience."
+            ]
+        },
+        dns: {
+            title: "Dynamic Neuromuscular Stabilization (DNS)",
+            description: "Based on developmental kinesiology, DNS activates the body's innate stabilization system.",
+            detail: "We utilize DNS principles to restore ideal movement patterns, treating the root cause of pain rather than just symptoms. This approach is effective for both rehabilitation and high-performance athletic training."
+        },
+        rehab: {
+            title: "Scientific Rehabilitation",
+            description: "Data-driven approach to musculoskeletal recovery.",
+            features: [
+                "Post-surgical rehabilitation protocols",
+                "Chronic pain management",
+                "Sports injury prevention",
+                "Spinal alignment correction"
             ]
         },
         breathing: {

@@ -33,9 +33,9 @@ export default function PageTransitionLink({ href, children, className }: PageTr
                 overlay.classList.add('fade-out');
                 setTimeout(() => {
                     document.body.removeChild(overlay);
-                }, 500);
-            }, 100);
-        }, 500);
+                }, 300);
+            }, 50);
+        }, 300);
     };
 
     return (

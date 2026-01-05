@@ -23,6 +23,7 @@ export interface PartnerSale {
     currency: string;
     commission: number;
     isPaid: boolean;
+    status?: 'paid' | 'pending' | 'refunded';
 }
 
 export interface MonthlyStats {

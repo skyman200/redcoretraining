@@ -248,6 +248,7 @@ export const en = {
                 settlement: "Settlement",
                 completed: "Paid",
                 pending: "Pending",
+                refunded: "Refunded",
                 noSales: "No sales records found."
             },
             months: {

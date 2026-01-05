@@ -70,7 +70,12 @@ export default function SalesTable({ sales, loading }: SalesTableProps) {
                                     ${sale.commission.toLocaleString()}
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-center">
-                                    {sale.isPaid ? (
+                                    {sale.status === 'refunded' || sale.amount < 0 ? (
+                                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">
+                                            {/* 환불 아이콘 또는 경고 아이콘 */}
+                                            {d.table.refunded || 'Refunded'}
+                                        </span>
+                                    ) : sale.isPaid ? (
                                         <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
                                             <CheckCircle size={12} />
                                             {d.table.completed}

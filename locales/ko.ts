@@ -248,6 +248,7 @@ export const ko = {
                 settlement: "정산",
                 completed: "완료",
                 pending: "대기",
+                refunded: "환불됨",
                 noSales: "판매 내역이 없습니다."
             },
             months: {

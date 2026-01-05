@@ -27,7 +27,7 @@ export default function ProposalKo() {
                     <ul className="space-y-3">
                         <li className="flex items-center gap-3">
                             <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>
-                            <span>검증된 DNS(동적신경근안정화) 기반 프로그램</span>
+                            <span>검증된 SOOM BREATHING 애플리케이션</span>
                         </li>
                         <li className="flex items-center gap-3">
                             <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>
@@ -75,7 +75,7 @@ export default function ProposalKo() {
                     <div className="space-y-4">
                         <div className="w-16 h-16 bg-red-500/20 text-red-500 rounded-full flex items-center justify-center mx-auto text-2xl font-bold">$</div>
                         <h3 className="text-xl font-bold text-white">3. Get Paid</h3>
-                        <p className="text-sm">결제 금액의 20%가 매월 당신의 계좌로 정산됩니다.</p>
+                        <p className="text-sm">결제 금액의 20%가 매월 당신의 계좌로 정산됩니다.<br /><span className="text-zinc-500 text-xs">(해외 송금의 경우 $100 미만은 이월됩니다.)</span></p>
                     </div>
                 </div>
             </section>

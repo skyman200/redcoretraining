@@ -42,6 +42,7 @@ export default function GuideEn() {
                             <ul className="list-[circle] pl-5 mt-2 text-zinc-400 space-y-1">
                                 <li>International partners accept payouts primarily via <strong>Wise</strong>.</li>
                                 <li>If you don't use Wise, please provide your SWIFT code and bank details.</li>
+                                <li className="text-red-400">Note: Payouts under $100 will be carried over to the next month.</li>
                             </ul>
                         </li>
                     </ul>

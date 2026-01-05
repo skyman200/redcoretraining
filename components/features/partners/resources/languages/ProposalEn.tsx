@@ -27,7 +27,7 @@ export default function ProposalEn() {
                     <ul className="space-y-3">
                         <li className="flex items-center gap-3">
                             <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>
-                            <span>Proven DNS (Dynamic Neuromuscular Stabilization) programs</span>
+                            <span>Proven SOOM BREATHING Application</span>
                         </li>
                         <li className="flex items-center gap-3">
                             <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>
@@ -75,7 +75,7 @@ export default function ProposalEn() {
                     <div className="space-y-4">
                         <div className="w-16 h-16 bg-red-500/20 text-red-500 rounded-full flex items-center justify-center mx-auto text-2xl font-bold">$</div>
                         <h3 className="text-xl font-bold text-white">3. Get Paid</h3>
-                        <p className="text-sm">20% of the payment amount is settled to your account monthly.</p>
+                        <p className="text-sm">20% of the payment amount is settled to your account monthly.<br /><span className="text-zinc-500 text-xs">(International transfers below $100 will be carried over.)</span></p>
                     </div>
                 </div>
             </section>

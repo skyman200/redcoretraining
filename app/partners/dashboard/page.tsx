@@ -35,7 +35,7 @@ export default function PartnerDashboardPage() {
     const [copied, setCopied] = useState(false);
 
     const isApproved = partnerData?.status === 'approved';
-    const partnerId = partnerData?.name?.toLowerCase().replace(/\s+/g, '_') || '';
+    const partnerId = partnerData?.uid || '';
     const d = t.partners.dashboard;
 
     const loadDashboardData = useCallback(async () => {

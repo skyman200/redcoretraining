@@ -2,10 +2,22 @@ export interface PartnerApplication {
     uid: string;
     email: string | null;
     name: string;
+    type: "domestic" | "international";
+    country?: string;
+    wiseEmail?: string; // Optional (if using Wise account)
+    swiftCode?: string; // For bank transfer via Wise
+    bankAddress?: string; // For bank transfer via Wise
+    // Japan specific
+    branchName?: string;
+    branchCode?: string;
+    accountType?: "ordinary" | "current" | "savings";
+    accountHolderKatakana?: string;
+
+    passportNumber?: string; // Instead of RRN
     contact: string;
     bankName: string;
     accountNumber: string;
-    residentRegistrationNumber: string;
+    residentRegistrationNumber?: string; // Optional for international
     birthDate: string;
     status: "pending" | "approved" | "rejected";
     createdAt: string;

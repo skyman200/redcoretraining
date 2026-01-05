@@ -35,6 +35,14 @@ export const partnersApi = {
                     resident_registration_number: data.residentRegistrationNumber,
                     birth_date: data.birthDate,
                     status: 'pending',
+                    // International Fields
+                    type: data.type || 'domestic',
+                    country: data.country,
+                    wise_email: data.wiseEmail,
+                    swift_code: data.swiftCode,
+                    bank_address: data.bankAddress,
+                    passport_number: data.passportNumber,
+
                 });
 
             if (error) throw error;
@@ -71,6 +79,14 @@ export const partnersApi = {
                     status: data.status,
                     createdAt: data.created_at,
                     agreedAt: data.agreed_at,
+                    // International Fields
+                    type: data.type || 'domestic',
+                    country: data.country,
+                    wiseEmail: data.wise_email,
+                    swiftCode: data.swift_code,
+                    bankAddress: data.bank_address,
+                    passportNumber: data.passport_number,
+
                 },
                 error: null
             };
@@ -104,6 +120,14 @@ export const partnersApi = {
                 status: row.status,
                 createdAt: row.created_at,
                 agreedAt: row.agreed_at,
+                // International Fields
+                type: row.type || 'domestic',
+                country: row.country,
+                wiseEmail: row.wise_email,
+                swiftCode: row.swift_code,
+                bankAddress: row.bank_address,
+                passportNumber: row.passport_number,
+
             }));
 
             return { data: applications, error: null };

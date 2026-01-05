@@ -11,6 +11,7 @@ interface AuthContextType {
     session: Session | null;
     partnerData: PartnerApplication | null;
     loading: boolean;
+    logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -18,6 +19,7 @@ const AuthContext = createContext<AuthContextType>({
     session: null,
     partnerData: null,
     loading: true,
+    logout: async () => { },
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -72,8 +74,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
     };
 
+    const logout = async () => {
+        if (!supabase) return;
+        await supabase.auth.signOut();
+        setUser(null);
+        setSession(null);
+        setPartnerData(null);
+    };
+
     return (
-        <AuthContext.Provider value={{ user, session, partnerData, loading }}>
+        <AuthContext.Provider value={{ user, session, partnerData, loading, logout }}>
             {!loading && children}
         </AuthContext.Provider>
     );

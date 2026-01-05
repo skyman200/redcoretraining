@@ -2,44 +2,46 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useRouter } from 'next/navigation';
+import { useLanguage } from '@/contexts/LanguageContext';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import BoardCard from '@/components/BoardCard';
 import { motion } from 'framer-motion';
-import { Lock, FileText, LayoutDashboard } from 'lucide-react';
+import { Lock, FileText, LogIn, LogOut, ArrowRight, LayoutDashboard } from 'lucide-react';
 import Link from 'next/link';
 import { postsApi } from '@/services/api/postsApi';
 import { Post } from '@/types/post';
 
 export default function PartnerBoardPage() {
-    const { user, partnerData, loading: authLoading } = useAuth();
-    const router = useRouter();
+    const { user, partnerData, loading: authLoading, logout } = useAuth();
+    const { t } = useLanguage();
     const [posts, setPosts] = useState<Post[]>([]);
     const [loading, setLoading] = useState(true);
 
     const isApproved = partnerData?.status === 'approved';
+    const b = t.partners.board; // Short alias for board translations
 
     const loadPartnerPosts = useCallback(async () => {
         if (!isApproved) return;
 
         setLoading(true);
-        const result = await postsApi.getByCategory('Partner');
-        if (result.data) {
-            setPosts(result.data);
+        try {
+            const result = await postsApi.getByCategory('Partner');
+            if (result.data) {
+                setPosts(result.data);
+            }
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     }, [isApproved]);
 
     useEffect(() => {
-        if (!authLoading) {
-            if (!user) {
-                router.push('/partners/login');
-                return;
-            }
+        if (!authLoading && user && isApproved) {
             loadPartnerPosts();
         }
-    }, [user, authLoading, router, loadPartnerPosts]);
+    }, [user, authLoading, isApproved, loadPartnerPosts]);
 
     if (authLoading) {
         return (
@@ -49,6 +51,37 @@ export default function PartnerBoardPage() {
         );
     }
 
+    // 1. Not Logged In State
+    if (!user) {
+        return (
+            <div className="min-h-screen bg-gray-50 flex flex-col">
+                <Header />
+                <main className="flex-grow pt-32 pb-20 px-6">
+                    <div className="container mx-auto max-w-2xl text-center">
+                        <div className="bg-white p-12 rounded-2xl shadow-xl border border-gray-100">
+                            <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-8 text-gray-400">
+                                <Lock size={40} />
+                            </div>
+                            <h1 className="text-3xl font-bold mb-4">{b.sections?.loginRequired || "로그인이 필요합니다"}</h1>
+                            <p className="text-gray-600 mb-8 leading-relaxed">
+                                {b.sections?.loginDesc || "파트너스 게시판을 이용하려면 로그인이 필요합니다."}
+                            </p>
+                            <Link
+                                href="/partners/login"
+                                className="inline-flex items-center gap-2 px-8 py-4 bg-black text-white rounded-lg font-bold hover:bg-gray-800 transition-all"
+                            >
+                                <LogIn size={20} />
+                                {b.sections?.login || "로그인"}
+                            </Link>
+                        </div>
+                    </div>
+                </main>
+                <Footer />
+            </div>
+        );
+    }
+
+    // 2. Logged In but Not Approved State
     if (!isApproved) {
         return (
             <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -59,10 +92,9 @@ export default function PartnerBoardPage() {
                             <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-8 text-red-600">
                                 <Lock size={40} />
                             </div>
-                            <h1 className="text-3xl font-bold mb-4">접근 권한이 없습니다</h1>
+                            <h1 className="text-3xl font-bold mb-4">{b.accessDenied}</h1>
                             <p className="text-gray-600 mb-8 leading-relaxed">
-                                파트너 게시판은 승인된 파트너만 이용 가능합니다.<br />
-                                신청 상태를 확인하시거나, 아직 신청하지 않으셨다면 파트너 신청을 진행해 주세요.
+                                {b.accessDeniedDesc}
                             </p>
                             <div className="flex flex-col gap-4">
                                 <Link
@@ -72,12 +104,13 @@ export default function PartnerBoardPage() {
                                     <LayoutDashboard size={20} />
                                     대시보드로 이동
                                 </Link>
-                                <Link
-                                    href="/partners"
-                                    className="px-8 py-4 bg-white text-black border-2 border-black rounded-lg font-bold hover:bg-gray-50 transition-all"
+                                <button
+                                    onClick={logout}
+                                    className="px-8 py-4 bg-white text-black border-2 border-black rounded-lg font-bold hover:bg-gray-50 transition-all flex items-center justify-center gap-2"
                                 >
-                                    파트너십 안내
-                                </Link>
+                                    <LogOut size={20} />
+                                    {b.sections?.logout || "로그아웃"}
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -87,6 +120,7 @@ export default function PartnerBoardPage() {
         );
     }
 
+    // 3. Approved Partner State (Board View)
     return (
         <div className="min-h-screen bg-white flex flex-col">
             <Header />
@@ -98,9 +132,25 @@ export default function PartnerBoardPage() {
                             <div>
                                 <div className="flex items-center gap-3 mb-2">
                                     <span className="bg-red-600 text-[10px] font-bold px-2 py-0.5 rounded text-white uppercase tracking-wider">Partner Only</span>
-                                    <h1 className="text-4xl font-bold tracking-tighter">파트너스 게시판</h1>
+                                    <h1 className="text-4xl font-bold tracking-tighter">{b.title}</h1>
                                 </div>
-                                <p className="text-gray-500">레드코어와 파트너를 위한 전용 정보 및 자료실입니다.</p>
+                                <p className="text-gray-500">{b.subtitle}</p>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <Link
+                                    href="/partners/dashboard"
+                                    className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-black transition-colors flex items-center gap-2"
+                                >
+                                    <LayoutDashboard size={16} />
+                                    대시보드
+                                </Link>
+                                <button
+                                    onClick={logout}
+                                    className="px-4 py-2 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors flex items-center gap-2"
+                                >
+                                    <LogOut size={16} />
+                                    {b.sections?.logout || "로그아웃"}
+                                </button>
                             </div>
                         </header>
                     </div>
@@ -123,7 +173,7 @@ export default function PartnerBoardPage() {
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: index * 0.1 }}
                                 >
-                                    <BoardCard post={post as any} />
+                                    <BoardCard post={post} />
                                 </motion.div>
                             ))}
                         </div>

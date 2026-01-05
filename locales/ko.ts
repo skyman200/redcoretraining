@@ -206,7 +206,11 @@ export const ko = {
             sections: {
                 notice: "파트너 공지사항",
                 resources: "마케팅 자료실",
-                network: "네트워크 & 협업"
+                network: "네트워크 & 협업",
+                login: "로그인",
+                logout: "로그아웃",
+                loginRequired: "로그인이 필요합니다",
+                loginDesc: "파트너스 게시판을 이용하려면 로그인이 필요합니다."
             }
         },
         dashboard: {

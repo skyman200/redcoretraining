@@ -8,7 +8,7 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowLeft, Calendar, Download } from 'lucide-react';
-import { posts as defaultPosts } from '@/components/BoardCard';
+import { defaultPosts } from '@/lib/boardData';
 import { use } from 'react';
 import { postsApi } from '@/services/api/postsApi';
 import { Post } from '@/types/post';

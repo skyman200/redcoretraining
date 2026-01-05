@@ -206,7 +206,11 @@ export const en = {
             sections: {
                 notice: "Partner Notices",
                 resources: "Marketing Resources",
-                network: "Network & Collaboration"
+                network: "Network & Collaboration",
+                login: "Login",
+                logout: "Logout",
+                loginRequired: "Login Required",
+                loginDesc: "You need to log in to access the Partner Board."
             }
         },
         dashboard: {

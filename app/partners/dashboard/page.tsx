@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -16,6 +17,7 @@ import { PartnerStats, PartnerSale } from '@/types/partner';
 
 export default function PartnerDashboardPage() {
     const { user, partnerData, loading: authLoading } = useAuth();
+    const { t } = useLanguage();
     const router = useRouter();
 
     // Stats state
@@ -34,6 +36,7 @@ export default function PartnerDashboardPage() {
 
     const isApproved = partnerData?.status === 'approved';
     const partnerId = partnerData?.name?.toLowerCase().replace(/\s+/g, '_') || '';
+    const d = t.partners.dashboard;
 
     const loadDashboardData = useCallback(async () => {
         if (!isApproved || !partnerId) return;
@@ -42,7 +45,6 @@ export default function PartnerDashboardPage() {
         setError(null);
 
         try {
-            // Load partner stats
             const statsResult = await salesApi.getPartnerStats(partnerId);
             if (statsResult.data) {
                 setStats(statsResult.data);
@@ -50,8 +52,8 @@ export default function PartnerDashboardPage() {
             } else if (statsResult.error) {
                 setError(statsResult.error.message);
             }
-        } catch (err) {
-            setError('데이터를 불러오는 중 오류가 발생했습니다.');
+        } catch {
+            setError('Failed to load data');
         } finally {
             setLoading(false);
         }
@@ -115,16 +117,15 @@ export default function PartnerDashboardPage() {
                             <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-8 text-red-600">
                                 <Lock size={40} />
                             </div>
-                            <h1 className="text-3xl font-bold mb-4">접근 권한이 없습니다</h1>
+                            <h1 className="text-3xl font-bold mb-4">{d.accessDenied}</h1>
                             <p className="text-gray-600 mb-8 leading-relaxed">
-                                대시보드는 승인된 파트너만 이용 가능합니다.<br />
-                                신청 상태를 확인하시거나, 아직 신청하지 않으셨다면 파트너 신청을 진행해 주세요.
+                                {d.accessDeniedDesc}
                             </p>
                             <PageTransitionLink
                                 href="/partners/onboarding"
                                 className="inline-block px-8 py-4 bg-black text-white rounded-lg font-bold hover:bg-gray-800 transition-all"
                             >
-                                파트너 신청하기
+                                {d.applyPartner}
                             </PageTransitionLink>
                         </div>
                     </div>
@@ -151,13 +152,13 @@ export default function PartnerDashboardPage() {
                             className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-black transition-colors mb-4"
                         >
                             <ArrowLeft size={16} />
-                            게시판으로 돌아가기
+                            {d.backToBoard}
                         </PageTransitionLink>
                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                             <div>
-                                <h1 className="text-3xl font-bold">파트너 대시보드</h1>
+                                <h1 className="text-3xl font-bold">{d.title}</h1>
                                 <p className="text-gray-500 mt-1">
-                                    안녕하세요, <span className="font-semibold text-black">{partnerData?.name}</span>님
+                                    {d.greeting} <span className="font-semibold text-black">{partnerData?.name}</span>
                                 </p>
                             </div>
                             <button
@@ -165,7 +166,7 @@ export default function PartnerDashboardPage() {
                                 className="inline-flex items-center gap-2 px-4 py-2 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors"
                             >
                                 {copied ? <Check size={18} /> : <Copy size={18} />}
-                                {copied ? '복사됨!' : '파트너 링크 복사'}
+                                {copied ? d.copied : d.copyLink}
                             </button>
                         </div>
                     </motion.div>
@@ -192,26 +193,26 @@ export default function PartnerDashboardPage() {
                             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8"
                         >
                             <StatsCard
-                                title="총 매출"
+                                title={d.stats.totalSales}
                                 value={`$${(stats?.totalSales || 0).toLocaleString()}`}
-                                subtitle={`${stats?.salesCount || 0}건`}
+                                subtitle={`${stats?.salesCount || 0} ${d.stats.salesCount}`}
                                 icon="sales"
                                 variant="info"
                             />
                             <StatsCard
-                                title="총 커미션 (20%)"
+                                title={d.stats.totalCommission}
                                 value={`$${(stats?.totalCommission || 0).toLocaleString()}`}
                                 icon="commission"
                                 variant="default"
                             />
                             <StatsCard
-                                title="정산 완료"
+                                title={d.stats.paidCommission}
                                 value={`$${(stats?.paidCommission || 0).toLocaleString()}`}
                                 icon="paid"
                                 variant="success"
                             />
                             <StatsCard
-                                title="미정산"
+                                title={d.stats.pendingCommission}
                                 value={`$${(stats?.pendingCommission || 0).toLocaleString()}`}
                                 icon="pending"
                                 variant="warning"
@@ -228,7 +229,7 @@ export default function PartnerDashboardPage() {
                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
                             <h2 className="text-xl font-bold flex items-center gap-2">
                                 <FileText size={20} />
-                                판매 내역
+                                {d.salesHistory}
                             </h2>
                             <MonthSelector
                                 selectedYear={selectedYear}
@@ -249,7 +250,7 @@ export default function PartnerDashboardPage() {
                     >
                         <h3 className="font-bold mb-3 flex items-center gap-2">
                             <Link size={18} />
-                            내 파트너 링크
+                            {d.myLink}
                         </h3>
                         <div className="flex items-center gap-3">
                             <input
@@ -266,7 +267,7 @@ export default function PartnerDashboardPage() {
                             </button>
                         </div>
                         <p className="text-xs text-gray-400 mt-2">
-                            이 링크를 통해 가입한 사용자의 구매에 대해 20% 커미션이 적립됩니다.
+                            {d.linkDescription}
                         </p>
                     </motion.div>
                 </div>

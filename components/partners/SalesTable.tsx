@@ -1,6 +1,7 @@
 'use client';
 
 import { PartnerSale } from '@/types/partner';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { CheckCircle, Clock } from 'lucide-react';
 
 interface SalesTableProps {
@@ -9,6 +10,9 @@ interface SalesTableProps {
 }
 
 export default function SalesTable({ sales, loading }: SalesTableProps) {
+    const { t } = useLanguage();
+    const d = t.partners.dashboard;
+
     if (loading) {
         return (
             <div className="bg-white rounded-2xl border border-gray-200 p-8">
@@ -22,7 +26,7 @@ export default function SalesTable({ sales, loading }: SalesTableProps) {
     if (sales.length === 0) {
         return (
             <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center">
-                <p className="text-gray-500">판매 내역이 없습니다.</p>
+                <p className="text-gray-500">{d.table.noSales}</p>
             </div>
         );
     }
@@ -34,19 +38,19 @@ export default function SalesTable({ sales, loading }: SalesTableProps) {
                     <thead className="bg-gray-50 border-b border-gray-200">
                         <tr>
                             <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
-                                날짜
+                                {d.table.date}
                             </th>
                             <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
-                                상품
+                                {d.table.product}
                             </th>
                             <th className="px-6 py-4 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">
-                                매출
+                                {d.table.sales}
                             </th>
                             <th className="px-6 py-4 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">
-                                커미션
+                                {d.table.commission}
                             </th>
                             <th className="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">
-                                정산
+                                {d.table.settlement}
                             </th>
                         </tr>
                     </thead>
@@ -69,12 +73,12 @@ export default function SalesTable({ sales, loading }: SalesTableProps) {
                                     {sale.isPaid ? (
                                         <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
                                             <CheckCircle size={12} />
-                                            완료
+                                            {d.table.completed}
                                         </span>
                                     ) : (
                                         <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-700">
                                             <Clock size={12} />
-                                            대기
+                                            {d.table.pending}
                                         </span>
                                     )}
                                 </td>

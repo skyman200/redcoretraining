@@ -1,5 +1,6 @@
 'use client';
 
+import { useLanguage } from '@/contexts/LanguageContext';
 import { ChevronDown } from 'lucide-react';
 
 interface MonthSelectorProps {
@@ -9,29 +10,32 @@ interface MonthSelectorProps {
     onMonthChange: (month: number) => void;
 }
 
-const months = [
-    { value: 1, label: '1월' },
-    { value: 2, label: '2월' },
-    { value: 3, label: '3월' },
-    { value: 4, label: '4월' },
-    { value: 5, label: '5월' },
-    { value: 6, label: '6월' },
-    { value: 7, label: '7월' },
-    { value: 8, label: '8월' },
-    { value: 9, label: '9월' },
-    { value: 10, label: '10월' },
-    { value: 11, label: '11월' },
-    { value: 12, label: '12월' },
-];
-
 export default function MonthSelector({
     selectedYear,
     selectedMonth,
     onYearChange,
     onMonthChange,
 }: MonthSelectorProps) {
+    const { t } = useLanguage();
+    const d = t.partners.dashboard;
+
     const currentYear = new Date().getFullYear();
     const years = Array.from({ length: 3 }, (_, i) => currentYear - i);
+
+    const months = [
+        { value: 1, label: d.months.jan },
+        { value: 2, label: d.months.feb },
+        { value: 3, label: d.months.mar },
+        { value: 4, label: d.months.apr },
+        { value: 5, label: d.months.may },
+        { value: 6, label: d.months.jun },
+        { value: 7, label: d.months.jul },
+        { value: 8, label: d.months.aug },
+        { value: 9, label: d.months.sep },
+        { value: 10, label: d.months.oct },
+        { value: 11, label: d.months.nov },
+        { value: 12, label: d.months.dec },
+    ];
 
     return (
         <div className="flex items-center gap-3">
@@ -43,7 +47,7 @@ export default function MonthSelector({
                 >
                     {years.map((year) => (
                         <option key={year} value={year}>
-                            {year}년
+                            {year}{d.yearSuffix}
                         </option>
                     ))}
                 </select>

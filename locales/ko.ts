@@ -208,11 +208,59 @@ export const ko = {
                 resources: "마케팅 자료실",
                 network: "네트워크 & 협업"
             }
+        },
+        dashboard: {
+            title: "파트너 대시보드",
+            greeting: "안녕하세요,",
+            copyLink: "파트너 링크 복사",
+            copied: "복사됨!",
+            backToBoard: "게시판으로 돌아가기",
+            accessDenied: "접근 권한이 없습니다",
+            accessDeniedDesc: "대시보드는 승인된 파트너만 이용 가능합니다. 신청 상태를 확인하시거나, 아직 신청하지 않으셨다면 파트너 신청을 진행해 주세요.",
+            applyPartner: "파트너 신청하기",
+            stats: {
+                totalSales: "총 매출",
+                totalCommission: "총 커미션 (20%)",
+                paidCommission: "정산 완료",
+                pendingCommission: "미정산",
+                salesCount: "건"
+            },
+            salesHistory: "판매 내역",
+            myLink: "내 파트너 링크",
+            linkDescription: "이 링크를 통해 가입한 사용자의 구매에 대해 20% 커미션이 적립됩니다.",
+            table: {
+                date: "날짜",
+                product: "상품",
+                sales: "매출",
+                commission: "커미션",
+                settlement: "정산",
+                completed: "완료",
+                pending: "대기",
+                noSales: "판매 내역이 없습니다."
+            },
+            months: {
+                jan: "1월", feb: "2월", mar: "3월", apr: "4월",
+                may: "5월", jun: "6월", jul: "7월", aug: "8월",
+                sep: "9월", oct: "10월", nov: "11월", dec: "12월"
+            },
+            yearSuffix: "년"
         }
     },
     admin: {
         managePartners: "파트너 관리",
         deleteConfirm: "정말로 이 파트너를 삭제하시겠습니까? 관련 데이터가 모두 삭제됩니다.",
+        modal: {
+            approve: "파트너 승인",
+            reject: "파트너 거절",
+            delete: "파트너 삭제",
+            approveMsg: "이 파트너를 승인하시겠습니까?",
+            rejectMsg: "이 파트너를 거절하시겠습니까?",
+            deleteMsg: "정말로 이 파트너를 삭제하시겠습니까? 관련 데이터가 모두 삭제됩니다.",
+            approveBtn: "승인",
+            rejectBtn: "거절",
+            deleteBtn: "삭제",
+            cancel: "취소"
+        },
         status: {
             approved: "승인됨",
             pending: "대기 중",

@@ -208,11 +208,59 @@ export const en = {
                 resources: "Marketing Resources",
                 network: "Network & Collaboration"
             }
+        },
+        dashboard: {
+            title: "Partner Dashboard",
+            greeting: "Hello,",
+            copyLink: "Copy Partner Link",
+            copied: "Copied!",
+            backToBoard: "Back to Board",
+            accessDenied: "Access Denied",
+            accessDeniedDesc: "Dashboard is only available to approved partners. Please check your application status or apply to become a partner.",
+            applyPartner: "Apply as Partner",
+            stats: {
+                totalSales: "Total Sales",
+                totalCommission: "Total Commission (20%)",
+                paidCommission: "Paid",
+                pendingCommission: "Pending",
+                salesCount: "sales"
+            },
+            salesHistory: "Sales History",
+            myLink: "My Partner Link",
+            linkDescription: "You earn 20% commission on purchases made by users who sign up through this link.",
+            table: {
+                date: "Date",
+                product: "Product",
+                sales: "Sales",
+                commission: "Commission",
+                settlement: "Settlement",
+                completed: "Paid",
+                pending: "Pending",
+                noSales: "No sales records found."
+            },
+            months: {
+                jan: "January", feb: "February", mar: "March", apr: "April",
+                may: "May", jun: "June", jul: "July", aug: "August",
+                sep: "September", oct: "October", nov: "November", dec: "December"
+            },
+            yearSuffix: ""
         }
     },
     admin: {
         managePartners: "Manage Partners",
         deleteConfirm: "Are you sure you want to delete this partner? All related data will be removed.",
+        modal: {
+            approve: "Approve Partner",
+            reject: "Reject Partner",
+            delete: "Delete Partner",
+            approveMsg: "Are you sure you want to approve this partner?",
+            rejectMsg: "Are you sure you want to reject this partner?",
+            deleteMsg: "Are you sure you want to delete this partner? All related data will be removed.",
+            approveBtn: "Approve",
+            rejectBtn: "Reject",
+            deleteBtn: "Delete",
+            cancel: "Cancel"
+        },
         status: {
             approved: "Approved",
             pending: "Pending",

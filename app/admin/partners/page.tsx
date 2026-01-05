@@ -149,7 +149,8 @@ export default function AdminPartnerManagementPage() {
                                                 initial={{ opacity: 0 }}
                                                 animate={{ opacity: 1 }}
                                                 exit={{ opacity: 0, x: -10 }}
-                                                className="hover:bg-gray-50 transition-colors"
+                                                onClick={() => router.push(`/admin/partners/${partner.uid}`)}
+                                                className="hover:bg-gray-50 transition-colors cursor-pointer"
                                             >
                                                 <td className="px-6 py-4">
                                                     <div className="flex flex-col">

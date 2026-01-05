@@ -38,10 +38,24 @@ export default function PartnerBoardPage() {
     }, [isApproved]);
 
     useEffect(() => {
-        if (!authLoading && user && isApproved) {
-            loadPartnerPosts();
+        if (!authLoading) {
+            if (!user) {
+                // Not handled here, rendered in JSX
+                return;
+            }
+            // If user is logged in but has no partnerData (e.g. deleted), redirect to onboarding
+            if (!partnerData) {
+                // Use window.location to ensure full refresh or just router
+                // router is fine, but we need import
+                window.location.href = '/partners/onboarding';
+                return;
+            }
+
+            if (isApproved) {
+                loadPartnerPosts();
+            }
         }
-    }, [user, authLoading, isApproved, loadPartnerPosts]);
+    }, [user, partnerData, authLoading, isApproved, loadPartnerPosts]);
 
     if (authLoading) {
         return (

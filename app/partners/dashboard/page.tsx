@@ -78,9 +78,16 @@ export default function PartnerDashboardPage() {
                 router.push('/partners/login');
                 return;
             }
+
+            // If user is logged in but has no partnerData (e.g. deleted), redirect to onboarding
+            if (!partnerData) {
+                router.replace('/partners/onboarding');
+                return;
+            }
+
             loadDashboardData();
         }
-    }, [user, authLoading, router, loadDashboardData]);
+    }, [user, partnerData, authLoading, router, loadDashboardData]);
 
     useEffect(() => {
         if (stats) {

@@ -107,7 +107,34 @@ export default function PartnerDashboardPage() {
         );
     }
 
+    // State-based rendering helper
+    const renderStateMessage = () => {
+        if (partnerData?.status === 'pending') {
+            return {
+                icon: <RefreshCw size={40} className="animate-spin" />,
+                title: "심사 진행 중입니다",
+                desc: "파트너 신청이 접수되어 심사가 진행 중입니다. 승인이 완료되면 이메일로 알려드립니다.",
+                action: null
+            };
+        }
+        // Default (Access Denied / Rejected / Unknown)
+        return {
+            icon: <Lock size={40} />,
+            title: d.accessDenied,
+            desc: d.accessDeniedDesc,
+            action: (
+                <PageTransitionLink
+                    href="/partners/onboarding"
+                    className="inline-block px-8 py-4 bg-black text-white rounded-lg font-bold hover:bg-gray-800 transition-all"
+                >
+                    {d.applyPartner}
+                </PageTransitionLink>
+            )
+        };
+    };
+
     if (!isApproved) {
+        const stateMsg = renderStateMessage();
         return (
             <div className="min-h-screen bg-gray-50 flex flex-col">
                 <Header />
@@ -115,18 +142,19 @@ export default function PartnerDashboardPage() {
                     <div className="container mx-auto max-w-2xl text-center">
                         <div className="bg-white p-12 rounded-2xl shadow-xl border border-gray-100">
                             <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-8 text-red-600">
-                                <Lock size={40} />
+                                {stateMsg.icon}
                             </div>
-                            <h1 className="text-3xl font-bold mb-4">{d.accessDenied}</h1>
+                            <h1 className="text-3xl font-bold mb-4">{stateMsg.title}</h1>
                             <p className="text-gray-600 mb-8 leading-relaxed">
-                                {d.accessDeniedDesc}
+                                {stateMsg.desc}
                             </p>
-                            <PageTransitionLink
-                                href="/partners/onboarding"
-                                className="inline-block px-8 py-4 bg-black text-white rounded-lg font-bold hover:bg-gray-800 transition-all"
+                            {stateMsg.action}
+                            <button
+                                onClick={logout}
+                                className="mt-4 text-gray-400 text-sm hover:text-black hover:underline underline-offset-4 transition-colors block mx-auto"
                             >
-                                {d.applyPartner}
-                            </PageTransitionLink>
+                                로그아웃
+                            </button>
                         </div>
                     </div>
                 </main>

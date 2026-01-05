@@ -25,6 +25,7 @@ export const viewport: Viewport = {
 };
 
 import { AuthProvider } from "@/contexts/AuthContext";
+import ForceRefreshListener from "@/components/features/system/ForceRefreshListener";
 
 export default function RootLayout({
   children,
@@ -38,6 +39,7 @@ export default function RootLayout({
       >
         <AuthProvider>
           <LanguageProvider>
+            <ForceRefreshListener />
             {children}
           </LanguageProvider>
         </AuthProvider>

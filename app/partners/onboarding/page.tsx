@@ -10,15 +10,20 @@ import { useRouter } from "next/navigation";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function PartnerOnboardingPage() {
-    const { user, loading } = useAuth();
+    const { user, partnerData, loading } = useAuth();
     const router = useRouter();
     const { t } = useLanguage();
 
     useEffect(() => {
-        if (!loading && !user) {
-            router.push("/partners/login");
+        if (!loading) {
+            if (!user) {
+                router.push("/partners/login");
+            } else if (partnerData) {
+                // 이미 신청한 경우 대시보드로 이동
+                router.replace("/partners/dashboard");
+            }
         }
-    }, [user, loading, router]);
+    }, [user, partnerData, loading, router]);
 
     if (loading || !user) {
         return (

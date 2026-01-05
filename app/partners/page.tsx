@@ -12,8 +12,9 @@ export default function PartnersRedirectPage() {
         if (!loading) {
             if (!user) {
                 router.replace("/partners/login");
-            } else if (partnerData?.status === "approved") {
-                router.replace("/partners/board");
+            } else if (partnerData) {
+                // 신청 내역이 있으면 (승인/대기/거절 등) 대시보드로 이동하여 상태 확인
+                router.replace("/partners/dashboard");
             } else {
                 router.replace("/partners/onboarding");
             }

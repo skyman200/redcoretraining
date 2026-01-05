@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import { Plus, FileText, LogOut, Trash2 } from 'lucide-react';
 import { postsApi } from '@/services/api/postsApi';
 import { Post } from '@/types/post';
+import AdminStats from '@/components/features/admin/dashboard/AdminStats';
 
 export default function AdminDashboard() {
     const router = useRouter();
@@ -123,6 +124,9 @@ export default function AdminDashboard() {
 
             {/* Main Content */}
             <main className="container mx-auto px-6 py-12">
+                {/* Statistics Section */}
+                <AdminStats />
+
                 <div className="flex justify-between items-center mb-8">
                     <h2 className="text-3xl font-bold">게시글 관리</h2>
                     <Link

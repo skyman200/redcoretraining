@@ -6,13 +6,38 @@ import { useRouter } from "next/navigation";
 import { partnersApi } from "@/services/api/partnersApi";
 import { PartnerApplication } from "@/types/partner";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, UserX, CheckCircle, Clock, Trash2, Search } from "lucide-react";
+import { ArrowLeft, UserX, CheckCircle, Clock, Trash2, Search, X, AlertTriangle } from "lucide-react";
+
+interface ConfirmModalState {
+    isOpen: boolean;
+    title: string;
+    message: string;
+    confirmText: string;
+    confirmColor: "green" | "red" | "orange";
+    onConfirm: () => void;
+}
 
 export default function AdminPartnerManagementPage() {
     const router = useRouter();
     const [partners, setPartners] = useState<PartnerApplication[]>([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
+    const [confirmModal, setConfirmModal] = useState<ConfirmModalState>({
+        isOpen: false,
+        title: "",
+        message: "",
+        confirmText: "",
+        confirmColor: "green",
+        onConfirm: () => { },
+    });
+
+    const openConfirmModal = (config: Omit<ConfirmModalState, "isOpen">) => {
+        setConfirmModal({ ...config, isOpen: true });
+    };
+
+    const closeConfirmModal = () => {
+        setConfirmModal(prev => ({ ...prev, isOpen: false }));
+    };
 
     const fetchPartners = async () => {
         setLoading(true);
@@ -29,29 +54,44 @@ export default function AdminPartnerManagementPage() {
             router.push("/admin");
             return;
         }
-        // Wrap in setTimeout to avoid cascading renders warning
         setTimeout(() => {
             fetchPartners();
         }, 0);
     }, [router]);
 
-    const handleUpdateStatus = async (uid: string, status: PartnerApplication["status"]) => {
-        const confirmMsg = status === "approved" ? "승인하시겠습니까?" : "거절하시겠습니까?";
-        if (typeof window === "undefined" || !window.confirm(confirmMsg)) return;
-
-        const result = await partnersApi.updateStatus(uid, status);
-        if (!result.error) {
-            setPartners(prev => prev.map(p => p.uid === uid ? { ...p, status } : p));
-        }
+    const handleUpdateStatus = (uid: string, status: PartnerApplication["status"]) => {
+        const isApprove = status === "approved";
+        openConfirmModal({
+            title: isApprove ? "파트너 승인" : "파트너 거절",
+            message: isApprove
+                ? "이 파트너를 승인하시겠습니까?"
+                : "이 파트너를 거절하시겠습니까?",
+            confirmText: isApprove ? "승인" : "거절",
+            confirmColor: isApprove ? "green" : "orange",
+            onConfirm: async () => {
+                const result = await partnersApi.updateStatus(uid, status);
+                if (!result.error) {
+                    setPartners(prev => prev.map(p => p.uid === uid ? { ...p, status } : p));
+                }
+                closeConfirmModal();
+            },
+        });
     };
 
-    const handleDelete = async (uid: string) => {
-        if (typeof window === "undefined" || !window.confirm("정말로 이 파트너를 삭제하시겠습니까? 관련 데이터가 모두 삭제됩니다.")) return;
-
-        const result = await partnersApi.deleteApplication(uid);
-        if (!result.error) {
-            setPartners(prev => prev.filter(p => p.uid !== uid));
-        }
+    const handleDelete = (uid: string) => {
+        openConfirmModal({
+            title: "파트너 삭제",
+            message: "정말로 이 파트너를 삭제하시겠습니까? 관련 데이터가 모두 삭제됩니다.",
+            confirmText: "삭제",
+            confirmColor: "red",
+            onConfirm: async () => {
+                const result = await partnersApi.deleteApplication(uid);
+                if (!result.error) {
+                    setPartners(prev => prev.filter(p => p.uid !== uid));
+                }
+                closeConfirmModal();
+            },
+        });
     };
 
     const filteredPartners = partners.filter(p =>
@@ -175,6 +215,60 @@ export default function AdminPartnerManagementPage() {
                     </div>
                 )}
             </main>
+
+            {/* Confirm Modal */}
+            <AnimatePresence>
+                {confirmModal.isOpen && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+                        onClick={closeConfirmModal}
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-md mx-4"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className={`p-2 rounded-full ${confirmModal.confirmColor === "red" ? "bg-red-100" :
+                                        confirmModal.confirmColor === "orange" ? "bg-orange-100" :
+                                            "bg-green-100"
+                                    }`}>
+                                    <AlertTriangle className={`w-5 h-5 ${confirmModal.confirmColor === "red" ? "text-red-600" :
+                                            confirmModal.confirmColor === "orange" ? "text-orange-600" :
+                                                "text-green-600"
+                                        }`} />
+                                </div>
+                                <h3 className="text-lg font-bold text-gray-900">{confirmModal.title}</h3>
+                            </div>
+                            <p className="text-gray-600 mb-6">{confirmModal.message}</p>
+                            <div className="flex gap-3 justify-end">
+                                <button
+                                    type="button"
+                                    onClick={closeConfirmModal}
+                                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                                >
+                                    취소
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={confirmModal.onConfirm}
+                                    className={`px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors ${confirmModal.confirmColor === "red" ? "bg-red-600 hover:bg-red-700" :
+                                            confirmModal.confirmColor === "orange" ? "bg-orange-600 hover:bg-orange-700" :
+                                                "bg-green-600 hover:bg-green-700"
+                                        }`}
+                                >
+                                    {confirmModal.confirmText}
+                                </button>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }

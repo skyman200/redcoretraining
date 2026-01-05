@@ -37,7 +37,7 @@ export default function AdminPartnerManagementPage() {
 
     const handleUpdateStatus = async (uid: string, status: PartnerApplication["status"]) => {
         const confirmMsg = status === "approved" ? "승인하시겠습니까?" : "거절하시겠습니까?";
-        if (!confirm(confirmMsg)) return;
+        if (typeof window === "undefined" || !window.confirm(confirmMsg)) return;
 
         const result = await partnersApi.updateStatus(uid, status);
         if (!result.error) {
@@ -46,7 +46,7 @@ export default function AdminPartnerManagementPage() {
     };
 
     const handleDelete = async (uid: string) => {
-        if (!confirm("정말로 이 파트너를 삭제하시겠습니까? 관련 데이터가 모두 삭제됩니다.")) return;
+        if (typeof window === "undefined" || !window.confirm("정말로 이 파트너를 삭제하시겠습니까? 관련 데이터가 모두 삭제됩니다.")) return;
 
         const result = await partnersApi.deleteApplication(uid);
         if (!result.error) {
@@ -134,14 +134,16 @@ export default function AdminPartnerManagementPage() {
                                                         {partner.status === "pending" && (
                                                             <>
                                                                 <button
-                                                                    onClick={() => handleUpdateStatus(partner.uid, "approved")}
+                                                                    type="button"
+                                                                    onClick={(e) => { e.stopPropagation(); handleUpdateStatus(partner.uid, "approved"); }}
                                                                     className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
                                                                     title="승인"
                                                                 >
                                                                     <CheckCircle size={18} />
                                                                 </button>
                                                                 <button
-                                                                    onClick={() => handleUpdateStatus(partner.uid, "rejected")}
+                                                                    type="button"
+                                                                    onClick={(e) => { e.stopPropagation(); handleUpdateStatus(partner.uid, "rejected"); }}
                                                                     className="p-2 text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
                                                                     title="거절"
                                                                 >
@@ -150,7 +152,8 @@ export default function AdminPartnerManagementPage() {
                                                             </>
                                                         )}
                                                         <button
-                                                            onClick={() => handleDelete(partner.uid)}
+                                                            type="button"
+                                                            onClick={(e) => { e.stopPropagation(); handleDelete(partner.uid); }}
                                                             className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                                                             title="삭제"
                                                         >

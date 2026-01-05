@@ -5,7 +5,7 @@ export interface PartnerApplication {
     email: string | null;
     name: string;
     type: "domestic" | "international";
-    languageRegion: LanguageRegion; // ko, en, ja, es, de
+    languageRegion: LanguageRegion; // e.g. "ko", "en", "ja"
     country?: string;
     wiseEmail?: string; // Optional (if using Wise account)
     swiftCode?: string; // For bank transfer via Wise
@@ -13,7 +13,7 @@ export interface PartnerApplication {
     // Japan specific
     branchName?: string;
     branchCode?: string;
-    accountType?: "ordinary" | "current" | "savings" | string;
+    accountType?: string; // Changed from strict union to string to allow flexibility
     accountHolderKatakana?: string;
 
     passportNumber?: string; // Instead of RRN
@@ -25,6 +25,20 @@ export interface PartnerApplication {
     status: "pending" | "approved" | "rejected";
     createdAt: string;
     agreedAt: string;
+}
+
+// Partner Payout / Settlement History
+export interface PartnerPayout {
+    id: string;
+    partnerId: string;
+    amount: number;
+    currency: string;
+    status: 'pending' | 'paid';
+    periodStart: string;
+    periodEnd: string;
+    description?: string;
+    paidAt?: string;
+    createdAt: string;
 }
 
 export type PartnerApplicationFormData = Omit<PartnerApplication, "uid" | "email" | "status" | "createdAt" | "agreedAt">;

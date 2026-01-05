@@ -14,6 +14,7 @@ import { Lock, Copy, Check, Link, FileText, ArrowLeft, LogOut, RefreshCw } from 
 import PageTransitionLink from '@/components/PageTransitionLink';
 import { salesApi } from '@/services/api/salesApi';
 import { PartnerStats, PartnerSale } from '@/types/partner';
+import SettlementHistory from '@/components/features/partners/SettlementHistory';
 
 export default function PartnerDashboardPage() {
     const { user, partnerData, loading: authLoading, logout } = useAuth();
@@ -281,6 +282,26 @@ export default function PartnerDashboardPage() {
                             />
                         </div>
                         <SalesTable sales={sales} loading={loading} />
+                        <SalesTable sales={sales} loading={loading} />
+                    </motion.div>
+
+                    {/* Settlement History Section */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.25 }}
+                        className="mt-8"
+                    >
+                        <h2 className="text-xl font-bold flex items-center gap-2 mb-4">
+                            <FileText size={20} />
+                            {d.salesHistory || "Settlement History"}
+                        </h2>
+                        {partnerData && (
+                            <SettlementHistory
+                                partnerId={partnerId}
+                                partnerProfile={partnerData}
+                            />
+                        )}
                     </motion.div>
 
                     {/* Partner Link Info */}

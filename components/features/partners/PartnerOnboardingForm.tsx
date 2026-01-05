@@ -6,7 +6,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { usePartners } from "@/hooks/usePartners";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { motion } from "framer-motion";
-import AgreementText from "./AgreementText";
 import AgreementTextInternational from "./AgreementTextInternational";
 import DomesticPartnerForm from "./DomesticPartnerForm";
 import InternationalPartnerForm from "./InternationalPartnerForm";
@@ -95,11 +94,7 @@ export default function PartnerOnboardingForm() {
                 <h2 className="text-xl font-bold border-b border-zinc-800 pb-2">
                     1. {isDomestic ? ot.agreementTitle : "Partnership Agreement"}
                 </h2>
-                {isDomestic ? (
-                    <AgreementText />
-                ) : (
-                    <AgreementTextInternational languageRegion={languageRegion} />
-                )}
+                <AgreementTextInternational languageRegion={languageRegion} />
                 <label className="flex items-start space-x-3 cursor-pointer group">
                     <input
                         type="checkbox"
@@ -128,11 +123,13 @@ export default function PartnerOnboardingForm() {
                 )}
             </section>
 
-            {(error || localError) && (
-                <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500 text-sm">
-                    {error || localError}
-                </div>
-            )}
+            {
+                (error || localError) && (
+                    <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500 text-sm">
+                        {error || localError}
+                    </div>
+                )
+            }
 
             <button
                 type="submit"
@@ -141,7 +138,7 @@ export default function PartnerOnboardingForm() {
             >
                 {loading ? ot.submitting : ot.submit}
             </button>
-        </form>
+        </form >
     );
 }
 

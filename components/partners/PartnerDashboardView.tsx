@@ -10,6 +10,7 @@ import MonthSelector from '@/components/partners/MonthSelector';
 import PageTransitionLink from '@/components/PageTransitionLink';
 import { PartnerSale, PartnerStats, PartnerApplication } from '@/types/partner';
 import { salesApi } from '@/services/api/salesApi';
+import SettlementHistory from '@/components/features/partners/SettlementHistory';
 
 interface PartnerDashboardViewProps {
     // Data
@@ -228,6 +229,26 @@ export default function PartnerDashboardView({
                         </div>
                         <SalesTable sales={sales} loading={loading} />
                     </motion.div>
+
+                    {/* Settlement History (Admin View) */}
+                    {partnerProfile && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.25 }}
+                            className="mt-8"
+                        >
+                            <h2 className="text-xl font-bold flex items-center gap-2 mb-4">
+                                <FileText size={20} />
+                                {d?.salesHistory ? "Settlement History" : "Settlement History / Invoices"}
+                            </h2>
+                            <SettlementHistory
+                                partnerId={partnerId}
+                                partnerProfile={partnerProfile}
+                                isAdminView={isAdminView}
+                            />
+                        </motion.div>
+                    )}
 
                     {/* Partner Link Info */}
                     <motion.div

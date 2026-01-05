@@ -10,7 +10,7 @@ import StatsCard from '@/components/partners/StatsCard';
 import SalesTable from '@/components/partners/SalesTable';
 import MonthSelector from '@/components/partners/MonthSelector';
 import { motion } from 'framer-motion';
-import { Lock, Copy, Check, Link, FileText, ArrowLeft, LogOut } from 'lucide-react';
+import { Lock, Copy, Check, Link, FileText, ArrowLeft, LogOut, RefreshCw } from 'lucide-react';
 import PageTransitionLink from '@/components/PageTransitionLink';
 import { salesApi } from '@/services/api/salesApi';
 import { PartnerStats, PartnerSale } from '@/types/partner';

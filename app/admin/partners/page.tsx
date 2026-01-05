@@ -9,6 +9,7 @@ import { PartnerApplication } from "@/types/partner";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, UserX, CheckCircle, Clock, Trash2, Search, X, AlertTriangle, Eye, EyeOff } from "lucide-react";
 import { deletePartnerAction, updatePartnerStatusAction } from "@/app/actions/partnerActions";
+import { PartnerResources } from "@/components/features/admin/partners/PartnerResources";
 
 interface ConfirmModalState {
     isOpen: boolean;
@@ -135,6 +136,7 @@ export default function AdminPartnerManagementPage() {
             </header>
 
             <main className="container mx-auto px-6 py-12 flex-grow">
+                <PartnerResources />
                 {loading ? (
                     <div className="flex justify-center py-20">
                         <div className="w-8 h-8 border-2 border-black border-t-transparent rounded-full animate-spin"></div>

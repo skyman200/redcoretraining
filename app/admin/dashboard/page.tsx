@@ -144,10 +144,10 @@ export default function AdminDashboard() {
                         </button>
                     </div>
                 </div>
-            </header >
+            </header>
 
             {/* Main Content */}
-            < main className="container mx-auto px-6 py-12" >
+            <main className="container mx-auto px-6 py-12">
                 {/* Statistics Section */}
                 < AdminStats />
 

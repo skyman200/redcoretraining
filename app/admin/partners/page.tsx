@@ -8,6 +8,7 @@ import { partnersApi } from "@/services/api/partnersApi";
 import { PartnerApplication } from "@/types/partner";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, UserX, CheckCircle, Clock, Trash2, Search, X, AlertTriangle, Eye, EyeOff } from "lucide-react";
+import { deletePartnerAction, updatePartnerStatusAction } from "@/app/actions/partnerActions";
 
 interface ConfirmModalState {
     isOpen: boolean;
@@ -62,6 +63,10 @@ export default function AdminPartnerManagementPage() {
         }, 0);
     }, [router]);
 
+
+
+    // ... existing imports ...
+
     const handleUpdateStatus = (uid: string, status: PartnerApplication["status"]) => {
         const isApprove = status === "approved";
         openConfirmModal({
@@ -70,9 +75,11 @@ export default function AdminPartnerManagementPage() {
             confirmText: isApprove ? m.approveBtn : m.rejectBtn,
             confirmColor: isApprove ? "green" : "orange",
             onConfirm: async () => {
-                const result = await partnersApi.updateStatus(uid, status);
-                if (!result.error) {
+                const result = await updatePartnerStatusAction(uid, status);
+                if (result.success) {
                     setPartners(prev => prev.map(p => p.uid === uid ? { ...p, status } : p));
+                } else {
+                    alert(`오류가 발생했습니다: ${result.error}`);
                 }
                 closeConfirmModal();
             },
@@ -86,9 +93,13 @@ export default function AdminPartnerManagementPage() {
             confirmText: m.deleteBtn,
             confirmColor: "red",
             onConfirm: async () => {
-                const result = await partnersApi.deleteApplication(uid);
-                if (!result.error) {
+                const result = await deletePartnerAction(uid);
+                if (result.success) {
                     setPartners(prev => prev.filter(p => p.uid !== uid));
+                    // Optional: force refresh if needed, but optimistic update is fine
+                    await fetchPartners();
+                } else {
+                    alert(`삭제 중 오류가 발생했습니다: ${result.error}`);
                 }
                 closeConfirmModal();
             },

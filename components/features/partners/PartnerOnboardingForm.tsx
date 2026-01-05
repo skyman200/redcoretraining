@@ -220,7 +220,7 @@ interface BreadcrumbProps {
 
 function Breadcrumb({ onBack, currentRegion }: BreadcrumbProps) {
     return (
-        <div className="flex items-center gap-2 text-sm text-zinc-500 mb-[-20px]">
+        <div className="flex items-center gap-2 text-sm text-zinc-500 mb-6">
             <button type="button" onClick={onBack} className="hover:text-white underline">
                 Region Selection
             </button>

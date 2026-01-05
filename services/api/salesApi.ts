@@ -128,7 +128,7 @@ export const salesApi = {
      */
     generatePartnerLink(partnerId: string): string {
         const ONELINK_SUBDOMAIN = "soom";
-        const ONELINK_TEMPLATE = "YOUR_ONELINK_TEMPLATE_ID"; // .env에서 관리 권장
+        const ONELINK_TEMPLATE = process.env.NEXT_PUBLIC_ONELINK_TEMPLATE_ID || "Jt2p";
 
         return `https://${ONELINK_SUBDOMAIN}.onelink.me/${ONELINK_TEMPLATE}?af_sub1=${encodeURIComponent(partnerId)}&pid=partner&c=${encodeURIComponent(partnerId)}_campaign`;
     },

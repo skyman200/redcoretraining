@@ -10,13 +10,13 @@ import StatsCard from '@/components/partners/StatsCard';
 import SalesTable from '@/components/partners/SalesTable';
 import MonthSelector from '@/components/partners/MonthSelector';
 import { motion } from 'framer-motion';
-import { Lock, Copy, Check, Link, FileText, ArrowLeft } from 'lucide-react';
+import { Lock, Copy, Check, Link, FileText, ArrowLeft, LogOut } from 'lucide-react';
 import PageTransitionLink from '@/components/PageTransitionLink';
 import { salesApi } from '@/services/api/salesApi';
 import { PartnerStats, PartnerSale } from '@/types/partner';
 
 export default function PartnerDashboardPage() {
-    const { user, partnerData, loading: authLoading } = useAuth();
+    const { user, partnerData, loading: authLoading, logout } = useAuth();
     const { t } = useLanguage();
     const router = useRouter();
 
@@ -167,6 +167,13 @@ export default function PartnerDashboardPage() {
                             >
                                 {copied ? <Check size={18} /> : <Copy size={18} />}
                                 {copied ? d.copied : d.copyLink}
+                            </button>
+                            <button
+                                onClick={logout}
+                                className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 bg-white text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+                                title="Logout"
+                            >
+                                <LogOut size={18} />
                             </button>
                         </div>
                     </motion.div>

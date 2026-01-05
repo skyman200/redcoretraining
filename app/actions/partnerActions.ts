@@ -6,6 +6,7 @@ import { revalidatePath } from 'next/cache';
 
 export async function deletePartnerAction(uid: string) {
     try {
+        console.log(`[Admin Action] Attempting to delete partner: ${uid}`);
         const supabase = getAdminSupabase();
 
         // 1. Delete from partner_applications

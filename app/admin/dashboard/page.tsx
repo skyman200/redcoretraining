@@ -116,6 +116,7 @@ export default function AdminDashboard() {
                             onClick={async () => {
                                 if (confirm('정말로 모든 사용자의 브라우저를 새로고침 하시겠습니까?')) {
                                     try {
+                                        if (!supabase) throw new Error('Supabase client failed to initialize');
                                         const { error } = await supabase
                                             .from('system_config')
                                             .upsert({

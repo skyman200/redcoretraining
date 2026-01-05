@@ -1,8 +1,11 @@
+import { LanguageRegion } from "@/lib/partnerConstants";
+
 export interface PartnerApplication {
     uid: string;
     email: string | null;
     name: string;
     type: "domestic" | "international";
+    languageRegion: LanguageRegion; // ko, en, ja, es, de
     country?: string;
     wiseEmail?: string; // Optional (if using Wise account)
     swiftCode?: string; // For bank transfer via Wise
@@ -10,7 +13,7 @@ export interface PartnerApplication {
     // Japan specific
     branchName?: string;
     branchCode?: string;
-    accountType?: "ordinary" | "current" | "savings";
+    accountType?: "ordinary" | "current" | "savings" | string;
     accountHolderKatakana?: string;
 
     passportNumber?: string; // Instead of RRN

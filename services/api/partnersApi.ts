@@ -37,11 +37,17 @@ export const partnersApi = {
                     status: 'pending',
                     // International Fields
                     type: data.type || 'domestic',
+                    language_region: data.languageRegion || 'ko',
                     country: data.country,
                     wise_email: data.wiseEmail,
                     swift_code: data.swiftCode,
                     bank_address: data.bankAddress,
                     passport_number: data.passportNumber,
+                    // Japan Specific
+                    branch_name: data.branchName,
+                    branch_code: data.branchCode,
+                    account_type: data.accountType,
+                    account_holder_katakana: data.accountHolderKatakana,
 
                 });
 
@@ -81,11 +87,17 @@ export const partnersApi = {
                     agreedAt: data.agreed_at,
                     // International Fields
                     type: data.type || 'domestic',
+                    languageRegion: data.language_region || 'ko',
                     country: data.country,
                     wiseEmail: data.wise_email,
                     swiftCode: data.swift_code,
                     bankAddress: data.bank_address,
                     passportNumber: data.passport_number,
+                    // Japan Specific
+                    branchName: data.branch_name,
+                    branchCode: data.branch_code,
+                    accountType: data.account_type,
+                    accountHolderKatakana: data.account_holder_katakana,
 
                 },
                 error: null
@@ -122,11 +134,17 @@ export const partnersApi = {
                 agreedAt: row.agreed_at,
                 // International Fields
                 type: row.type || 'domestic',
+                languageRegion: row.language_region || 'ko',
                 country: row.country,
                 wiseEmail: row.wise_email,
                 swiftCode: row.swift_code,
                 bankAddress: row.bank_address,
                 passportNumber: row.passport_number,
+                // Japan Specific
+                branchName: row.branch_name,
+                branchCode: row.branch_code,
+                accountType: row.account_type,
+                accountHolderKatakana: row.account_holder_katakana,
 
             }));
 

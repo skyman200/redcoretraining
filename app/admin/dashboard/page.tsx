@@ -107,152 +107,155 @@ export default function AdminDashboard() {
                             파트너 관리
                         </Link>
                         <Link
+                            href="/"
+                            className="px-4 py-2 bg-white/10 hover:bg-white/20 transition-colors rounded text-sm font-medium"
+                        >
                             홈페이지 보기
                         </Link>
-                    <button
-                        onClick={async () => {
-                            if (confirm('정말로 모든 사용자의 브라우저를 새로고침 하시겠습니까?')) {
-                                try {
-                                    const { error } = await supabase
-                                        .from('system_config')
-                                        .upsert({
-                                            key: 'last_force_refresh_at',
-                                            value: new Date().toISOString()
-                                        });
-
-                                    if (error) throw error;
-                                    alert('전체 사용자 새로고침 신호를 보냈습니다.');
-                                } catch (e) {
-                                    alert('실패했습니다: ' + (e as Error).message);
-                                }
-                            }
-                        }}
-                        className="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 transition-colors rounded text-sm font-medium flex items-center gap-2"
-                    >
-                        <RefreshCcw size={16} />
-                        전체 사용자 새로고침
-                    </button>
-                    <button
-                        onClick={handleLogout}
-                        className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 transition-colors rounded text-sm font-medium"
-                    >
-                        <LogOut size={16} />
-                        로그아웃
-                    </button>
-                </div>
-        </div>
-            </header >
-
-        {/* Main Content */ }
-        < main className = "container mx-auto px-6 py-12" >
-            {/* Statistics Section */ }
-            < AdminStats />
-
-            <div className="flex justify-between items-center mb-8">
-                <h2 className="text-3xl font-bold">게시글 관리</h2>
-                <Link
-                    href="/admin/new-post"
-                    className="flex items-center gap-2 px-6 py-3 bg-black text-white hover:bg-gray-800 transition-colors rounded font-medium"
-                >
-                    <Plus size={20} />
-                    새 게시글 작성
-                </Link>
-            </div>
-
-    {
-        posts.length === 0 ? (
-            <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="text-center py-20 bg-white rounded-lg border-2 border-dashed border-gray-300"
-            >
-                <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <p className="text-xl text-gray-600 mb-4">게시글이 없습니다</p>
-                <Link
-                    href="/admin/new-post"
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-black text-white hover:bg-gray-800 transition-colors rounded font-medium"
-                >
-                    <Plus size={20} />
-                    첫 게시글 작성하기
-                </Link>
-            </motion.div>
-        ) : (
-            <div className="grid gap-4">
-                {posts.map((post, index) => (
-                    <motion.div
-                        key={post.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.05 }}
-                        className="bg-white p-6 rounded-lg border border-gray-200 hover:shadow-lg transition-shadow"
-                    >
-                        <div className="flex justify-between items-start">
-                            <div className="flex-1">
-                                <h3 className="text-xl font-bold mb-2">{post.title}</h3>
-                                <p className="text-gray-600 mb-2 line-clamp-2">{post.excerpt}</p>
-                                <div className="flex items-center gap-4 text-sm text-gray-500">
-                                    <span className="px-2 py-1 bg-gray-100 rounded">{post.category}</span>
-                                    <span>{post.date}</span>
-                                    {post.files && post.files.length > 0 && (
-                                        <span>📎 {post.files.length}개 파일</span>
-                                    )}
-                                </div>
-                            </div>
-                            <div className="flex gap-2 ml-4">
-                                <Link
-                                    href={`/board/${post.id}`}
-                                    className="p-2 text-gray-600 hover:text-black hover:bg-gray-100 rounded transition-colors"
-                                    title="보기"
-                                >
-                                    <FileText size={20} />
-                                </Link>
-                                <button
-                                    onClick={() => handleDeleteClick(post.id)}
-                                    className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded transition-colors"
-                                    title="삭제"
-                                >
-                                    <Trash2 size={20} />
-                                </button>
-                            </div>
-                        </div>
-                    </motion.div>
-                ))}
-            </div>
-        )
-    }
-            </main >
-
-        {/* Delete Confirmation Modal */ }
-    {
-        showDeleteModal && (
-            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="bg-white rounded-xl p-6 max-w-md w-full shadow-xl"
-                >
-                    <h3 className="text-xl font-bold mb-4">게시글 삭제</h3>
-                    <p className="text-gray-600 mb-6">
-                        정말로 이 게시글을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.
-                    </p>
-                    <div className="flex justify-end gap-3">
                         <button
-                            onClick={() => setShowDeleteModal(false)}
-                            className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors font-medium"
+                            onClick={async () => {
+                                if (confirm('정말로 모든 사용자의 브라우저를 새로고침 하시겠습니까?')) {
+                                    try {
+                                        const { error } = await supabase
+                                            .from('system_config')
+                                            .upsert({
+                                                key: 'last_force_refresh_at',
+                                                value: new Date().toISOString()
+                                            });
+
+                                        if (error) throw error;
+                                        alert('전체 사용자 새로고침 신호를 보냈습니다.');
+                                    } catch (e) {
+                                        alert('실패했습니다: ' + (e as Error).message);
+                                    }
+                                }
+                            }}
+                            className="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 transition-colors rounded text-sm font-medium flex items-center gap-2"
                         >
-                            취소
+                            <RefreshCcw size={16} />
+                            전체 사용자 새로고침
                         </button>
                         <button
-                            onClick={confirmDelete}
-                            className="px-4 py-2 bg-red-600 text-white hover:bg-red-700 rounded-lg transition-colors font-medium"
+                            onClick={handleLogout}
+                            className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 transition-colors rounded text-sm font-medium"
                         >
-                            삭제하기
+                            <LogOut size={16} />
+                            로그아웃
                         </button>
                     </div>
-                </motion.div>
-            </div>
-        )
-    }
+                </div>
+            </header >
+
+            {/* Main Content */}
+            < main className="container mx-auto px-6 py-12" >
+                {/* Statistics Section */}
+                < AdminStats />
+
+                <div className="flex justify-between items-center mb-8">
+                    <h2 className="text-3xl font-bold">게시글 관리</h2>
+                    <Link
+                        href="/admin/new-post"
+                        className="flex items-center gap-2 px-6 py-3 bg-black text-white hover:bg-gray-800 transition-colors rounded font-medium"
+                    >
+                        <Plus size={20} />
+                        새 게시글 작성
+                    </Link>
+                </div>
+
+                {
+                    posts.length === 0 ? (
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="text-center py-20 bg-white rounded-lg border-2 border-dashed border-gray-300"
+                        >
+                            <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                            <p className="text-xl text-gray-600 mb-4">게시글이 없습니다</p>
+                            <Link
+                                href="/admin/new-post"
+                                className="inline-flex items-center gap-2 px-6 py-3 bg-black text-white hover:bg-gray-800 transition-colors rounded font-medium"
+                            >
+                                <Plus size={20} />
+                                첫 게시글 작성하기
+                            </Link>
+                        </motion.div>
+                    ) : (
+                        <div className="grid gap-4">
+                            {posts.map((post, index) => (
+                                <motion.div
+                                    key={post.id}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: index * 0.05 }}
+                                    className="bg-white p-6 rounded-lg border border-gray-200 hover:shadow-lg transition-shadow"
+                                >
+                                    <div className="flex justify-between items-start">
+                                        <div className="flex-1">
+                                            <h3 className="text-xl font-bold mb-2">{post.title}</h3>
+                                            <p className="text-gray-600 mb-2 line-clamp-2">{post.excerpt}</p>
+                                            <div className="flex items-center gap-4 text-sm text-gray-500">
+                                                <span className="px-2 py-1 bg-gray-100 rounded">{post.category}</span>
+                                                <span>{post.date}</span>
+                                                {post.files && post.files.length > 0 && (
+                                                    <span>📎 {post.files.length}개 파일</span>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <div className="flex gap-2 ml-4">
+                                            <Link
+                                                href={`/board/${post.id}`}
+                                                className="p-2 text-gray-600 hover:text-black hover:bg-gray-100 rounded transition-colors"
+                                                title="보기"
+                                            >
+                                                <FileText size={20} />
+                                            </Link>
+                                            <button
+                                                onClick={() => handleDeleteClick(post.id)}
+                                                className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded transition-colors"
+                                                title="삭제"
+                                            >
+                                                <Trash2 size={20} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </div>
+                    )
+                }
+            </main >
+
+            {/* Delete Confirmation Modal */}
+            {
+                showDeleteModal && (
+                    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            className="bg-white rounded-xl p-6 max-w-md w-full shadow-xl"
+                        >
+                            <h3 className="text-xl font-bold mb-4">게시글 삭제</h3>
+                            <p className="text-gray-600 mb-6">
+                                정말로 이 게시글을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.
+                            </p>
+                            <div className="flex justify-end gap-3">
+                                <button
+                                    onClick={() => setShowDeleteModal(false)}
+                                    className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors font-medium"
+                                >
+                                    취소
+                                </button>
+                                <button
+                                    onClick={confirmDelete}
+                                    className="px-4 py-2 bg-red-600 text-white hover:bg-red-700 rounded-lg transition-colors font-medium"
+                                >
+                                    삭제하기
+                                </button>
+                            </div>
+                        </motion.div>
+                    </div>
+                )
+            }
         </div >
     );
 }

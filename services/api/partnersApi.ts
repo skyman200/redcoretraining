@@ -32,6 +32,7 @@ export const partnersApi = {
                     contact: data.contact,
                     bank_name: data.bankName,
                     account_number: data.accountNumber,
+                    resident_registration_number: data.residentRegistrationNumber,
                     birth_date: data.birthDate,
                     status: 'pending',
                 });
@@ -65,6 +66,7 @@ export const partnersApi = {
                     contact: data.contact,
                     bankName: data.bank_name,
                     accountNumber: data.account_number,
+                    residentRegistrationNumber: data.resident_registration_number,
                     birthDate: data.birth_date,
                     status: data.status,
                     createdAt: data.created_at,
@@ -97,6 +99,7 @@ export const partnersApi = {
                 contact: row.contact,
                 bankName: row.bank_name,
                 accountNumber: row.account_number,
+                residentRegistrationNumber: row.resident_registration_number,
                 birthDate: row.birth_date,
                 status: row.status,
                 createdAt: row.created_at,

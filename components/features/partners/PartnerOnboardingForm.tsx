@@ -22,6 +22,7 @@ export default function PartnerOnboardingForm() {
         contact: "",
         bankName: "",
         accountNumber: "",
+        residentRegistrationNumber: "",
         birthDate: "",
     });
     const [submitted, setSubmitted] = useState(false);
@@ -97,6 +98,15 @@ export default function PartnerOnboardingForm() {
                     <InputField label={ot.bankName} name="bankName" value={formData.bankName} onChange={handleChange} placeholder="Wells Fargo / SWIFT" required />
                     <InputField label={ot.accountNumber} name="accountNumber" value={formData.accountNumber} onChange={handleChange} placeholder="123456789" required />
                     <InputField label={ot.birthDate} name="birthDate" value={formData.birthDate} onChange={handleChange} placeholder="900101" maxLength={10} required />
+                    <InputField
+                        label={ot.rrn}
+                        name="residentRegistrationNumber"
+                        value={formData.residentRegistrationNumber}
+                        onChange={handleChange}
+                        placeholder="123456-1234567"
+                        required
+                        description={ot.rrnDescription}
+                    />
                 </div>
             </section>
 
@@ -119,9 +129,10 @@ export default function PartnerOnboardingForm() {
 
 interface InputFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
     label: string;
+    description?: string;
 }
 
-function InputField({ label, ...props }: InputFieldProps) {
+function InputField({ label, description, ...props }: InputFieldProps) {
     return (
         <div className="space-y-2">
             <label className="text-xs font-medium text-zinc-500 uppercase tracking-widest ml-1">{label}</label>
@@ -129,6 +140,12 @@ function InputField({ label, ...props }: InputFieldProps) {
                 className="w-full bg-zinc-900/50 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-white/20 transition-all font-light"
                 {...props}
             />
+            {description && (
+                <p className="text-[11px] text-zinc-500 ml-1 leading-relaxed">
+                    <span className="text-blue-400 mr-1">ℹ️</span>
+                    {description}
+                </p>
+            )}
         </div>
     );
 }

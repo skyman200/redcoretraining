@@ -5,6 +5,7 @@ export interface PartnerApplication {
     contact: string;
     bankName: string;
     accountNumber: string;
+    residentRegistrationNumber: string;
     birthDate: string;
     status: "pending" | "approved" | "rejected";
     createdAt: string;

@@ -7,7 +7,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { partnersApi } from "@/services/api/partnersApi";
 import { PartnerApplication } from "@/types/partner";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, UserX, CheckCircle, Clock, Trash2, Search, X, AlertTriangle } from "lucide-react";
+import { ArrowLeft, UserX, CheckCircle, Clock, Trash2, Search, X, AlertTriangle, Eye, EyeOff } from "lucide-react";
 
 interface ConfirmModalState {
     isOpen: boolean;
@@ -162,6 +162,7 @@ export default function AdminPartnerManagementPage() {
                                                     <div className="flex flex-col text-sm">
                                                         <span>{partner.contact}</span>
                                                         <span className="text-xs text-gray-500">{partner.bankName} {partner.accountNumber}</span>
+                                                        <SensitiveText text={partner.residentRegistrationNumber} />
                                                     </div>
                                                 </td>
                                                 <td className="px-6 py-4">
@@ -270,6 +271,28 @@ export default function AdminPartnerManagementPage() {
                     </motion.div>
                 )}
             </AnimatePresence>
+        </div>
+    );
+}
+
+function SensitiveText({ text }: { text?: string }) {
+    const [visible, setVisible] = useState(false);
+
+    if (!text) return <span className="text-xs text-gray-400 font-mono mt-0.5">미입력</span>;
+
+    return (
+        <div className="flex items-center gap-2 mt-0.5">
+            <span className="text-xs text-gray-400 font-mono">
+                {visible ? text : `${text.slice(0, 8)}******`}
+            </span>
+            <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); setVisible(!visible); }}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+                title={visible ? "숨기기" : "보기"}
+            >
+                {visible ? <EyeOff size={12} /> : <Eye size={12} />}
+            </button>
         </div>
     );
 }

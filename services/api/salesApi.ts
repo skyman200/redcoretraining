@@ -62,7 +62,9 @@ export const salesApi = {
             });
 
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                const errorData = await response.json().catch(() => ({}));
+                console.error("[salesApi] Server Error:", errorData);
+                throw new Error(errorData.message || errorData.error || `HTTP error! status: ${response.status}`);
             }
 
             const result: PartnerDashboardResponse = await response.json();

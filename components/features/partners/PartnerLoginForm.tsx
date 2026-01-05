@@ -61,6 +61,14 @@ export default function PartnerLoginForm() {
                     />
                 </div>
 
+                {!isLogin && (
+                    <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
+                        <p className="text-blue-400 text-xs text-center">
+                            {lt.emailVerificationNotice}
+                        </p>
+                    </div>
+                )}
+
                 {error && (
                     <p className="text-red-500 text-xs mt-2 px-1">{error}</p>
                 )}

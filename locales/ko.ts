@@ -173,6 +173,7 @@ export const ko = {
             hasAccount: "이미 계정이 있으신가요?",
             loginError: "로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.",
             signupError: "회원가입에 실패했습니다.",
+            emailVerificationNotice: "가입 후 이메일 인증이 필요합니다.",
         },
         onboarding: {
             title: "파트너스 정산 정보 입력",

@@ -173,6 +173,7 @@ export const en = {
             hasAccount: "Already have an account?",
             loginError: "Login failed. Please check your email and password.",
             signupError: "Sign up failed.",
+            emailVerificationNotice: "Email verification is required after sign up.",
         },
         onboarding: {
             title: "Partner Settlement Information",

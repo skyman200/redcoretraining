@@ -53,10 +53,10 @@ export const partnersApi = {
                 .from(TABLE_NAME)
                 .select('*')
                 .eq('uid', uid)
-                .single();
+                .maybeSingle();
 
             if (error) throw error;
-            if (!data) return { error: new Error("Application not found") };
+            if (!data) return { data: undefined, error: null };
 
             return {
                 data: {
